@@ -98,8 +98,8 @@ static bool is_short_identifier(char chr) {
                 || chr == '~';
 }
 
-static OToken next_token(Lexer *l) {
-        OToken t = {0};
+static Arq_Token next_token(Lexer *l) {
+        Arq_Token t = {0};
 
         if (isdigit(l->at[l->cursor_idx])) {
                 t.id = ARQ_CMD_P_NUMBER; 
@@ -180,12 +180,12 @@ static OTokenVec ts = {
 };
 #endif
 
-static void append_token(OTokenBuilder *tb, OToken const *t) {
+static void append_token(Arq_VectorBuilder *tb, Arq_Token const *t) {
         assert(tb->num_of_token < tb->NUM_OF_TOKEN);
         tb->at[tb->num_of_token++] = *t;
 }
 
-void arq_compile_cmd(int argc, char **argv, OTokenBuilder *tb) {
+void arq_tokenize_cmd(int argc, char **argv, Arq_VectorBuilder *tb) {
         if (argc  < 2) {
                 return;
         }
@@ -197,7 +197,7 @@ void arq_compile_cmd(int argc, char **argv, OTokenBuilder *tb) {
                         .cursor_idx = 0,
                         .at = argv[i],
                 };
-                OToken t = next_token(&lexer);
+                Arq_Token t = next_token(&lexer);
                 append_token(tb, &t);
         }
         return;

@@ -25,8 +25,8 @@ static void skip_space(Lexer *l) {
     }
 }
 
-static OToken next_token(Lexer *l) {
-        OToken t = {0};
+static Arq_Token next_token(Lexer *l) {
+        Arq_Token t = {0};
         skip_space(l);
         t.at = l->at;
         if (l->cursor_idx == l->SIZE ) {
@@ -108,12 +108,23 @@ static OToken next_token(Lexer *l) {
         return t;
 }
 
-static void append_token(OTokenBuilder *tb, OToken const *t) {
-        assert(tb->num_of_token < tb->NUM_OF_TOKEN);
-        tb->at[tb->num_of_token++] = *t;
+uint32_t arq_num_of_option_token(Arq_Option const *option) {
+        uint32_t len = strlen(option->arguments);
+        Lexer l = {
+                .cursor_idx = 0,
+                .SIZE = len,
+                .at = option->arguments,
+        };
+        uint32_t num_of_token = 0;
+        while (l.cursor_idx < l.SIZE) {
+                (void) next_token(&l);
+                num_of_token++;
+        }
+        return num_of_token;
 }
 
-void arq_compile_option(Arq_Option const *option, OTokenBuilder *tb) {
+void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_of_token) {
+        assert(v->num_of_token == 0);
         uint32_t len = strlen(option->arguments);
         Lexer l = {
                 .cursor_idx = 0,
@@ -121,8 +132,9 @@ void arq_compile_option(Arq_Option const *option, OTokenBuilder *tb) {
                 .at = option->arguments,
         };
         while (l.cursor_idx < l.SIZE) {
-                OToken t = next_token(&l);
-                append_token(tb, &t);
+                assert(v->num_of_token < num_of_token);
+                Arq_Token t = next_token(&l);
+                v->at[v->num_of_token++] = t;
         }
 }
 

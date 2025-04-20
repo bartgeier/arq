@@ -7,22 +7,22 @@ typedef struct {
         uint32_t id;
         uint32_t size;
         char const *at;
-} OToken;
+} Arq_Token;
 
 typedef struct {
         uint32_t const NUM_OF_TOKEN;
         uint32_t num_of_token;
-        OToken *at;
-} OTokenBuilder;
+        Arq_Token *at;
+} Arq_VectorBuilder;
 
 typedef struct {
         uint32_t num_of_token;
-        OToken at[];
-} OTokenVec;
+        Arq_Token at[];
+} Arq_Vector;
 
 typedef struct {
         uint32_t num_of_tokenVec;
-        OTokenVec *at[];
-} List_of_OTokenVec;
+        Arq_Vector *at[];
+} Arq_List_Vector;
 
 #endif
