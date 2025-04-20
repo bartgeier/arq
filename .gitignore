@@ -1,0 +1,9 @@
+**/build
+**/.cache
+**/trash
+
+nob
+nob.old
+
+nob.exe
+nob.old.exe
