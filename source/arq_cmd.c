@@ -2,25 +2,10 @@
 #include "arq_symbols.h"
 #include <stdint.h>
 #include <stdbool.h>
-//#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
-
-#if 0
-typedef struct {
-        uint32_t id;
-        uint32_t size;
-        char const *at;
-} OToken;
-
-typedef struct {
-        uint32_t const NUM_OF_TOKEN;
-        uint32_t num_of_token;
-        OToken *at;
-} OTokenVec;
-
-#endif
+//#include <stdio.h>
 
 typedef struct {
         uint32_t cursor_idx;
@@ -171,21 +156,26 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
-#if 0
-static OToken b0[20];
-static OTokenVec ts = {
-        .NUM_OF_TOKEN = sizeof(b0)/sizeof(OToken),
-        .num_of_token = 0,
-        .at = &b0[0],
-};
-#endif
-
-static void append_token(Arq_VectorBuilder *tb, Arq_Token const *t) {
-        assert(tb->num_of_token < tb->NUM_OF_TOKEN);
-        tb->at[tb->num_of_token++] = *t;
+uint32_t arq_num_of_cmd_token(int argc, char **argv) {
+        uint32_t num_of_token = 0;
+        if (argc  < 2) {
+                return 0;
+        }
+        argv += 1;
+        argc -= 1;
+        for (int i = 0; i < argc; i++) {
+                Lexer lexer = {
+                        .SIZE = strlen(argv[i]),
+                        .cursor_idx = 0,
+                        .at = argv[i],
+                };
+                (void) next_token(&lexer);
+                num_of_token++;
+        }
+        return num_of_token;
 }
 
-void arq_tokenize_cmd(int argc, char **argv, Arq_VectorBuilder *tb) {
+void arq_tokenize_cmd(int argc, char **argv, Arq_Vector *v, uint32_t num_of_token) {
         if (argc  < 2) {
                 return;
         }
@@ -198,8 +188,8 @@ void arq_tokenize_cmd(int argc, char **argv, Arq_VectorBuilder *tb) {
                         .at = argv[i],
                 };
                 Arq_Token t = next_token(&lexer);
-                append_token(tb, &t);
+                assert(v->num_of_token < num_of_token);
+                v->at[v->num_of_token++] = t;
         }
-        return;
 }
 

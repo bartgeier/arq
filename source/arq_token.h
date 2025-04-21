@@ -10,12 +10,6 @@ typedef struct {
 } Arq_Token;
 
 typedef struct {
-        uint32_t const NUM_OF_TOKEN;
-        uint32_t num_of_token;
-        Arq_Token *at;
-} Arq_VectorBuilder;
-
-typedef struct {
         uint32_t num_of_token;
         Arq_Token at[];
 } Arq_Vector;

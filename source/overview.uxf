@@ -338,23 +338,12 @@ transparency=0</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>204</x>
-      <y>708</y>
-      <w>168</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>TokenBuilder</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
       <x>564</x>
       <y>708</y>
       <w>168</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>TokenVec</panel_attributes>
+    <panel_attributes>Vector</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -365,7 +354,7 @@ transparency=0</panel_attributes>
       <w>168</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>TokenVec</panel_attributes>
+    <panel_attributes>Vector</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -387,7 +376,7 @@ transparency=0</panel_attributes>
       <w>192</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>List_of_TokenVec</panel_attributes>
+    <panel_attributes>option_list</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -426,8 +415,8 @@ transparency=0</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>192</x>
-      <y>780</y>
+      <x>1044</x>
+      <y>804</y>
       <w>168</w>
       <h>48</h>
     </coordinates>
@@ -437,12 +426,67 @@ transparency=0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>264</x>
+      <x>1056</x>
       <y>732</y>
-      <w>36</w>
-      <h>72</h>
+      <w>96</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+    <additional_attributes>10.0;10.0;60.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1008</x>
+      <y>708</y>
+      <w>168</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Vector</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>612</x>
+      <y>816</y>
+      <w>168</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>option tokens</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>732</y>
+      <w>36</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>672</x>
+      <y>732</y>
+      <w>144</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>100.0;10.0;90.0;30.0;30.0;40.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>732</y>
+      <w>252</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>190.0;10.0;180.0;30.0;30.0;50.0;10.0;70.0</additional_attributes>
   </element>
 </diagram>
