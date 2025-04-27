@@ -92,7 +92,22 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
 
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
 
-#if 1 
+#if 0 
+                        Arq_Vector *v = option_list->at[idx.n];
+                        Arq_Token expected = v->at[idx];
+                        if (expected.id == ARQ_PARA_UINT32_T) {
+                                uint32_t u32;
+                                if (is_para_eq(v, idx.v++)
+                                && is_para_p_number(v, idx.v)) {
+                                        u32 = get_para_u32(v, idx.v++);
+                                        if (is_cmd_u32(cmd, i) {
+                                                u32 = get_cmd_u32(cmd, i);
+                                        }
+                                }
+
+                        }
+                }
+
                 if (idx.ok) {
                         Arq_Vector *v = option_list->at[idx.n];
                         Arq_Token expected = v->at[idx.v++];

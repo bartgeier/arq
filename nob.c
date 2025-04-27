@@ -26,6 +26,7 @@ void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/arq_stack.c");
         nob_cmd_append(&source_paths, "./source/arq_options.c");
         nob_cmd_append(&source_paths, "./source/arq_cmd.c");
+        nob_cmd_append(&source_paths, "./source/arq_string.c");
 }
 
 bool arq_build(bool const clean) {

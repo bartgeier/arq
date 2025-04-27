@@ -1,9 +1,40 @@
 #include "arq_options.h"
 #include "arq_symbols.h"
+#include "arq_string.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdio.h>
+
+
+typedef struct {
+    uint32_t id;
+    char *at;
+} KeyWord;
+
+static KeyWord const key_words[] = {
+        {  ARQ_PARA_UINT8_T,  "uint8_t" },
+        {  ARQ_PARA_UINT16_T, "uint16_t" },
+        {  ARQ_PARA_UINT32_T, "uint32_t" },
+        {  ARQ_PARA_UINT64_T, "uint64_t" },
+        {  ARQ_PARA_INT8_T,   "int8_t" },
+        {  ARQ_PARA_INT16_T,  "int16_t" },
+        {  ARQ_PARA_INT32_T,  "int32_t" },
+        {  ARQ_PARA_INT64_T,  "int64_t" },
+};
+
+static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
+        if (str_size != strlen(cstr->at)) {
+                return false;
+        }
+        for (uint32_t i = 0; i < str_size; i++) {
+                if (str[i] != cstr->at[i]) {
+                        return false;
+                }
+        }
+        return true;
+}
 
 static bool is_identifier_start(char chr) {
         return isalpha(chr) || chr == '_';
@@ -69,6 +100,11 @@ static Arq_Token next_token(Lexer *l) {
                         l->cursor_idx++;
                         t.size++;
                 }
+                for (uint32_t i = 0; i < sizeof(key_words)/sizeof(KeyWord); i++) {
+                        if (str_eq_keyword(t.at,t.size, &key_words[i])) {
+                                t.id = key_words[i].id;
+                        }
+                }
                 return t;
         }
 
@@ -108,6 +144,47 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
+static bool verify_vector(Arq_Vector const *tokens) {
+        uint32_t i = 0;
+        while (i < tokens->num_of_token) {
+                if (tokens->at[i].id == ARQ_PARA_UINT32_T) {
+                        i++;
+                        if (tokens->at[i].id == ARQ_PARA_EQ) {
+                                i++;
+                                if (is_a_uint32_t_number(&tokens->at[i])) {
+                                        i++;
+                                        if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                                i++;
+                                                continue;
+                                        } else if (tokens->at[i].id == ARQ_PARA_END) {
+                                                i++;
+                                                break;
+                                        } else {
+                                                printf("i = %d %s ',' or end expected\n", i, tokens->at[i].at);
+                                                return false;
+                                        }
+                                } else {
+                                        printf("i = %d %s is not a type!\tn", i, tokens->at[i].at);
+                                        return false;
+                                }
+                        } else if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                i++;
+                                continue;
+                        } else if (tokens->at[i].id == ARQ_PARA_END) {
+                                i++;
+                                break;
+                        } else {
+                                printf("i = %d %s a ',' or '=' expected.\n", i, tokens->at[i].at);
+                                return false;
+                        }
+                } else {
+                        printf("i = %d token.id = %d a type expected.\n", i, tokens->at[i].id);
+                        return false;
+                }
+        }
+        return true;
+}
+
 uint32_t arq_num_of_option_token(Arq_Option const *option) {
         uint32_t len = strlen(option->arguments);
         Lexer l = {
@@ -120,7 +197,7 @@ uint32_t arq_num_of_option_token(Arq_Option const *option) {
                 (void) next_token(&l);
                 num_of_token++;
         }
-        return num_of_token;
+        return ++num_of_token;
 }
 
 void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_of_token) {
@@ -136,5 +213,13 @@ void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_o
                 Arq_Token t = next_token(&l);
                 v->at[v->num_of_token++] = t;
         }
+        Arq_Token t = { .id = ARQ_PARA_END, .at = &l.at[l.SIZE], .size = 0 };
+        v->at[v->num_of_token++] = t;
+
+        // for(uint32_t i = 0; i < v->num_of_token; i++) {
+        //         printf("i = %d %d a ',' or '=' expected.\n", i, v->at[i].id);
+        // }
+        verify_vector(v);
 }
+
 
