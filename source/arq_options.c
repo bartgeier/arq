@@ -146,6 +146,7 @@ static Arq_Token next_token(Lexer *l) {
 
 static bool verify_vector(Arq_Vector const *tokens) {
         uint32_t i = 0;
+        printf("\n");
         while (i < tokens->num_of_token) {
                 if (tokens->at[i].id == ARQ_PARA_UINT32_T) {
                         i++;
@@ -177,6 +178,8 @@ static bool verify_vector(Arq_Vector const *tokens) {
                                 printf("i = %d %s a ',' or '=' expected.\n", i, tokens->at[i].at);
                                 return false;
                         }
+                } else if (tokens->at[i].id == ARQ_PARA_END) {
+                        break;
                 } else {
                         printf("i = %d token.id = %d a type expected.\n", i, tokens->at[i].id);
                         return false;
@@ -219,7 +222,8 @@ void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_o
         // for(uint32_t i = 0; i < v->num_of_token; i++) {
         //         printf("i = %d %d a ',' or '=' expected.\n", i, v->at[i].id);
         // }
-        verify_vector(v);
+        // assert(true == verify_vector(v));
+         (void) verify_vector(v);
 }
 
 

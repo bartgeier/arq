@@ -40,8 +40,8 @@ int main(int argc, char **argv) {
         //char buffer[1000];
         Arq_Option options[] = {
                 {"help", 'h', fn_help, &self, "uint32_t=5, uint32_t = 11"},
-                {"version", 'v', fn_version, &self, "bool"},
-                {"test", 't', fn_test, &self, "345"},
+                {"version", 'v', fn_version, &self, "uint32_t"},
+                {"test", 't', fn_test, &self, ""},
                 // {"print", 'p', fn_print, &self, "uint32_t, uint32_t = 1000"},
         };
         arq_fn(argc, argv, options, sizeof(options)/sizeof(Arq_Option));

@@ -4,6 +4,7 @@
 #include "arq_stack.h"
 #include "arq_cmd.h"
 #include "arq_token.h"
+#include "arq_string.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,19 +23,7 @@ static void print_token(Arq_Token *t) {
         printf("\n");
 }
 
-static bool string_eq(char const *a, Arq_Token *t) {
-        if (strlen(a) != t->size) {
-                return false;
-        }
-        for (uint32_t i = 0; i < t->size; i++) {
-                if (a[i] != t->at[i]) {
-                        return false;
-                }
-        }
-        return true;
-}
-
-static bool char_eq(char a, Arq_Token *t) {
+static bool char_eq(Arq_Token *t, char a) {
         return a == (char)t->at[0];
 }
 
@@ -60,7 +49,7 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
                 assert(option_list->num_of_tokenVec < num_of_options);
                 option_list->at[option_list->num_of_tokenVec++] = v;
 
-                printf("\nOption %d:\n", i);
+                printf("Option %d:\n", i);
                 for (uint32_t j = 0; j < v->num_of_token; j++) {
                         print_token(&v->at[j]);
                 }
@@ -81,72 +70,69 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
                 print_token(&cmd->at[i]);
         }
         printf("\n");
-
+        
 ///////////////////////////////////////////////////////////////////////////////
 
-        struct {
-                uint32_t n;
-                uint32_t v;
-                bool ok;
-        } idx = {0};
-
-        for (uint32_t i = 0; i < cmd->num_of_token; i++) {
-
-#if 0 
-                        Arq_Vector *v = option_list->at[idx.n];
-                        Arq_Token expected = v->at[idx];
-                        if (expected.id == ARQ_PARA_UINT32_T) {
-                                uint32_t u32;
-                                if (is_para_eq(v, idx.v++)
-                                && is_para_p_number(v, idx.v)) {
-                                        u32 = get_para_u32(v, idx.v++);
-                                        if (is_cmd_u32(cmd, i) {
-                                                u32 = get_cmd_u32(cmd, i);
-                                        }
+        uint32_t row = 0;
+        bool found = false;
+        for (uint32_t j = 0; j < cmd->num_of_token; j++) {
+                if (cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
+                        for (uint32_t o = 0; o < num_of_options; o++) {
+                                if (string_eq(&cmd->at[j], options[o].name)) {
+                                        found = true;
+                                        row = o;
+                                        break;
                                 }
-
                         }
+                        if (!found) {
+                                assert(false && "unknown long option");
+                        }
+                        continue;
                 }
-
-                if (idx.ok) {
-                        Arq_Vector *v = option_list->at[idx.n];
-                        Arq_Token expected = v->at[idx.v++];
-                        if (expected.id == ARQ_PARA_UINT32_T) {
-                                uint32_t u32;
-                                if (is_para_eq(v, idx.v++)
-                                && is_para_p_number(v, idx.v)) {
-                                        u32 = get_para_u32(v, idx.v++);
-                                        if (is_cmd_u32(cmd, i) {
-                                                u32 = get_cmd_u32(cmd, i);
-                                        }
+                if (cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
+                        for (uint32_t o = 0; o < num_of_options; o++) {
+                                if (char_eq(&cmd->at[j], options[o].chr)) {
+                                        found = true;
+                                        row = o;
+                                        break;
                                 }
-
                         }
+                        if (!found) {
+                                assert(false && "unknown short option");
+                        }
+                        continue;
                 }
+                assert(true == found);
+                found = false;
+
+                bool overflow;
+                Arq_Vector *opt = option_list->at[row];
+                uint32_t i = 0;
+                while (true) {
+#if 1
+                        if (opt->at[row++].id == ARQ_PARA_UINT32_T) {
+                                uint32_t u32 = (opt->at[i++].id == ARQ_PARA_EQ) ? string_to_uint32(&opt->at[i++]) : 0;
+                                /* get num from cmd */
+                                u32 = string_to_uint32_safe(&cmd->at[j], &overflow); 
+                                if (overflow) {
+                                        printf("Number overflows uint32_t\n");
+                                }
+                                arq_push_uint32_t(u32);
+                                if (opt->at[i++].id == ARQ_PARA_COMMA) {
+                                        continue;
+                                }
+                                //call_option_fn(&options[row]); 
+                                printf("AA\n");
+                                break;
+                        }
+                        if (opt->at[i++].id == ARQ_PARA_END) {
+                                //call_option_fn(&options[row]); 
+                                printf("BB\n");
+                                break;
+                        }
 #endif
-                if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
-                        for (uint32_t j = 0; j < num_of_options; j++) {
-                                if (string_eq(options[j].name, &cmd->at[i])) {
-                                        if (idx.ok) { 
-                                                call_option_fn(&options[idx.n]); 
-                                        }
-                                        idx.ok = true;
-                                        idx.n = j;
-                                }
-                        }
                 }
-                if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
-                        for (uint32_t j = 0; j < num_of_options; j++) {
-                                if (char_eq(options[j].chr, &cmd->at[i])) {
-                                        if (idx.ok) { 
-                                                call_option_fn(&options[idx.n]); 
-                                        }
-                                        idx.ok = true;
-                                        idx.n = j;
-                                }
-                        }
-                }
-                //printf("First token is not an Option\n");
+
         }
 }
 
