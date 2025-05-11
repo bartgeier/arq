@@ -31,6 +31,13 @@ void call_option_fn(Arq_Option const * option) {
         option->fn(option->self);
 }
 
+static uint32_t next_idx(Arq_Vector *v, uint32_t idx) {
+        if (idx < v->num_of_token - 1) {
+                idx++;
+        }
+        return idx;
+}
+
 void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options) {
         option_list = (Arq_List_Vector *)malloc(sizeof(Arq_List_Vector) + num_of_options * sizeof(Arq_Vector));
 
@@ -75,66 +82,102 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
 
         uint32_t row = 0;
         bool found = false;
-        for (uint32_t j = 0; j < cmd->num_of_token; j++) {
-                if (cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
+        uint32_t j = 0;
+        uint32_t i = 0;
+        while(true) {
+                if (!found && cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
+                        printf("ARQ_CMD_LONG_OPTION ");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (string_eq(&cmd->at[j], options[o].name)) {
+                                        printf("found\n");
                                         found = true;
                                         row = o;
+                                        i = 0;
                                         break;
                                 }
                         }
                         if (!found) {
                                 assert(false && "unknown long option");
                         }
+                        j = next_idx(cmd, j);
                         continue;
                 }
-                if (cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
+                if (!found && cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
+                        printf("ARQ_CMD_SHORT_OPTION ");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (char_eq(&cmd->at[j], options[o].chr)) {
+                                        printf("found\n");
                                         found = true;
                                         row = o;
+                                        i = 0;
                                         break;
                                 }
                         }
                         if (!found) {
                                 assert(false && "unknown short option");
                         }
+                        j = next_idx(cmd, j);
                         continue;
                 }
                 assert(true == found);
-                found = false;
 
-                bool overflow;
                 Arq_Vector *opt = option_list->at[row];
-                uint32_t i = 0;
                 while (true) {
-#if 1
-                        if (opt->at[row++].id == ARQ_PARA_UINT32_T) {
-                                uint32_t u32 = (opt->at[i++].id == ARQ_PARA_EQ) ? string_to_uint32(&opt->at[i++]) : 0;
-                                /* get num from cmd */
-                                u32 = string_to_uint32_safe(&cmd->at[j], &overflow); 
-                                if (overflow) {
-                                        printf("Number overflows uint32_t\n");
-                                }
-                                arq_push_uint32_t(u32);
-                                if (opt->at[i++].id == ARQ_PARA_COMMA) {
+                        if (opt->at[i].id == ARQ_PARA_UINT32_T) {
+                                i = next_idx(opt, i);
+                                printf("ARQ_PARA_UINT32_T\n");
+
+                                uint32_t u32 = 0;
+                                if (opt->at[i].id == ARQ_PARA_EQ) {
+                                        i = next_idx(opt, i);
+                                        u32 = string_to_uint32(&opt->at[i++]);
+                                        if (cmd->at[j].id == ARQ_P_NUMBER) {
+                                                bool overflow;
+                                                u32 = string_to_uint32_safe(&cmd->at[j], &overflow); // get uint32_t num argument from cmd
+                                                if (overflow) {
+                                                        printf("Number overflows uint32_t\n");
+                                                }
+                                                j = next_idx(cmd, j);
+                                        }
+                                        arq_push_uint32_t(u32);
+                                        printf("u32 %d\n", u32);
+                                        continue;
+                                } else {
+                                        if (cmd->at[j].id != ARQ_P_NUMBER) {
+                                                printf("cmd->at[j].id != ARQ_P_NUMBER");
+                                                exit(1);
+                                        }
+                                        bool overflow;
+                                        u32 = string_to_uint32_safe(&cmd->at[j], &overflow); // get uint32_t num argument from cmd
+                                        j = next_idx(cmd, j);
+                                        if (overflow) {
+                                                printf("Number overflows uint32_t\n");
+                                        }
+                                        arq_push_uint32_t(u32);
+                                        printf("u32 %d\n", u32);
                                         continue;
                                 }
-                                //call_option_fn(&options[row]); 
-                                printf("AA\n");
-                                break;
                         }
-                        if (opt->at[i++].id == ARQ_PARA_END) {
-                                //call_option_fn(&options[row]); 
-                                printf("BB\n");
-                                break;
-                        }
-#endif
-                }
 
-        }
-}
+                        if (opt->at[i].id == ARQ_PARA_COMMA) {
+                                printf("ARQ_PARA_COMMA\n");
+                                i = next_idx(opt, i);
+                                continue;
+                        }
+
+                        if (opt->at[i].id == ARQ_END) {
+                                //call_option_fn(&options[row]); 
+                                printf("ARQ_END\n\n");
+                                found = false;
+                                if (cmd->at[j].id == ARQ_END) {
+                                        return;
+                                } else {
+                                        break;
+                                }
+                        }
+                } // while 
+        } // while
+} 
 
 #if 0 
 typedef struct {
@@ -145,3 +188,4 @@ typedef struct {
         const char *arguments;   // "uint8_t, bool = false"
 } Arq_Option;
 #endif
+

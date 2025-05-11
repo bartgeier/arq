@@ -2,6 +2,7 @@
 #include "arq_symbols.h"
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 bool string_eq(Arq_Token *token, char const *cstr) {
         if (strlen(cstr) != token->size) {
@@ -16,7 +17,8 @@ bool string_eq(Arq_Token *token, char const *cstr) {
 }
 
 uint32_t string_to_uint32_safe(Arq_Token const *token, bool *overflow) {
-        if (token->id != ARQ_PARA_P_NUMBER) {
+        if (token->id != ARQ_P_NUMBER) {
+                printf("%s token id %d wrong!\n", __func__, token->id);
                 *overflow = true; 
                 return 0;
         }

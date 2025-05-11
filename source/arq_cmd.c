@@ -87,7 +87,7 @@ static Arq_Token next_token(Lexer *l) {
         Arq_Token t = {0};
 
         if (isdigit(l->at[l->cursor_idx])) {
-                t.id = ARQ_CMD_P_NUMBER; 
+                t.id = ARQ_P_NUMBER; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -103,7 +103,7 @@ static Arq_Token next_token(Lexer *l) {
                 l->cursor_idx++;
                 t.size = 1;
                 if (isdigit(l->at[l->cursor_idx])) {
-                        t.id = ARQ_CMD_N_NUMBER; 
+                        t.id = ARQ_N_NUMBER; 
                         l->cursor_idx++;
                         t.size++;
                         while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
@@ -191,5 +191,11 @@ void arq_tokenize_cmd(int argc, char **argv, Arq_Vector *v, uint32_t num_of_toke
                 assert(v->num_of_token < num_of_token);
                 v->at[v->num_of_token++] = t;
         }
+        Arq_Token t = {
+                .id = ARQ_END,
+                .at = NULL,
+                .size = 0,
+        };
+        v->at[v->num_of_token++] = t;
 }
 

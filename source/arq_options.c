@@ -84,7 +84,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (l->at[l->cursor_idx] == 0) {
-                t.id = ARQ_PARA_END; 
+                t.id = ARQ_END; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -109,7 +109,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (isdigit(l->at[l->cursor_idx])) {
-                t.id = ARQ_PARA_P_NUMBER; 
+                t.id = ARQ_P_NUMBER; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -121,7 +121,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (l->at[l->cursor_idx] == '-') {
-                t.id = ARQ_PARA_N_NUMBER; 
+                t.id = ARQ_N_NUMBER; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -157,7 +157,7 @@ static bool verify_vector(Arq_Vector const *tokens) {
                                         if (tokens->at[i].id == ARQ_PARA_COMMA) {
                                                 i++;
                                                 continue;
-                                        } else if (tokens->at[i].id == ARQ_PARA_END) {
+                                        } else if (tokens->at[i].id == ARQ_END) {
                                                 i++;
                                                 break;
                                         } else {
@@ -171,14 +171,14 @@ static bool verify_vector(Arq_Vector const *tokens) {
                         } else if (tokens->at[i].id == ARQ_PARA_COMMA) {
                                 i++;
                                 continue;
-                        } else if (tokens->at[i].id == ARQ_PARA_END) {
+                        } else if (tokens->at[i].id == ARQ_END) {
                                 i++;
                                 break;
                         } else {
                                 printf("i = %d %s a ',' or '=' expected.\n", i, tokens->at[i].at);
                                 return false;
                         }
-                } else if (tokens->at[i].id == ARQ_PARA_END) {
+                } else if (tokens->at[i].id == ARQ_END) {
                         break;
                 } else {
                         printf("i = %d token.id = %d a type expected.\n", i, tokens->at[i].id);
@@ -216,7 +216,7 @@ void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_o
                 Arq_Token t = next_token(&l);
                 v->at[v->num_of_token++] = t;
         }
-        Arq_Token t = { .id = ARQ_PARA_END, .at = &l.at[l.SIZE], .size = 0 };
+        Arq_Token t = { .id = ARQ_END, .at = &l.at[l.SIZE], .size = 0 };
         v->at[v->num_of_token++] = t;
 
         // for(uint32_t i = 0; i < v->num_of_token; i++) {
