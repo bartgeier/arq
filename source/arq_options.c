@@ -217,6 +217,7 @@ void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_o
                 v->at[v->num_of_token++] = t;
         }
         Arq_Token t = { .id = ARQ_END, .at = &l.at[l.SIZE], .size = 0 };
+        assert(v->num_of_token < num_of_token);
         v->at[v->num_of_token++] = t;
 
         // for(uint32_t i = 0; i < v->num_of_token; i++) {

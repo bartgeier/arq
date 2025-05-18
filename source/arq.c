@@ -38,7 +38,7 @@ static uint32_t next_idx(Arq_Vector *v, uint32_t idx) {
         return idx;
 }
 
-void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options) {
+void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num_of_options) {
         option_list = (Arq_List_Vector *)malloc(sizeof(Arq_List_Vector) + num_of_options * sizeof(Arq_Vector));
 
         uint32_t n = arq_stack_init(&stack_buffer, sizeof(stack_buffer));
@@ -72,7 +72,7 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
         );
         arq_tokenize_cmd(argc, argv, cmd, num_of_token);
 
-        printf("Command line:\n");
+        printf("Command line: %d \n", num_of_token);
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
                 print_token(&cmd->at[i]);
         }
@@ -84,7 +84,7 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
         bool found = false;
         uint32_t j = 0;
         uint32_t i = 0;
-        while(true) {
+        while(j < cmd->num_of_token) {
                 if (!found && cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
                         printf("ARQ_CMD_LONG_OPTION ");
                         for (uint32_t o = 0; o < num_of_options; o++) {
@@ -96,14 +96,10 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
                                         break;
                                 }
                         }
-                        if (!found) {
-                                assert(false && "unknown long option");
-                        }
+                        assert(found && "unknown long option"); // todo special assert
                         j = next_idx(cmd, j);
-                        continue;
-                }
-                if (!found && cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
-                        printf("ARQ_CMD_SHORT_OPTION ");
+                } else if (!found && cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
+                        printf("ARQ_CMD_SHORT_OPTION");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (char_eq(&cmd->at[j], options[o].chr)) {
                                         printf("found\n");
@@ -113,20 +109,21 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
                                         break;
                                 }
                         }
-                        if (!found) {
-                                assert(false && "unknown short option");
-                        }
+                        assert(found && "unknown short option"); // todo special assert
                         j = next_idx(cmd, j);
+                } else if (!found && cmd->at[j].id == ARQ_END) {
+                        printf("cmd end!\n");
+                        return;
+                } else if (!found) {
+                        j = next_idx(cmd, j);
+                        printf("no option?\n\n");
                         continue;
                 }
-                assert(true == found);
-
                 Arq_Vector *opt = option_list->at[row];
                 while (true) {
                         if (opt->at[i].id == ARQ_PARA_UINT32_T) {
                                 i = next_idx(opt, i);
                                 printf("ARQ_PARA_UINT32_T\n");
-
                                 uint32_t u32 = 0;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
@@ -144,7 +141,7 @@ void arq_fn(int argc, char **argv, Arq_Option *options, uint32_t num_of_options)
                                         continue;
                                 } else {
                                         if (cmd->at[j].id != ARQ_P_NUMBER) {
-                                                printf("cmd->at[j].id != ARQ_P_NUMBER");
+                                                printf("cmd->at[j].id != ARQ_P_NUMBER\n");
                                                 exit(1);
                                         }
                                         bool overflow;

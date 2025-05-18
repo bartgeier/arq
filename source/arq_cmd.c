@@ -5,7 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
-//#include <stdio.h>
+#include <stdio.h>
 
 typedef struct {
         uint32_t cursor_idx;
@@ -135,6 +135,7 @@ static Arq_Token next_token(Lexer *l) {
                         }
                         if (t.size == 0) {
                                 t.at = t.at - 2;
+                                t.size = 2;
                                 t.id = ARQ_CMD_OPTION_END; 
                         }
                         return t; 
@@ -157,10 +158,8 @@ static Arq_Token next_token(Lexer *l) {
 }
 
 uint32_t arq_num_of_cmd_token(int argc, char **argv) {
+        assert(argc >= 1);
         uint32_t num_of_token = 0;
-        if (argc  < 2) {
-                return 0;
-        }
         argv += 1;
         argc -= 1;
         for (int i = 0; i < argc; i++) {
@@ -169,16 +168,15 @@ uint32_t arq_num_of_cmd_token(int argc, char **argv) {
                         .cursor_idx = 0,
                         .at = argv[i],
                 };
-                (void) next_token(&lexer);
-                num_of_token++;
+                if (ARQ_INIT != next_token(&lexer).id) {
+                        num_of_token++;
+                }
         }
-        return num_of_token;
+        return num_of_token + 1;
 }
 
 void arq_tokenize_cmd(int argc, char **argv, Arq_Vector *v, uint32_t num_of_token) {
-        if (argc  < 2) {
-                return;
-        }
+        assert(argc >= 1);
         argv += 1;
         argc -= 1;
         for (int i = 0; i < argc; i++) {
@@ -188,14 +186,17 @@ void arq_tokenize_cmd(int argc, char **argv, Arq_Vector *v, uint32_t num_of_toke
                         .at = argv[i],
                 };
                 Arq_Token t = next_token(&lexer);
-                assert(v->num_of_token < num_of_token);
-                v->at[v->num_of_token++] = t;
+                if (t.id != ARQ_INIT) {
+                        assert(v->num_of_token < num_of_token);
+                        v->at[v->num_of_token++] = t;
+                }
         }
         Arq_Token t = {
                 .id = ARQ_END,
                 .at = NULL,
                 .size = 0,
         };
+        assert(v->num_of_token < num_of_token);
         v->at[v->num_of_token++] = t;
 }
 

@@ -2,6 +2,8 @@
 #define ARQ_SYMBOLS_H
 
 #define ARQ_LIST_OF_IDS   \
+        X(ARQ_INIT) \
+\
         X(ARQ_PARA_SPACE_TAIL) \
         X(ARQ_PARA_N_PARAMETER) \
         X(ARQ_PARA_O_PARAMETER) \
