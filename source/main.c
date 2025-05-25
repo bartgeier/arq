@@ -12,10 +12,11 @@ typedef struct {
         uint8_t number;
 } Context;
 
-void fn_help(void *self) {
-        Context *m = (Context *)self;
-        m->help = true;
-        printf("help %d\n", m->help);
+void fn_print(void *self) {
+        (void)self;
+        uint32_t begin = arq_uint32_t();
+        uint32_t end = arq_uint32_t();
+        printf("fn_print begin = %d, end = %d\n", begin, end);
 }
 
 void fn_version(void *self) {
@@ -24,9 +25,10 @@ void fn_version(void *self) {
 }
 
 void fn_test(void *self) {
-        Context *m = (Context *)self;
-        m->number = arq_uint32_t();
-        printf("A number %d\n", m->number);
+        (void)self;
+        uint32_t num_0 = arq_uint32_t();
+        uint32_t num_1 = arq_uint32_t();
+        printf("fn_test %d %d\n", num_0, num_1);
 }
 
 
@@ -39,7 +41,7 @@ int main(int argc, char **argv) {
 
         //char buffer[1000];
         Arq_Option options[] = {
-                {"print", 'p', fn_help, &self, "uint32_t=5, uint32_t = 11"},
+                {"print", 'p', fn_print, &self, "uint32_t=5, uint32_t = 11"},
                 {"test", 't', fn_test, &self, "uint32_t, uint32_t"},
                 // {"version", 'v', fn_version, &self, "uint32_t"},
                 // {"print", 'p', fn_print, &self, "uint32_t, uint32_t = 1000"},
@@ -50,10 +52,10 @@ int main(int argc, char **argv) {
 
        // arq_compile_cmd(argc, argv);
 
-        options[0].fn(options[0].self);
+        // options[0].fn(options[0].self);
         // options[1].fn(options[1].self);
 
-        arq_push_uint32_t(68);
+        // arq_push_uint32_t(68);
         // options[2].fn(options[2].self);
 
         

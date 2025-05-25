@@ -11,9 +11,20 @@
 #include <assert.h>
 #include <stdbool.h>
 
-char stack_buffer[1000];
+char error_buffer[1000];
+Error_msg error_msg = {
+        .SIZE = sizeof(error_buffer),
+        .size = 0,
+        .at = error_buffer,
+};
 
+char stack_buffer[1000];
 Arq_List_Vector *option_list = NULL;
+
+static void end(Error_msg const *error_msg) {
+        printf("%s", error_msg->at);
+        exit(1);
+}
 
 static void print_token(Arq_Token *t) {
         printf("%3d %30s -> ", t->size, symbol_names[t->id]);
@@ -76,7 +87,7 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
                 print_token(&cmd->at[i]);
         }
-        printf("\n");
+        printf("\n-------- interpreter --------------\n\n");
         
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -102,7 +113,7 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                         printf("ARQ_CMD_SHORT_OPTION");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (char_eq(&cmd->at[j], options[o].chr)) {
-                                        printf("found\n");
+                                        printf(" found\n");
                                         found = true;
                                         row = o;
                                         i = 0;
@@ -124,34 +135,23 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                         if (opt->at[i].id == ARQ_PARA_UINT32_T) {
                                 i = next_idx(opt, i);
                                 printf("ARQ_PARA_UINT32_T\n");
-                                uint32_t u32 = 0;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        u32 = string_to_uint32(&opt->at[i++]);
+                                        uint32_to num = uint32_t_str_to_uint32_t(&opt->at[i++]);
                                         if (cmd->at[j].id == ARQ_P_NUMBER) {
-                                                bool overflow;
-                                                u32 = string_to_uint32_safe(&cmd->at[j], &overflow); // get uint32_t num argument from cmd
-                                                if (overflow) {
-                                                        printf("Number overflows uint32_t\n");
-                                                }
+                                                num = p_number_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure: ");
+                                                if (num.error) { end(&error_msg); }
                                                 j = next_idx(cmd, j);
                                         }
-                                        arq_push_uint32_t(u32);
-                                        printf("u32 %d\n", u32);
+                                        arq_push_uint32_t(num.u32);
+                                        printf("u32 %d\n", num.u32);
                                         continue;
                                 } else {
-                                        if (cmd->at[j].id != ARQ_P_NUMBER) {
-                                                printf("cmd->at[j].id != ARQ_P_NUMBER\n");
-                                                exit(1);
-                                        }
-                                        bool overflow;
-                                        u32 = string_to_uint32_safe(&cmd->at[j], &overflow); // get uint32_t num argument from cmd
+                                        uint32_to num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure: ");
+                                        if (num.error) { end(&error_msg); }
                                         j = next_idx(cmd, j);
-                                        if (overflow) {
-                                                printf("Number overflows uint32_t\n");
-                                        }
-                                        arq_push_uint32_t(u32);
-                                        printf("u32 %d\n", u32);
+                                        arq_push_uint32_t(num.u32);
+                                        printf("u32 %d\n", num.u32);
                                         continue;
                                 }
                         }
@@ -163,8 +163,8 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                         }
 
                         if (opt->at[i].id == ARQ_END) {
-                                //call_option_fn(&options[row]); 
                                 printf("ARQ_END\n\n");
+                                call_option_fn(&options[row]);
                                 found = false;
                                 if (cmd->at[j].id == ARQ_END) {
                                         return;
@@ -175,6 +175,9 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                 } // while 
         } // while
 } 
+
+error msg missing token
+error msg option line
 
 #if 0 
 typedef struct {
