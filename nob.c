@@ -36,7 +36,8 @@ bool arq_build(bool const clean) {
         nob_log(NOB_INFO, "BUILD: arq ----> cmd line argument library");
         Nob_Cmd c_ompiler = {0};
         //nob_cmd_append(&cmd, "gcc", "-O0", "-ggdb", "-pedantic");
-        nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wno-parentheses"); 
+        //nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wno-parentheses"); 
+        nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 
         Nob_Cmd cmd = {0};
         nob_cmd_append_cmd(&cmd, &c_ompiler);

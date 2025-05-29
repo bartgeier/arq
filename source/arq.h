@@ -5,8 +5,8 @@
 
 typedef void (*function_pointer_t)(void *self);
 typedef struct {
-        const char *name;        // --version
         char chr;                // -v
+        const char *name;        // --version
         function_pointer_t fn;
         void* self;              // context
         const char *arguments;   // "uint8_t, bool = false"

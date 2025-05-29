@@ -10,6 +10,9 @@ typedef struct {
         uint32_t size;
         char *at;
 } Error_msg;
+void Error_msg_format(Error_msg *m);
+void Error_msg_append_lf(Error_msg *m);
+void Error_msg_append_chr(Error_msg *m, char chr);
 void Error_msg_append_cstr(Error_msg *m, char const *cstr);
 void Error_msg_append_token(Error_msg *m, Arq_Token const *token);
 

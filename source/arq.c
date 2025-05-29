@@ -21,7 +21,26 @@ Error_msg error_msg = {
 char stack_buffer[1000];
 Arq_List_Vector *option_list = NULL;
 
-static void end(Error_msg const *error_msg) {
+
+static void end(Error_msg *error_msg, Arq_Option const *o) {
+        if (o != NULL) {
+                if (o->chr != 0) {
+                        Error_msg_append_cstr(error_msg, "-");
+                        Error_msg_append_chr(error_msg, o->chr);
+                }
+                if (strlen(o->name) != 0) {
+                        Error_msg_append_cstr(error_msg, " --");
+                        Error_msg_append_cstr(error_msg, o->name);
+
+                }
+                if (strlen(o->arguments ) != 0) {
+                        Error_msg_append_cstr(error_msg, " (");
+                        Error_msg_append_cstr(error_msg, o->arguments);
+                        Error_msg_append_cstr(error_msg, ")");
+                }
+                Error_msg_append_lf(error_msg);
+        }
+        Error_msg_format(error_msg);
         printf("%s", error_msg->at);
         exit(1);
 }
@@ -32,6 +51,14 @@ static void print_token(Arq_Token *t) {
                 putchar(t->at[i]);
         }
         printf("\n");
+}
+
+static void Error_msg_cmd_failure(Error_msg *error_msg, char const *cstrA, Arq_Token const *token, char const *cstrB) {
+        Error_msg_append_cstr(error_msg, "CMD line failure:\n");
+        Error_msg_append_cstr(error_msg, cstrA);
+        Error_msg_append_cstr(error_msg, token->at);
+        Error_msg_append_cstr(error_msg, cstrB);
+        Error_msg_append_lf(error_msg);
 }
 
 static bool char_eq(Arq_Token *t, char a) {
@@ -97,38 +124,42 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         uint32_t i = 0;
         while(j < cmd->num_of_token) {
                 if (!found && cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
-                        printf("ARQ_CMD_LONG_OPTION ");
+                        printf("ARQ_CMD_LONG_OPTION\n");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (string_eq(&cmd->at[j], options[o].name)) {
-                                        printf("found\n");
                                         found = true;
                                         row = o;
                                         i = 0;
                                         break;
                                 }
                         }
-                        assert(found && "unknown long option"); // todo special assert
+                        if (!found) { 
+                                Error_msg_cmd_failure(&error_msg, "'--", &cmd->at[j], "' unknown long option ");
+                                end(&error_msg, NULL);
+
+                        }
                         j = next_idx(cmd, j);
                 } else if (!found && cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
-                        printf("ARQ_CMD_SHORT_OPTION");
+                        printf("ARQ_CMD_SHORT_OPTION\n");
                         for (uint32_t o = 0; o < num_of_options; o++) {
                                 if (char_eq(&cmd->at[j], options[o].chr)) {
-                                        printf(" found\n");
                                         found = true;
                                         row = o;
                                         i = 0;
                                         break;
                                 }
                         }
-                        assert(found && "unknown short option"); // todo special assert
+                        if (!found) { 
+                                Error_msg_cmd_failure(&error_msg, "'-", &cmd->at[j], "' unknown short option");
+                                end(&error_msg, NULL);
+                        }
                         j = next_idx(cmd, j);
                 } else if (!found && cmd->at[j].id == ARQ_END) {
                         printf("cmd end!\n");
                         return;
                 } else if (!found) {
-                        j = next_idx(cmd, j);
-                        printf("no option?\n\n");
-                        continue;
+                        Error_msg_cmd_failure(&error_msg, "'", &cmd->at[j], "' is not an option");
+                        end(&error_msg, NULL);
                 }
                 Arq_Vector *opt = option_list->at[row];
                 while (true) {
@@ -139,16 +170,16 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                         i = next_idx(opt, i);
                                         uint32_to num = uint32_t_str_to_uint32_t(&opt->at[i++]);
                                         if (cmd->at[j].id == ARQ_P_NUMBER) {
-                                                num = p_number_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure: ");
-                                                if (num.error) { end(&error_msg); }
+                                                num = p_number_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                                if (num.error) { end(&error_msg, &options[row]); }
                                                 j = next_idx(cmd, j);
                                         }
                                         arq_push_uint32_t(num.u32);
                                         printf("u32 %d\n", num.u32);
                                         continue;
                                 } else {
-                                        uint32_to num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure: ");
-                                        if (num.error) { end(&error_msg); }
+                                        uint32_to num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                        if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
                                         arq_push_uint32_t(num.u32);
                                         printf("u32 %d\n", num.u32);
@@ -176,8 +207,6 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         } // while
 } 
 
-error msg missing token
-error msg option line
 
 #if 0 
 typedef struct {
