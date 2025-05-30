@@ -157,7 +157,7 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
-uint32_t arq_num_of_cmd_token(int argc, char **argv) {
+uint32_t arq_cmd_num_of_token(int argc, char **argv) {
         assert(argc >= 1);
         uint32_t num_of_token = 0;
         argv += 1;
@@ -175,7 +175,7 @@ uint32_t arq_num_of_cmd_token(int argc, char **argv) {
         return num_of_token + 1;
 }
 
-void arq_tokenize_cmd(int argc, char **argv, Arq_Vector *v, uint32_t num_of_token) {
+void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t num_of_token) {
         assert(argc >= 1);
         argv += 1;
         argc -= 1;

@@ -12,7 +12,7 @@
 #include <stdbool.h>
 
 char error_buffer[1000];
-Error_msg error_msg = {
+Arq_msg error_msg = {
         .SIZE = sizeof(error_buffer),
         .size = 0,
         .at = error_buffer,
@@ -22,31 +22,31 @@ char stack_buffer[1000];
 Arq_List_Vector *option_list = NULL;
 
 
-static void add_option_msg(Error_msg *error_msg, Arq_Option const *o) {
+static void add_option_msg(Arq_msg *error_msg, Arq_Option const *o) {
         assert(o != NULL);
         if (o->chr != 0) {
-                Error_msg_append_cstr(error_msg, "-");
-                Error_msg_append_chr(error_msg, o->chr);
-                Error_msg_append_cstr(error_msg, " ");
+                arq_msg_append_cstr(error_msg, "-");
+                arq_msg_append_chr(error_msg, o->chr);
+                arq_msg_append_cstr(error_msg, " ");
         }
         if (strlen(o->name) != 0) {
-                Error_msg_append_cstr(error_msg, "--");
-                Error_msg_append_cstr(error_msg, o->name);
-                Error_msg_append_cstr(error_msg, " ");
+                arq_msg_append_cstr(error_msg, "--");
+                arq_msg_append_cstr(error_msg, o->name);
+                arq_msg_append_cstr(error_msg, " ");
         }
         if (strlen(o->arguments ) != 0) {
-                Error_msg_append_cstr(error_msg, "(");
-                Error_msg_append_cstr(error_msg, o->arguments);
-                Error_msg_append_cstr(error_msg, ")");
+                arq_msg_append_cstr(error_msg, "(");
+                arq_msg_append_cstr(error_msg, o->arguments);
+                arq_msg_append_cstr(error_msg, ")");
         }
-        Error_msg_append_lf(error_msg);
+        arq_msg_append_lf(error_msg);
 }
 
-static void end(Error_msg *error_msg, Arq_Option const *o) {
+static void end(Arq_msg *error_msg, Arq_Option const *o) {
         if (o != NULL) {
                 add_option_msg(error_msg, o);
         }
-        Error_msg_format(error_msg);
+        arq_msg_format(error_msg);
         printf("%s", error_msg->at);
         exit(1);
 }
@@ -59,12 +59,12 @@ static void print_token(Arq_Token *t) {
         printf("\n");
 }
 
-static void Error_msg_cmd_failure(Error_msg *error_msg, char const *cstrA, Arq_Token const *token, char const *cstrB) {
-        Error_msg_append_cstr(error_msg, "CMD line failure:\n");
-        Error_msg_append_cstr(error_msg, cstrA);
-        Error_msg_append_cstr(error_msg, token->at);
-        Error_msg_append_cstr(error_msg, cstrB);
-        Error_msg_append_lf(error_msg);
+static void Error_msg_cmd_failure(Arq_msg *error_msg, char const *cstrA, Arq_Token const *token, char const *cstrB) {
+        arq_msg_append_cstr(error_msg, "CMD line failure:\n");
+        arq_msg_append_cstr(error_msg, cstrA);
+        arq_msg_append_cstr(error_msg, token->at);
+        arq_msg_append_cstr(error_msg, cstrB);
+        arq_msg_append_lf(error_msg);
 }
 
 static bool char_eq(Arq_Token *t, char a) {
@@ -89,19 +89,19 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         printf("Max possible arguments %d\n",n);
 
         for (uint32_t i = 0; i < num_of_options; i++) {
-                uint32_t num_of_token = arq_num_of_option_token(&options[i]);
+                uint32_t num_of_token = arq_option_num_of_token(&options[i]);
                 Arq_Vector *v = (Arq_Vector *)calloc(
                         1,
                         sizeof(Arq_Vector) + num_of_token * sizeof(Arq_Token)
                 );
 
-                arq_tokenize_option(&options[i], v, num_of_token);
-                uint32_to ups = arg_verify_vector(v, &error_msg);
+                arq_option_tokenize(&options[i], v, num_of_token);
+                uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
                         add_option_msg(&error_msg, &options[i]);
                         uint32_t const n = arq_option_parameter_idx(&options[i]) + 1 + ups.u32;
-                        Error_msg_append_nchr(&error_msg, ' ', n);
-                        Error_msg_append_cstr(&error_msg, "^\n");
+                        arq_msg_append_nchr(&error_msg, ' ', n);
+                        arq_msg_append_cstr(&error_msg, "^\n");
                         end(&error_msg, NULL);
                 }
 
@@ -117,12 +117,12 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
 
 ///////////////////////////////////////////////////////////////////////////////
 
-        uint32_t num_of_token = arq_num_of_cmd_token(argc, argv);
+        uint32_t num_of_token = arq_cmd_num_of_token(argc, argv);
         Arq_Vector *cmd = (Arq_Vector *)calloc(
                 1,
                 sizeof(Arq_Vector) + num_of_token * sizeof(Arq_Token)
         );
-        arq_tokenize_cmd(argc, argv, cmd, num_of_token);
+        arq_cmd_tokenize(argc, argv, cmd, num_of_token);
 
         printf("Command line: %d \n", num_of_token);
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
@@ -180,25 +180,23 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                         if (opt->at[i].id == ARQ_PARA_UINT32_T) {
                                 i = next_idx(opt, i);
                                 printf("ARQ_PARA_UINT32_T\n");
+                                uint32_to num;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        uint32_to num = uint32_t_str_to_uint32_t(&opt->at[i++]);
+                                        num = uint32_t_str_to_uint32_t(&opt->at[i++]);
                                         if (cmd->at[j].id == ARQ_P_NUMBER) {
                                                 num = p_number_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                                 if (num.error) { end(&error_msg, &options[row]); }
                                                 j = next_idx(cmd, j);
                                         }
-                                        arq_push_uint32_t(num.u32);
-                                        printf("u32 %d\n", num.u32);
-                                        continue;
                                 } else {
-                                        uint32_to num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                        num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                         if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
-                                        arq_push_uint32_t(num.u32);
-                                        printf("u32 %d\n", num.u32);
-                                        continue;
                                 }
+                                arq_stack_push_uint32_t(num.u32);
+                                printf("u32 %d\n", num.u32);
+                                continue;
                         }
 
                         if (opt->at[i].id == ARQ_PARA_COMMA) {

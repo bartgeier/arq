@@ -99,7 +99,7 @@ int32_t arq_int32_t(void) {
         return t.i32;
 }
 
-void arq_push_uint8_t(uint8_t n) {
+void arq_stack_push_uint8_t(uint8_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_UINT8_T,
@@ -109,7 +109,7 @@ void arq_push_uint8_t(uint8_t n) {
         stack.write_idx++;
 }
 
-void arq_push_uint16_t(uint16_t n) {
+void arq_stack_push_uint16_t(uint16_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_UINT16_T,
@@ -119,7 +119,7 @@ void arq_push_uint16_t(uint16_t n) {
         stack.write_idx++;
 }
 
-void arq_push_uint32_t(uint32_t n) {
+void arq_stack_push_uint32_t(uint32_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_UINT32_T,
@@ -130,7 +130,7 @@ void arq_push_uint32_t(uint32_t n) {
 }
 
 
-void arq_push_uint64_t(uint64_t n) {
+void arq_stack_push_uint64_t(uint64_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_UINT64_T,
@@ -141,7 +141,7 @@ void arq_push_uint64_t(uint64_t n) {
 }
 
 
-void arq_push_int8_t(int8_t n) {
+void arq_stack_push_int8_t(int8_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_INT8_T,
@@ -152,7 +152,7 @@ void arq_push_int8_t(int8_t n) {
 }
 
 
-void arq_push_int16_t(int16_t n) {
+void arq_stack_push_int16_t(int16_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_INT16_T,
@@ -163,7 +163,7 @@ void arq_push_int16_t(int16_t n) {
 }
 
 
-void arq_push_int32_t(int32_t n) {
+void arq_stack_push_int32_t(int32_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
                 .type_id = ARQ_PARA_INT32_T,

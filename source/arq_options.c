@@ -3,11 +3,8 @@
 #include "arq_string.h"
 #include <string.h>
 #include <ctype.h>
-#include <inttypes.h>
 #include <stdbool.h>
 #include <assert.h>
-#include <stdio.h>
-
 
 typedef struct {
     uint32_t id;
@@ -145,7 +142,7 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
-uint32_t arq_num_of_option_token(Arq_Option const *option) {
+uint32_t arq_option_num_of_token(Arq_Option const *option) {
         uint32_t len = strlen(option->arguments);
         Lexer l = {
                 .cursor_idx = 0,
@@ -172,7 +169,7 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         return result;
 }
 
-uint32_to arg_verify_vector(Arq_Vector const *tokens, Error_msg *error_msg) {
+uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg) {
         uint32_t i = 0;
         while (i < tokens->num_of_token) {
                 if (tokens->at[i].id == ARQ_PARA_UINT32_T) {
@@ -188,18 +185,18 @@ uint32_to arg_verify_vector(Arq_Vector const *tokens, Error_msg *error_msg) {
                                                 i++;
                                                 break;
                                         } else {
-                                                Error_msg_append_cstr(error_msg, "Assert Option:\n");
-                                                Error_msg_append_cstr(error_msg, "token '");
-                                                Error_msg_append_token(error_msg, &tokens->at[i]);
-                                                Error_msg_append_cstr(error_msg, "' but expected ',' or ''\n");
+                                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                                arq_msg_append_cstr(error_msg, "token '");
+                                                arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                                arq_msg_append_cstr(error_msg, "' but expected ',' or ''\n");
                                                 uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                                 return idx;
                                         }
                                 } else {
-                                        Error_msg_append_cstr(error_msg, "Assert Option:\n");
-                                        Error_msg_append_cstr(error_msg, "token '");
-                                        Error_msg_append_token(error_msg, &tokens->at[i]);
-                                        Error_msg_append_cstr(error_msg, "' is not a positive number\n");
+                                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                        arq_msg_append_cstr(error_msg, "token '");
+                                        arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                        arq_msg_append_cstr(error_msg, "' is not a positive number\n");
                                         uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                         return idx;
                                 }
@@ -210,20 +207,20 @@ uint32_to arg_verify_vector(Arq_Vector const *tokens, Error_msg *error_msg) {
                                 i++;
                                 break;
                         } else {
-                                Error_msg_append_cstr(error_msg, "Assert Option:\n");
-                                Error_msg_append_cstr(error_msg, "token '");
-                                Error_msg_append_token(error_msg, &tokens->at[i]);
-                                Error_msg_append_cstr(error_msg, "' but expected ',' or '=' or ''\n");
+                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                arq_msg_append_cstr(error_msg, "token '");
+                                arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                arq_msg_append_cstr(error_msg, "' but expected ',' or '=' or ''\n");
                                 uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                 return idx;
                         }
                 } else if (tokens->at[i].id == ARQ_END) {
                         break;
                 } else {
-                        Error_msg_append_cstr(error_msg, "Assert Option:\n");
-                        Error_msg_append_cstr(error_msg, "token '");
-                        Error_msg_append_token(error_msg, &tokens->at[i]);
-                        Error_msg_append_cstr(error_msg, "' is not a type\n");
+                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                        arq_msg_append_cstr(error_msg, "token '");
+                        arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                        arq_msg_append_cstr(error_msg, "' is not a type\n");
                         uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                         return idx;
                 }
@@ -233,7 +230,7 @@ uint32_to arg_verify_vector(Arq_Vector const *tokens, Error_msg *error_msg) {
 }
 
 
-void arq_tokenize_option(Arq_Option const *option, Arq_Vector *v, uint32_t num_of_token) {
+void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const num_of_token) {
         assert(v->num_of_token == 0);
         uint32_t len = strlen(option->arguments);
         Lexer l = {
