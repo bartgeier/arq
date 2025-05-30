@@ -31,10 +31,16 @@ void Error_msg_format(Error_msg *m) {
         }
 }
 
-void Error_msg_append_chr(Error_msg *m, char chr) {
+void Error_msg_append_chr(Error_msg *m, char const chr) {
         assert(m->size + 1 < m->SIZE);
         m->at[m->size++] = chr;
         m->at[m->size] = 0; // thats wy m->size has to be smaller than m->SIZE
+}
+
+void Error_msg_append_nchr(Error_msg *m, char const chr, uint32_t num_of_chr) {
+        for (uint32_t i = 0; i < num_of_chr; i++) {
+                Error_msg_append_chr(m, chr);
+        }
 }
 
 void Error_msg_append_lf(Error_msg *m) {

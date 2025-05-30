@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 
         //char buffer[1000];
         Arq_Option options[] = {
-                {'p', "print", fn_print, &self, "uint32_t, uint32_t = 11"},
+                {'p', "print", fn_print, &self, "uint32_t asdf"},
                 {'t', "test",  fn_test, &self, "uint32_t, uint32_t"},
                 // {'v', "version", fn_version, &self, "uint32_t"},
                 // {'p', "print", fn_print, &self, "uint32_t, uint32_t = 1000"},

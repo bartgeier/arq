@@ -22,23 +22,29 @@ char stack_buffer[1000];
 Arq_List_Vector *option_list = NULL;
 
 
+static void add_option_msg(Error_msg *error_msg, Arq_Option const *o) {
+        assert(o != NULL);
+        if (o->chr != 0) {
+                Error_msg_append_cstr(error_msg, "-");
+                Error_msg_append_chr(error_msg, o->chr);
+                Error_msg_append_cstr(error_msg, " ");
+        }
+        if (strlen(o->name) != 0) {
+                Error_msg_append_cstr(error_msg, "--");
+                Error_msg_append_cstr(error_msg, o->name);
+                Error_msg_append_cstr(error_msg, " ");
+        }
+        if (strlen(o->arguments ) != 0) {
+                Error_msg_append_cstr(error_msg, "(");
+                Error_msg_append_cstr(error_msg, o->arguments);
+                Error_msg_append_cstr(error_msg, ")");
+        }
+        Error_msg_append_lf(error_msg);
+}
+
 static void end(Error_msg *error_msg, Arq_Option const *o) {
         if (o != NULL) {
-                if (o->chr != 0) {
-                        Error_msg_append_cstr(error_msg, "-");
-                        Error_msg_append_chr(error_msg, o->chr);
-                }
-                if (strlen(o->name) != 0) {
-                        Error_msg_append_cstr(error_msg, " --");
-                        Error_msg_append_cstr(error_msg, o->name);
-
-                }
-                if (strlen(o->arguments ) != 0) {
-                        Error_msg_append_cstr(error_msg, " (");
-                        Error_msg_append_cstr(error_msg, o->arguments);
-                        Error_msg_append_cstr(error_msg, ")");
-                }
-                Error_msg_append_lf(error_msg);
+                add_option_msg(error_msg, o);
         }
         Error_msg_format(error_msg);
         printf("%s", error_msg->at);
@@ -90,6 +96,14 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                 );
 
                 arq_tokenize_option(&options[i], v, num_of_token);
+                uint32_to ups = arg_verify_vector(v, &error_msg);
+                if (ups.error) {
+                        add_option_msg(&error_msg, &options[i]);
+                        uint32_t const n = arq_option_parameter_idx(&options[i]) + 1 + ups.u32;
+                        Error_msg_append_nchr(&error_msg, ' ', n);
+                        Error_msg_append_cstr(&error_msg, "^\n");
+                        end(&error_msg, NULL);
+                }
 
                 assert(option_list->num_of_tokenVec < num_of_options);
                 option_list->at[option_list->num_of_tokenVec++] = v;
