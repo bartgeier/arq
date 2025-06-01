@@ -14,77 +14,23 @@ typedef struct {
 } Lexer;
 
 static bool is_long_identifier(char chr) {
-        return isalnum(chr) 
-                // || chr == '"'
-                || chr == '!'
-                || chr == '#'
-                || chr == '$'
-                || chr == '%'
-                || chr == '&'
-                || chr == '\''
-                || chr == '('
-                || chr == ')'
-                || chr == '*'
-                || chr == '+'
-                || chr == ','
-                || chr == '-'
-                || chr == '.'
-                || chr == '/'
-                || chr == ':'
-                || chr == ';'
-                || chr == '<'
-                || chr == '='
-                || chr == '>'
-                || chr == '?'
-                || chr == '@'
-                || chr == '['
-                || chr == '\\'
-                || chr == ']'
-                || chr == '^'
-                || chr == '_'
-                || chr == '{'
-                || chr == '|'
-                || chr == '}'
-                || chr == '~';
+        return isalnum(chr) || chr == '-';
 }
 
 static bool is_short_identifier(char chr) {
-        return isalnum(chr) 
-                // || chr == '"'
-                || chr == '!'
-                || chr == '#'
-                || chr == '$'
-                || chr == '%'
-                || chr == '&'
-                || chr == '\''
-                || chr == '('
-                || chr == ')'
-                || chr == '*'
-                || chr == '+'
-                || chr == ','
-                //|| chr == '-'
-                || chr == '.'
-                || chr == '/'
-                || chr == ':'
-                || chr == ';'
-                || chr == '<'
-                || chr == '='
-                || chr == '>'
-                || chr == '?'
-                || chr == '@'
-                || chr == '['
-                || chr == '\\'
-                || chr == ']'
-                || chr == '^'
-                || chr == '_'
-                || chr == '{'
-                || chr == '|'
-                || chr == '}'
-                || chr == '~';
+        return isalpha(chr) || chr == '?';
 }
 
-static Arq_Token next_token(Lexer *l) {
+static Arq_Token next_token(Lexer *l, bool const bundling) {
         Arq_Token t = {0};
+
+        if (bundling && is_short_identifier(l->at[l->cursor_idx])) {
+                t.id = ARQ_CMD_SHORT_OPTION; 
+                t.at = &l->at[l->cursor_idx];
+                l->cursor_idx++;
+                t.size = 1;
+                return t;
+        }
 
         if (isdigit(l->at[l->cursor_idx])) {
                 t.id = ARQ_P_NUMBER; 
@@ -94,6 +40,10 @@ static Arq_Token next_token(Lexer *l) {
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
+                }
+                if (l->cursor_idx < l->SIZE) {
+                        t.size = l->SIZE;
+                        t.id = ARQ_CMD_RAW_STR;
                 }
                 return t;
         }
@@ -111,7 +61,8 @@ static Arq_Token next_token(Lexer *l) {
                                 t.size++;
                         }
                         if (l->cursor_idx < l->SIZE) {
-                                t.id = ARQ_CMD_ERROR_NOT_NUMBER;
+                                t.size = l->SIZE;
+                                t.id = ARQ_CMD_RAW_STR;
                         }
                         return t;
                 }
@@ -162,33 +113,59 @@ uint32_t arq_cmd_num_of_token(int argc, char **argv) {
         uint32_t num_of_token = 0;
         argv += 1;
         argc -= 1;
+        bool bundling = false;
         for (int i = 0; i < argc; i++) {
                 Lexer lexer = {
                         .SIZE = strlen(argv[i]),
                         .cursor_idx = 0,
                         .at = argv[i],
                 };
-                if (ARQ_INIT != next_token(&lexer).id) {
+                Arq_Token const t = next_token(&lexer, bundling);
+                if (t.id != ARQ_INIT) {
                         num_of_token++;
+                }
+                bundling = lexer.cursor_idx < lexer.SIZE;
+                while (bundling) {
+                        // Option clustering
+                        lexer.SIZE -= lexer.cursor_idx;
+                        lexer.at = &lexer.at[lexer.cursor_idx];
+                        lexer.cursor_idx = 0;
+                        Arq_Token const t = next_token(&lexer, bundling);
+                        num_of_token++;
+                        bundling = (t.id == ARQ_CMD_SHORT_OPTION)
+                        && (lexer.cursor_idx < lexer.SIZE);
                 }
         }
         return num_of_token + 1;
 }
 
-void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t num_of_token) {
+void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
         assert(argc >= 1);
         argv += 1;
         argc -= 1;
+        bool bundling = false;
         for (int i = 0; i < argc; i++) {
                 Lexer lexer = {
                         .SIZE = strlen(argv[i]),
                         .cursor_idx = 0,
                         .at = argv[i],
                 };
-                Arq_Token t = next_token(&lexer);
+                Arq_Token const t = next_token(&lexer, bundling);
                 if (t.id != ARQ_INIT) {
                         assert(v->num_of_token < num_of_token);
                         v->at[v->num_of_token++] = t;
+                }
+                bundling = lexer.cursor_idx < lexer.SIZE;
+                while (bundling) { 
+                        // Option clustering
+                        lexer.SIZE -= lexer.cursor_idx;
+                        lexer.at = &lexer.at[lexer.cursor_idx];
+                        lexer.cursor_idx = 0;
+                        Arq_Token const t = next_token(&lexer, bundling);
+                        assert(v->num_of_token < num_of_token);
+                        v->at[v->num_of_token++] = t;
+                        bundling = (t.id == ARQ_CMD_SHORT_OPTION)
+                        && (lexer.cursor_idx < lexer.SIZE);
                 }
         }
         Arq_Token t = {
@@ -196,7 +173,7 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t num_of_toke
                 .at = NULL,
                 .size = 0,
         };
-        assert(v->num_of_token < num_of_token);
+        assert(v->num_of_token == num_of_token - 1);
         v->at[v->num_of_token++] = t;
 }
 

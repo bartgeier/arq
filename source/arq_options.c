@@ -1,6 +1,6 @@
 #include "arq_options.h"
 #include "arq_symbols.h"
-#include "arq_string.h"
+#include "arq_tok.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -176,7 +176,7 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                         i++;
                         if (tokens->at[i].id == ARQ_PARA_EQ) {
                                 i++;
-                                if (is_a_uint32_t_number(&tokens->at[i])) {
+                                if (arq_is_a_uint32_t(&tokens->at[i])) {
                                         i++;
                                         if (tokens->at[i].id == ARQ_PARA_COMMA) {
                                                 i++;

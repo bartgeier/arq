@@ -1,4 +1,4 @@
-#include "arq_string.h"
+#include "arq_tok.h"
 #include "arq_symbols.h"
 #include <assert.h>
 #include <string.h>
@@ -56,12 +56,12 @@ uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg
                 result.error = true;
                 return result;
         }
-        result = arq_tok_PNumber_to_uint32_t(token, error_msg, cstr);
+        result = arq_tok_pNumber_to_uint32_t(token, error_msg, cstr);
         return result;
 }
 
 uint32_to arq_tok_uint32_t_to_uint32_t(Arq_Token const *token) {
-        uint32_to num = arq_tok_PNumber_to_uint32_t(token, NULL, "");
+        uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
         assert(num.error == false);
         return num;
 }

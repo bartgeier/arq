@@ -4,7 +4,7 @@
 #include "arq_stack.h"
 #include "arq_cmd.h"
 #include "arq_token.h"
-#include "arq_string.h"
+#include "arq_tok.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,7 +62,7 @@ static void print_token(Arq_Token *t) {
 static void Error_msg_cmd_failure(Arq_msg *error_msg, char const *cstrA, Arq_Token const *token, char const *cstrB) {
         arq_msg_append_cstr(error_msg, "CMD line failure:\n");
         arq_msg_append_cstr(error_msg, cstrA);
-        arq_msg_append_cstr(error_msg, token->at);
+        arq_msg_append_str(error_msg, token->at, token->size);
         arq_msg_append_cstr(error_msg, cstrB);
         arq_msg_append_lf(error_msg);
 }
@@ -183,14 +183,14 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                 uint32_to num;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        num = uint32_t_str_to_uint32_t(&opt->at[i++]);
+                                        num = arq_tok_uint32_t_to_uint32_t(&opt->at[i++]);
                                         if (cmd->at[j].id == ARQ_P_NUMBER) {
-                                                num = p_number_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                                num = arq_tok_pNumber_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                                 if (num.error) { end(&error_msg, &options[row]); }
                                                 j = next_idx(cmd, j);
                                         }
                                 } else {
-                                        num = string_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                        num = arq_tok_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                         if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
                                 }

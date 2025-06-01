@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
         Arq_Option options[] = {
                 {'p', "print", fn_print, &self, "uint32_t = 3, uint32_t = 43"},
                 {'t', "test",  fn_test, &self, "uint32_t, uint32_t"},
-                // {'v', "version", fn_version, &self, "uint32_t"},
+                {'v', "version", fn_version, &self, ""},
                 // {'p', "print", fn_print, &self, "uint32_t, uint32_t = 1000"},
         };
         arq_fn(argc, argv, options, sizeof(options)/sizeof(Arq_Option));

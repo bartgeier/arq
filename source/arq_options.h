@@ -3,7 +3,7 @@
 
 #include "arq.h"
 #include "arq_token.h"
-#include "arq_string.h"
+#include "arq_tok.h"
 
 uint32_t arq_option_num_of_token(Arq_Option const *option);
 uint32_t arq_option_parameter_idx(Arq_Option const *option);
