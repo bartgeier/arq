@@ -31,6 +31,13 @@ void fn_test(void *self) {
         printf("fn_test %d %d\n", num_0, num_1);
 }
 
+void fn_cstring(void *self) {
+        (void)self;
+        // cstr_a = arq_cstr();
+        // cstr_b = arq_cstr();
+        //printf("fn_cstring cstr_a: %p, cstr_b %p\n", (void*)cstr_a, (void*)cstr_b);
+        printf("fn_cstring\n");
+}
 
 int main(int argc, char **argv) {
         // printf("%s\n", argv[1]);
@@ -41,10 +48,10 @@ int main(int argc, char **argv) {
 
         //char buffer[1000];
         Arq_Option options[] = {
-                {'p', "print", fn_print, &self, "uint32_t = 3, uint32_t = 43"},
+                {'p', "print", fn_print, &self, "uint32_t=3, uint32_t = 4"},
                 {'t', "test",  fn_test, &self, "uint32_t, uint32_t"},
                 {'v', "version", fn_version, &self, ""},
-                // {'p', "print", fn_print, &self, "uint32_t, uint32_t = 1000"},
+                {'c', "cstring", fn_cstring, &self, "cstr_t , cstr_t = NULL"},
         };
         arq_fn(argc, argv, options, sizeof(options)/sizeof(Arq_Option));
 

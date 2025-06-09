@@ -12,6 +12,8 @@ typedef struct {
 } KeyWord;
 
 static KeyWord const key_words[] = {
+        {  ARQ_PARA_NULL,  "NULL" },
+        {  ARQ_PARA_CSTR_T,  "cstr_t" },
         {  ARQ_PARA_UINT8_T,  "uint8_t" },
         {  ARQ_PARA_UINT16_T, "uint16_t" },
         {  ARQ_PARA_UINT32_T, "uint32_t" },
@@ -214,6 +216,50 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                                 uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                 return idx;
                         }
+                } else if (tokens->at[i].id == ARQ_PARA_CSTR_T) {
+                        i++;
+                        if (tokens->at[i].id == ARQ_PARA_EQ) {
+                                i++;
+                                if (tokens->at[i].id == ARQ_PARA_NULL) {
+                                        i++;
+                                        if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                                i++;
+                                                continue;
+                                        } else if (tokens->at[i].id == ARQ_END) {
+                                                i++;
+                                                break;
+                                        } else {
+                                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                                arq_msg_append_cstr(error_msg, "token '");
+                                                arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                                arq_msg_append_cstr(error_msg, "' but expected ',' or ''\n");
+                                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
+                                                return idx;
+                                        }
+                                } else {
+                                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                        arq_msg_append_cstr(error_msg, "token '");
+                                        arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                        arq_msg_append_cstr(error_msg, "' must be NULL\n");
+                                        uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
+                                        return idx;
+                                }
+
+                        } else if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                i++;
+                                continue;
+                        } else if (tokens->at[i].id == ARQ_END) {
+                                i++;
+                                break;
+                        } else {
+                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
+                                arq_msg_append_cstr(error_msg, "token '");
+                                arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
+                                arq_msg_append_cstr(error_msg, "' but expected ',' or '=' or ''\n");
+                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
+                                return idx;
+                        }
+
                 } else if (tokens->at[i].id == ARQ_END) {
                         break;
                 } else {

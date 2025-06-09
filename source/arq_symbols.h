@@ -8,6 +8,7 @@
         X(ARQ_PARA_N_PARAMETER) \
         X(ARQ_PARA_O_PARAMETER) \
         X(ARQ_PARA_IDENTFIER)  \
+        X(ARQ_PARA_NULL)   \
         X(ARQ_P_NUMBER)   \
         X(ARQ_N_NUMBER)   \
         X(ARQ_PARA_EQ)         \
@@ -15,6 +16,7 @@
         X(ARQ_END)        \
         X(ARQ_PARA_UNKNOWN)    \
 \
+        X(ARQ_PARA_CSTR_T)     \
         X(ARQ_PARA_UINT8_T)    \
         X(ARQ_PARA_UINT16_T)   \
         X(ARQ_PARA_UINT32_T)   \

@@ -82,6 +82,18 @@ static uint32_t next_idx(Arq_Vector *v, uint32_t idx) {
         return idx;
 }
 
+static uint32_t next_bundle_idx(Arq_Vector *v, uint32_t idx) {
+        char const *const begin = v->at[idx].at;
+        char const *const end = begin + strlen(begin);
+        assert(*end == 0);
+        char const *x = begin;
+        while ((idx < v->num_of_token - 1) && (x >= begin) && (x < end)) {
+                idx++;
+                x = v->at[idx].at;
+        }
+        return idx;
+}
+
 void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num_of_options) {
         option_list = (Arq_List_Vector *)malloc(sizeof(Arq_List_Vector) + num_of_options * sizeof(Arq_Vector));
 
@@ -96,6 +108,11 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                 );
 
                 arq_option_tokenize(&options[i], v, num_of_token);
+                printf("Option %d:\n", i);
+                for (uint32_t j = 0; j < v->num_of_token; j++) {
+                        print_token(&v->at[j]);
+                }
+
                 uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
                         add_option_msg(&error_msg, &options[i]);
@@ -108,10 +125,6 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                 assert(option_list->num_of_tokenVec < num_of_options);
                 option_list->at[option_list->num_of_tokenVec++] = v;
 
-                printf("Option %d:\n", i);
-                for (uint32_t j = 0; j < v->num_of_token; j++) {
-                        print_token(&v->at[j]);
-                }
         }
         printf("\n");
 
@@ -183,19 +196,59 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                 uint32_to num;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        num = arq_tok_uint32_t_to_uint32_t(&opt->at[i++]);
+                                        num = arq_tok_uint32_t_to_uint32_t(&opt->at[i]);
+                                        i = next_idx(opt, i);
                                         if (cmd->at[j].id == ARQ_P_NUMBER) {
                                                 num = arq_tok_pNumber_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                                 if (num.error) { end(&error_msg, &options[row]); }
                                                 j = next_idx(cmd, j);
                                         }
                                 } else {
+                                        i = next_idx(opt, i);
                                         num = arq_tok_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
                                         if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
                                 }
                                 arq_stack_push_uint32_t(num.u32);
                                 printf("u32 %d\n", num.u32);
+                                continue;
+                        }
+
+                        if (opt->at[i].id == ARQ_PARA_CSTR_T) {
+                                i = next_idx(opt, i);
+                                printf("ARQ_PARA_CSTR_T\n");
+                                //uint32_to num;
+                                if (opt->at[i].id == ARQ_PARA_EQ) {
+                                        i = next_idx(opt, i);
+                                        char const *cstr = (cmd->at[j].size > 0) ? cmd->at[j].at : NULL;
+                                        i = next_idx(opt, i);
+                                        if (cstr == NULL) {
+                                                printf("b_ push cstr (NULL)\n");
+                                        } else {
+                                                //j = next_idx(cmd, j);
+                                                j = next_bundle_idx(cmd, j);
+                                                printf("b push cstr %s\n", cstr);
+                                        }
+                                } else {
+                                        i = next_idx(opt, i);
+                                        char const *cstr = (cmd->at[j].size > 0) ? cmd->at[j].at : NULL;
+                                        //j = next_idx(cmd, j);
+                                        j = next_bundle_idx(cmd, j);
+                                        if (cstr == NULL) {
+                                                // error CMD line failure
+                                                printf("error cmd line '' ");
+                                        } 
+                                        // num = arq_tok_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
+                                        // if (num.error) { end(&error_msg, &options[row]); }
+                                        printf("a push cstr %s\n", cstr);
+                                        //j = next_idx(cmd, j);
+                                }
+                                todo 
+                                    - push cstr pointer to stack
+                                    - ARQ_CMD_RAW_STR refactor to ARQ_CMD_CSTR 
+                                //printf("push cstr\n");
+                                // arq_stack_push_uint32_t(num.u32);
+                                // printf("u32 %d\n", num.u32);
                                 continue;
                         }
 
