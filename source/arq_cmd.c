@@ -76,6 +76,13 @@ static Arq_Token next_argument_token(Lexer *l) {
                 if (start_n_number(&t, l)) {
                         return t;
                 }
+                if (l->at[l->cursor_idx] == '-') {
+                        set_token_RAW_STR(&t ,l);
+                        if (t.size == 2) {
+                                t.id = ARQ_CMD_ARGUMENT_MODE; 
+                        }
+                        return t; 
+                }
                 set_token_RAW_STR(&t ,l);
                 return t;
         }
@@ -127,7 +134,7 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                         if (t.size == 0) {
                                 t.at = t.at - 2;
                                 t.size = 2;
-                                t.id = ARQ_CMD_OPTION_TERMINATOR; 
+                                t.id = ARQ_CMD_ARGUMENT_MODE; 
                         }
                         return t; 
                 }
@@ -157,8 +164,8 @@ uint32_t arq_cmd_num_of_token(int argc, char **argv) {
                 ? next_token(&lexer, bundling)
                 : next_argument_token(&lexer);
 
-                if (t.id == ARQ_CMD_OPTION_TERMINATOR) {
-                        option = false;
+                if (t.id == ARQ_CMD_ARGUMENT_MODE) {
+                        option = !option;
                 } else if (t.id != ARQ_INIT) {
                         num_of_token++;
                 }
@@ -193,8 +200,8 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
                 ? next_token(&lexer, bundling)
                 : next_argument_token(&lexer);
 
-                if (t.id == ARQ_CMD_OPTION_TERMINATOR) {
-                        option = false;
+                if (t.id == ARQ_CMD_ARGUMENT_MODE) {
+                        option = !option;
                 } else if (t.id != ARQ_INIT) {
                         assert(v->num_of_token < num_of_token);
                         v->at[v->num_of_token++] = t;

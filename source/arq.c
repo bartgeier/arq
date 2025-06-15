@@ -217,22 +217,19 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                         if (opt->at[i].id == ARQ_PARA_CSTR_T) {
                                 i = next_idx(opt, i);
                                 printf("ARQ_PARA_CSTR_T\n");
-                                //uint32_to num;
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        char const *cstr = (cmd->at[j].size > 0) ? cmd->at[j].at : NULL;
+                                        char const *cstr = (cmd->at[j].id == ARQ_CMD_RAW_STR) ? cmd->at[j].at : NULL;
                                         i = next_idx(opt, i);
                                         if (cstr == NULL) {
                                                 printf("b_ push cstr (NULL)\n");
                                         } else {
-                                                //j = next_idx(cmd, j);
                                                 j = next_bundle_idx(cmd, j);
                                                 printf("b push cstr %s\n", cstr);
                                         }
                                 } else {
                                         i = next_idx(opt, i);
                                         char const *cstr = (cmd->at[j].size > 0) ? cmd->at[j].at : NULL;
-                                        //j = next_idx(cmd, j);
                                         j = next_bundle_idx(cmd, j);
                                         if (cstr == NULL) {
                                                 // error CMD line failure
@@ -243,9 +240,10 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                         printf("a push cstr %s\n", cstr);
                                         //j = next_idx(cmd, j);
                                 }
-                                todo 
-                                    - push cstr pointer to stack
-                                    - ARQ_CMD_RAW_STR refactor to ARQ_CMD_CSTR 
+                                // todo 
+                                //     - print error cmd line failures
+                                //     - push cstr pointer to stack
+                                //     - ARQ_CMD_RAW_STR refactor to ARQ_CMD_CSTR 
                                 //printf("push cstr\n");
                                 // arq_stack_push_uint32_t(num.u32);
                                 // printf("u32 %d\n", num.u32);
