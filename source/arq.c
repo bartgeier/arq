@@ -219,7 +219,7 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                 printf("ARQ_PARA_CSTR_T\n");
                                 if (opt->at[i].id == ARQ_PARA_EQ) {
                                         i = next_idx(opt, i);
-                                        char const *cstr = (cmd->at[j].id == ARQ_CMD_RAW_STR) ? cmd->at[j].at : NULL;
+                                        char const *cstr = (cmd->at[j].id != ARQ_CMD_LONG_OPTION && cmd->at[j].id != ARQ_CMD_SHORT_OPTION) ? cmd->at[j].at : NULL;
                                         i = next_idx(opt, i);
                                         if (cstr == NULL) {
                                                 printf("b_ push cstr (NULL)\n");
@@ -229,19 +229,19 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                         }
                                 } else {
                                         i = next_idx(opt, i);
-                                        char const *cstr = (cmd->at[j].size > 0) ? cmd->at[j].at : NULL;
-                                        j = next_bundle_idx(cmd, j);
-                                        if (cstr == NULL) {
-                                                // error CMD line failure
-                                                printf("error cmd line '' ");
+                                        if (cmd->at[j].id == ARQ_END) {
+                                                arq_msg_append_cstr(&error_msg, "CMD line failure:\n");
+                                                arq_msg_append_cstr(&error_msg, "Token '");
+                                                arq_msg_append_str(&error_msg, cmd->at[j].at, cmd->at[j].size);
+                                                arq_msg_append_cstr(&error_msg, "' is not a c string");
+                                                arq_msg_append_lf(&error_msg);
+                                                end(&error_msg, &options[row]);
                                         } 
-                                        // num = arq_tok_to_uint32_t(&cmd->at[j], &error_msg, "CMD line failure:\n");
-                                        // if (num.error) { end(&error_msg, &options[row]); }
+                                        char const *cstr = cmd->at[j].at;
+                                        j = next_bundle_idx(cmd, j);
                                         printf("a push cstr %s\n", cstr);
-                                        //j = next_idx(cmd, j);
                                 }
                                 // todo 
-                                //     - print error cmd line failures
                                 //     - push cstr pointer to stack
                                 //     - ARQ_CMD_RAW_STR refactor to ARQ_CMD_CSTR 
                                 //printf("push cstr\n");
