@@ -15,6 +15,7 @@ typedef struct {
                 int16_t i16;
                 int32_t i32;
                 int64_t i64;
+                char const *cstr;
         };
 } Stack_Type;
 
@@ -99,6 +100,14 @@ int32_t arq_int32_t(void) {
         return t.i32;
 }
 
+char const *arq_cstr_t(void) {
+        assert(stack.read_idx < stack.write_idx);
+        Stack_Type t = stack.at[stack.read_idx];
+        stack.read_idx++;
+        assert(t.type_id == ARQ_PARA_CSTR_T);
+        return t.cstr;
+}
+
 void arq_stack_push_uint8_t(uint8_t n) {
         assert(stack.write_idx < stack.SIZE);
         Stack_Type t = {
@@ -173,3 +182,12 @@ void arq_stack_push_int32_t(int32_t n) {
         stack.write_idx++;
 }
 
+void arq_stack_push_cstr_t(char const * cstr) {
+        assert(stack.write_idx < stack.SIZE);
+        Stack_Type t = {
+                .type_id = ARQ_PARA_CSTR_T,
+                .cstr = cstr,
+        };
+        stack.at[stack.write_idx] = t;
+        stack.write_idx++;
+}

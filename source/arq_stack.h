@@ -14,5 +14,6 @@ void arq_stack_push_int8_t(int8_t n);
 void arq_stack_push_int16_t(int16_t n);
 void arq_stack_push_int32_t(int32_t n);
 void arq_stack_push_int64_t(int64_t n);
+void arq_stack_push_cstr_t(char const *cstr);
 
 #endif

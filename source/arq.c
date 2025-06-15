@@ -1,4 +1,4 @@
-//#include "arq.h"
+#include "arq.h"
 #include "arq_symbols.h"
 #include "arq_options.h"
 #include "arq_stack.h"
@@ -221,12 +221,10 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                         i = next_idx(opt, i);
                                         char const *cstr = (cmd->at[j].id != ARQ_CMD_LONG_OPTION && cmd->at[j].id != ARQ_CMD_SHORT_OPTION) ? cmd->at[j].at : NULL;
                                         i = next_idx(opt, i);
-                                        if (cstr == NULL) {
-                                                printf("b_ push cstr (NULL)\n");
-                                        } else {
+                                        if (cstr != NULL) {
                                                 j = next_bundle_idx(cmd, j);
-                                                printf("b push cstr %s\n", cstr);
                                         }
+                                        arq_stack_push_cstr_t(cstr);
                                 } else {
                                         i = next_idx(opt, i);
                                         if (cmd->at[j].id == ARQ_END) {
@@ -237,16 +235,17 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
                                                 arq_msg_append_lf(&error_msg);
                                                 end(&error_msg, &options[row]);
                                         } 
+                                        if (cmd->at[j].id == ARQ_CMD_SHORT_OPTION) {
+                                             cmd->at[j].at -= 1;    // -foo
+                                             cmd->at[j].size += 1;
+                                        } else if (cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
+                                             cmd->at[j].at -= 2;   // --foo
+                                             cmd->at[j].size += 2;
+                                        }
                                         char const *cstr = cmd->at[j].at;
                                         j = next_bundle_idx(cmd, j);
-                                        printf("a push cstr %s\n", cstr);
+                                        arq_stack_push_cstr_t(cstr);
                                 }
-                                // todo 
-                                //     - push cstr pointer to stack
-                                //     - ARQ_CMD_RAW_STR refactor to ARQ_CMD_CSTR 
-                                //printf("push cstr\n");
-                                // arq_stack_push_uint32_t(num.u32);
-                                // printf("u32 %d\n", num.u32);
                                 continue;
                         }
 
@@ -270,6 +269,7 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         } // while
 } 
 
+todo memory management
 
 #if 0 
 typedef struct {

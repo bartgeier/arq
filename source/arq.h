@@ -22,5 +22,6 @@ uint64_t arq_uint64_t(void);
 int8_t arq_int8_t(void);
 int16_t arq_int16_t(void);
 int32_t arq_int32_t(void);
+char const *arq_cstr_t(void);
 
 #endif

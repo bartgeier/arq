@@ -33,10 +33,10 @@ void fn_test(void *self) {
 
 void fn_cstring(void *self) {
         (void)self;
-        // cstr_a = arq_cstr();
-        // cstr_b = arq_cstr();
-        //printf("fn_cstring cstr_a: %p, cstr_b %p\n", (void*)cstr_a, (void*)cstr_b);
-        printf("fn_cstring\n");
+        char const *cstr_a = arq_cstr_t();
+        char const *cstr_b = arq_cstr_t();
+        printf("fn_cstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b);
+        //printf("fn_cstring\n");
 }
 
 int main(int argc, char **argv) {
