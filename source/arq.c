@@ -71,7 +71,7 @@ static bool char_eq(Arq_Token *t, char a) {
         return a == (char)t->at[0];
 }
 
-void call_option_fn(Arq_Option const * option) {
+static void call_option_fn(Arq_Option const * option) {
         option->fn(option->self);
 }
 
@@ -269,7 +269,7 @@ void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num
         } // while
 } 
 
-todo memory management
+// todo memory management
 
 #if 0 
 typedef struct {

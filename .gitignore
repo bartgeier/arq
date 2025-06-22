@@ -1,6 +1,7 @@
 **/build
 **/.cache
 **/trash
+**/googletest
 
 nob
 nob.old
