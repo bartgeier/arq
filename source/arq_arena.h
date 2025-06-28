@@ -14,5 +14,6 @@ typedef struct {
 } ArqArena;
 
 ArqArena *arq_arena_init(void *buffer, uint32_t const size);
+void *arq_arena_malloc(ArqArena *m, uint32_t const num_of_bytes);
 
 #endif

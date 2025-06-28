@@ -39,7 +39,9 @@ void *arq_arena_malloc(ArqArena *m, uint32_t const num_of_bytes) {
 
         uint32_t const begin = m->size;
         m->size += padded_size;
-        return &m->at[begin];
+        void *buffer = &m->at[begin];
+        assert((uintptr_t)buffer % ARQ_ARENA_SIZE_OF_PADDING == 0 && "buffer does not align");
+        return buffer;
 }
 
 
