@@ -11,12 +11,12 @@ typedef struct {
 
 typedef struct {
         uint32_t num_of_token;
-        Arq_Token at[];
+        Arq_Token at[1];
 } Arq_Vector;
 
 typedef struct {
         uint32_t num_of_tokenVec;
-        Arq_Vector *at[];
+        Arq_Vector *at[1];
 } Arq_List_Vector;
 
 #endif

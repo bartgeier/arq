@@ -1,7 +1,9 @@
+#include <stddef.h>
 #include "gtest/gtest.h"
-
 #include "arq_arena.h"
 #include <stddef.h>
+#include <stdint.h>
+#include <assert.h>
 #include <stdio.h>
 
 static uint32_t padding(uint32_t const offset) {
@@ -52,12 +54,31 @@ TEST(arq_arena, malloc) {
                         EXPECT_EQ(arena->size, (uint32_t)(ARQ_ARENA_SIZE_OF_PADDING * ((n + ARQ_ARENA_SIZE_OF_PADDING - 1) / ARQ_ARENA_SIZE_OF_PADDING)));
                 }
         }
+        {
+                char array[100] = {0};
+                ArqArena *arena = arq_arena_init(&array, sizeof(array));
+                uint32_t const size_of_header = offsetof(ArqArena, at);
+                EXPECT_EQ(size_of_header, (uint32_t)24);
+                EXPECT_EQ(arena->SIZE, (uint32_t)sizeof(array) - size_of_header);
+                (void)arq_arena_malloc(arena, arena->SIZE);
+                EXPECT_EQ(arena->size, arena->SIZE);
+                EXPECT_EQ(arena->size, (uint32_t)76);
+                EXPECT_EQ(arena->stack_size, (uint32_t)0);
+        }
 }
 
-// typedef struct {
-//         uint32_t const SIZE;
-//         uint32_t size;
-//         uint32_t stack_size;
-//         char *stack;
-//         char at[];
-// } ArqArena;
+TEST(arq_arena, malloc_rest) {
+        char buffer[100] = {0};
+        ArqArena *arena = arq_arena_init(&buffer, sizeof(buffer));
+        assert((char *)buffer == (char *)arena);
+        uint32_t const arena_header = offsetof(ArqArena, at);
+        EXPECT_EQ(arena_header, (uint32_t)24);
+        {
+                uint32_t NUM_OF_TOKEN;
+                uint32_t const offset = 0;
+                uint32_t const size_of_element = 1;
+                (void)arq_arena_malloc_rest(arena, offset, size_of_element, &NUM_OF_TOKEN);
+                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)76);
+                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)sizeof(buffer) - arena_header);
+        }
+}

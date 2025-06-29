@@ -144,21 +144,6 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
-uint32_t arq_option_num_of_token(Arq_Option const *option) {
-        uint32_t len = strlen(option->arguments);
-        Lexer l = {
-                .cursor_idx = 0,
-                .SIZE = len,
-                .at = option->arguments,
-        };
-        uint32_t num_of_token = 0;
-        while (l.cursor_idx < l.SIZE) {
-                (void) next_token(&l);
-                num_of_token++;
-        }
-        return ++num_of_token;
-}
-
 uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         uint32_t result = 0;
         if (option->chr != 0) {
@@ -276,7 +261,7 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
 }
 
 
-void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const num_of_token) {
+void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const NUM_OF_TOKEN) {
         assert(v->num_of_token == 0);
         uint32_t len = strlen(option->arguments);
         Lexer l = {
@@ -285,12 +270,12 @@ void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const
                 .at = option->arguments,
         };
         while (l.cursor_idx < l.SIZE) {
-                assert(v->num_of_token < num_of_token);
+                assert(v->num_of_token < NUM_OF_TOKEN);
                 Arq_Token t = next_token(&l);
                 v->at[v->num_of_token++] = t;
         }
         Arq_Token t = { .id = ARQ_END, .at = &l.at[l.SIZE], .size = 0 };
-        assert(v->num_of_token < num_of_token);
+        assert(v->num_of_token < NUM_OF_TOKEN);
         v->at[v->num_of_token++] = t;
 }
 

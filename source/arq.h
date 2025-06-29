@@ -1,6 +1,7 @@
 #ifndef ARQ_H
 #define ARQ_H
 
+#include "arq_arena.h"
 #include <stdint.h>
 
 typedef void (*function_pointer_t)(void *self);
@@ -12,7 +13,7 @@ typedef struct {
         const char *arguments;   // "uint8_t, bool = false"
 } Arq_Option;
 
-void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num_of_options);
+void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, uint32_t const num_of_options);
 
 void arq_unused(void);
 uint8_t arq_uint8_t(void);

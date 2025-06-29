@@ -10,6 +10,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 char error_buffer[1000];
 Arq_msg error_msg = {
@@ -94,20 +95,22 @@ static uint32_t next_bundle_idx(Arq_Vector *v, uint32_t idx) {
         return idx;
 }
 
-void arq_fn(int argc, char **argv, Arq_Option const *options, uint32_t const num_of_options) {
-        option_list = (Arq_List_Vector *)malloc(sizeof(Arq_List_Vector) + num_of_options * sizeof(Arq_Vector));
+void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, uint32_t const num_of_options) {
+        option_list = (Arq_List_Vector *)arq_arena_malloc(arena, offsetof(Arq_List_Vector, at) + num_of_options * sizeof(Arq_Vector *));
 
         uint32_t n = arq_stack_init(&stack_buffer, sizeof(stack_buffer));
         printf("Max possible arguments %d\n",n);
 
         for (uint32_t i = 0; i < num_of_options; i++) {
-                uint32_t num_of_token = arq_option_num_of_token(&options[i]);
-                Arq_Vector *v = (Arq_Vector *)calloc(
-                        1,
-                        sizeof(Arq_Vector) + num_of_token * sizeof(Arq_Token)
-                );
+                uint32_t NUM_OF_TOKEN;
+                uint32_t const shrink = arena->size;
+                Arq_Vector *v = arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+                arena->size = shrink;
 
-                arq_option_tokenize(&options[i], v, num_of_token);
+                arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
+                Arq_Vector *vb = arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + v->num_of_token * sizeof(Arq_Token));
+                assert(v == vb);
+
                 printf("Option %d:\n", i);
                 for (uint32_t j = 0; j < v->num_of_token; j++) {
                         print_token(&v->at[j]);

@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "arq.h"
+#include "arq_arena.h"
 #include "arq_stack.h"
 //#include "arq_options.h"
 //#include "arq_cmd.h"
@@ -46,14 +47,15 @@ int main(int argc, char **argv) {
         (void) argv;
         Context self = { .help = false, };
 
-        //char buffer[1000];
         Arq_Option options[] = {
+                {'v', "version", fn_version, &self, ""},
                 {'p', "print", fn_print, &self, "uint32_t=3, uint32_t = 4"},
                 {'t', "test",  fn_test, &self, "uint32_t, uint32_t"},
-                {'v', "version", fn_version, &self, ""},
                 {'c', "cstring", fn_cstring, &self, "cstr_t , cstr_t = NULL"},
         };
-        arq_fn(argc, argv, options, sizeof(options)/sizeof(Arq_Option));
+        char *buffer[10000] = {0};
+        ArqArena *arena = arq_arena_init(&buffer, sizeof(buffer));
+        arq_fn(argc, argv, arena, options, sizeof(options)/sizeof(Arq_Option));
 
        // arq_compile_options(options, 3);
 
