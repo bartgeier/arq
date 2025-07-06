@@ -133,19 +133,22 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
 
 ///////////////////////////////////////////////////////////////////////////////
 
-        uint32_t num_of_token = arq_cmd_num_of_token(argc, argv);
-        Arq_Vector *cmd = (Arq_Vector *)calloc(
-                1,
-                sizeof(Arq_Vector) + num_of_token * sizeof(Arq_Token)
-        );
-        arq_cmd_tokenize(argc, argv, cmd, num_of_token);
-
-        printf("Command line: %d \n", num_of_token);
+        Arq_Vector *cmd;
+        {
+                uint32_t NUM_OF_TOKEN;
+                uint32_t const shrink = arena->size;
+                cmd = arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+                arena->size = shrink;
+                arq_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
+                Arq_Vector *cmd_b = arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + cmd->num_of_token * sizeof(Arq_Token));
+                assert(cmd == cmd_b);
+        }
+        printf("Command line: %d \n", cmd->num_of_token);
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
                 print_token(&cmd->at[i]);
         }
         printf("\n-------- interpreter --------------\n\n");
-        
+
 ///////////////////////////////////////////////////////////////////////////////
 
         uint32_t row = 0;

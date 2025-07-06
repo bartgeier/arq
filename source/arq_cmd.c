@@ -147,43 +147,6 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
         return t;
 }
 
-uint32_t arq_cmd_num_of_token(int argc, char **argv) {
-        assert(argc >= 1);
-        uint32_t num_of_token = 0;
-        argv += 1;
-        argc -= 1;
-        bool bundling = false;
-        bool option = true;
-        for (int i = 0; i < argc; i++) {
-                Lexer lexer = {
-                        .SIZE = strlen(argv[i]),
-                        .cursor_idx = 0,
-                        .at = argv[i],
-                };
-                Arq_Token const t = option
-                ? next_token(&lexer, bundling)
-                : next_argument_token(&lexer);
-
-                if (t.id == ARQ_CMD_ARGUMENT_MODE) {
-                        option = !option;
-                } else if (t.id != ARQ_INIT) {
-                        num_of_token++;
-                }
-                bundling = lexer.cursor_idx < lexer.SIZE;
-                while (bundling) {
-                        // Option clustering
-                        lexer.SIZE -= lexer.cursor_idx;
-                        lexer.at = &lexer.at[lexer.cursor_idx];
-                        lexer.cursor_idx = 0;
-                        Arq_Token const t = next_token(&lexer, bundling);
-                        num_of_token++;
-                        bundling = (t.id == ARQ_CMD_SHORT_OPTION)
-                        && (lexer.cursor_idx < lexer.SIZE);
-                }
-        }
-        return num_of_token + 1;
-}
-
 void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
         assert(argc >= 1);
         argv += 1;
@@ -224,7 +187,7 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
                 .at = NULL,
                 .size = 0,
         };
-        assert(v->num_of_token == num_of_token - 1);
+        assert(v->num_of_token < num_of_token);
         v->at[v->num_of_token++] = t;
 }
 
