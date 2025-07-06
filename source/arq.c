@@ -1,7 +1,7 @@
 #include "arq.h"
 #include "arq_symbols.h"
 #include "arq_options.h"
-#include "arq_stack.h"
+#include "arq_queue.h"
 #include "arq_cmd.h"
 #include "arq_token.h"
 #include "arq_tok.h"
@@ -98,8 +98,6 @@ static uint32_t next_bundle_idx(Arq_Vector *v, uint32_t idx) {
 void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, uint32_t const num_of_options) {
         option_list = (Arq_List_Vector *)arq_arena_malloc(arena, offsetof(Arq_List_Vector, at) + num_of_options * sizeof(Arq_Vector *));
 
-        uint32_t n = arq_stack_init(&stack_buffer, sizeof(stack_buffer));
-        printf("Max possible arguments %d\n",n);
 
         for (uint32_t i = 0; i < num_of_options; i++) {
                 uint32_t NUM_OF_TOKEN;
@@ -147,9 +145,20 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
         for (uint32_t i = 0; i < cmd->num_of_token; i++) {
                 print_token(&cmd->at[i]);
         }
-        printf("\n-------- interpreter --------------\n\n");
 
 ///////////////////////////////////////////////////////////////////////////////
+
+        printf("\n-------- interpreter --------------\n\n");
+        // {
+        //         uint32_t NUM_OF_TOKEN;
+        //         uint32_t const shrink = arena->size;
+        //         Arq_Vector *queue = arq_arena_malloc_rest(arena, offsetof(Stack, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+        //         arena->size = shrink;
+
+        //         // arq_stack_push_uint32_t(num.u32);
+        // }
+        uint32_t n = arq_queue_malloc(arena);
+        printf("Max possible arguments %d\n",n);
 
         uint32_t row = 0;
         bool found = false;
@@ -215,7 +224,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
                                 }
-                                arq_stack_push_uint32_t(num.u32);
+                                arq_queue_push_uint32_t(num.u32);
                                 printf("u32 %d\n", num.u32);
                                 continue;
                         }
@@ -230,7 +239,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         if (cstr != NULL) {
                                                 j = next_bundle_idx(cmd, j);
                                         }
-                                        arq_stack_push_cstr_t(cstr);
+                                        arq_queue_push_cstr_t(cstr);
                                 } else {
                                         i = next_idx(opt, i);
                                         if (cmd->at[j].id == ARQ_END) {
@@ -250,7 +259,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         }
                                         char const *cstr = cmd->at[j].at;
                                         j = next_bundle_idx(cmd, j);
-                                        arq_stack_push_cstr_t(cstr);
+                                        arq_queue_push_cstr_t(cstr);
                                 }
                                 continue;
                         }

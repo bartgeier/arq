@@ -4,9 +4,6 @@
 
 #include "arq.h"
 #include "arq_arena.h"
-#include "arq_stack.h"
-//#include "arq_options.h"
-//#include "arq_cmd.h"
 
 typedef struct {
         bool help;
