@@ -1,6 +1,5 @@
 #include "arq_options.h"
 #include "arq_symbols.h"
-#include "arq_tok.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>

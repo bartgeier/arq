@@ -4,7 +4,7 @@
 #include "arq_queue.h"
 #include "arq_cmd.h"
 #include "arq_token.h"
-#include "arq_tok.h"
+#include "arq_conversion.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,8 +72,8 @@ static bool char_eq(Arq_Token *t, char a) {
         return a == (char)t->at[0];
 }
 
-static void call_option_fn(Arq_Option const * option) {
-        option->fn(option->self);
+static void call_option_fn(Arq_Option const * option, Arq_Queue *queue) {
+        option->fn(option->context, queue);
 }
 
 static uint32_t next_idx(Arq_Vector *v, uint32_t idx) {
@@ -95,7 +95,7 @@ static uint32_t next_bundle_idx(Arq_Vector *v, uint32_t idx) {
         return idx;
 }
 
-void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, uint32_t const num_of_options) {
+void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options) {
         option_list = (Arq_List_Vector *)arq_arena_malloc(arena, offsetof(Arq_List_Vector, at) + num_of_options * sizeof(Arq_Vector *));
 
 
@@ -157,8 +157,8 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
 
         //         // arq_stack_push_uint32_t(num.u32);
         // }
-        uint32_t n = arq_queue_malloc(arena);
-        printf("Max possible arguments %d\n",n);
+        Arq_Queue *queue = arq_queue_malloc(arena);
+        printf("Max possible arguments %d\n", queue->NUM_OF_ARGUMENTS);
 
         uint32_t row = 0;
         bool found = false;
@@ -224,7 +224,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         if (num.error) { end(&error_msg, &options[row]); }
                                         j = next_idx(cmd, j);
                                 }
-                                arq_queue_push_uint32_t(num.u32);
+                                arq_push_uint32_t(queue, num.u32);
                                 printf("u32 %d\n", num.u32);
                                 continue;
                         }
@@ -239,7 +239,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         if (cstr != NULL) {
                                                 j = next_bundle_idx(cmd, j);
                                         }
-                                        arq_queue_push_cstr_t(cstr);
+                                        arq_push_cstr_t(queue, cstr);
                                 } else {
                                         i = next_idx(opt, i);
                                         if (cmd->at[j].id == ARQ_END) {
@@ -259,7 +259,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
                                         }
                                         char const *cstr = cmd->at[j].at;
                                         j = next_bundle_idx(cmd, j);
-                                        arq_queue_push_cstr_t(cstr);
+                                        arq_push_cstr_t(queue, cstr);
                                 }
                                 continue;
                         }
@@ -272,7 +272,7 @@ void arq_fn(int argc, char **argv, ArqArena *arena, Arq_Option const *options, u
 
                         if (opt->at[i].id == ARQ_END) {
                                 printf("ARQ_END\n\n");
-                                call_option_fn(&options[row]);
+                                call_option_fn(&options[row], queue);
                                 found = false;
                                 if (cmd->at[j].id == ARQ_END) {
                                         return;

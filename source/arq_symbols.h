@@ -43,7 +43,7 @@ X(ARQ_CMD_N_NUMBER)
 #define X(name)name,
 typedef enum {
         ARQ_LIST_OF_IDS
-} Arq_TypeID;
+} Arq_SymbolID;
 #undef X
 
 extern char *symbol_names[];

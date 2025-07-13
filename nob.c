@@ -26,7 +26,7 @@ void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/arq_queue.c");
         nob_cmd_append(&source_paths, "./source/arq_options.c");
         nob_cmd_append(&source_paths, "./source/arq_cmd.c");
-        nob_cmd_append(&source_paths, "./source/arq_tok.c");
+        nob_cmd_append(&source_paths, "./source/arq_conversion.c");
         nob_cmd_append(&source_paths, "./source/arq_msg.c");
         nob_cmd_append(&source_paths, "./source/arq_arena.c");
 }
@@ -150,7 +150,9 @@ bool unittests_build(bool const clean) {
         nob_cmd_append(&cmd, "-L", "googletest/build/lib/");
         nob_cmd_append(&cmd, "-o", "build/test");
         nob_cmd_append(&cmd, "source/arq_arena.c");
+        nob_cmd_append(&cmd, "source/arq_queue.c");
         nob_cmd_append(&cmd, "unittests/tst_arq_arena.c");
+        nob_cmd_append(&cmd, "unittests/tst_arq_queue.c");
         nob_cmd_append(&cmd, "-lgtest", "-lgtest_main");
         ok &= nob_cmd_run_sync(cmd);
         cmd.count = 0;

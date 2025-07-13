@@ -10,29 +10,30 @@ typedef struct {
         uint8_t number;
 } Context;
 
-void fn_print(void *self) {
-        (void)self;
-        uint32_t begin = arq_uint32_t();
-        uint32_t end = arq_uint32_t();
+void fn_print(void *context, Arq_Queue *queue) {
+        (void)context;
+        uint32_t begin = arq_uint32_t(queue);
+        uint32_t end = arq_uint32_t(queue);
         printf("fn_print begin = %d, end = %d\n", begin, end);
 }
 
-void fn_version(void *self) {
-        (void)self;
+void fn_version(void *context, Arq_Queue *queue) {
+        (void)context;
+        (void) queue;
         printf("version 1.1.1 \n");
 }
 
-void fn_test(void *self) {
-        (void)self;
-        uint32_t num_0 = arq_uint32_t();
-        uint32_t num_1 = arq_uint32_t();
+void fn_test(void *context, Arq_Queue *queue) {
+        (void)context;
+        uint32_t num_0 = arq_uint32_t(queue);
+        uint32_t num_1 = arq_uint32_t(queue);
         printf("fn_test %d %d\n", num_0, num_1);
 }
 
-void fn_cstring(void *self) {
-        (void)self;
-        char const *cstr_a = arq_cstr_t();
-        char const *cstr_b = arq_cstr_t();
+void fn_cstring(void *context, Arq_Queue *queue) {
+        (void)context;
+        char const *cstr_a = arq_cstr_t(queue);
+        char const *cstr_b = arq_cstr_t(queue);
         printf("fn_cstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b);
         //printf("fn_cstring\n");
 }
@@ -40,30 +41,18 @@ void fn_cstring(void *self) {
 int main(int argc, char **argv) {
         // printf("%s\n", argv[1]);
         // return 0;
-        (void) argc;
-        (void) argv;
-        Context self = { .help = false, };
+        // (void) argc;
+        // (void) argv;
+        Context ctx = { .help = false, };
 
         Arq_Option options[] = {
-                {'v', "version", fn_version, &self, ""},
-                {'p', "print", fn_print, &self, "uint32_t=3, uint32_t = 4"},
-                {'t', "test",  fn_test, &self, "uint32_t, uint32_t"},
-                {'c', "cstring", fn_cstring, &self, "cstr_t , cstr_t = NULL"},
+                {'v', "version", fn_version, &ctx, ""},
+                {'p', "print", fn_print, &ctx, "uint32_t=3, uint32_t = 4"},
+                {'t', "test",  fn_test, &ctx, "uint32_t, uint32_t"},
+                {'c', "cstring", fn_cstring, &ctx, "cstr_t , cstr_t = NULL"},
         };
         char *buffer[10000] = {0};
-        ArqArena *arena = arq_arena_init(&buffer, sizeof(buffer));
+        Arq_Arena *arena = arq_arena_init(&buffer, sizeof(buffer));
         arq_fn(argc, argv, arena, options, sizeof(options)/sizeof(Arq_Option));
-
-       // arq_compile_options(options, 3);
-
-       // arq_compile_cmd(argc, argv);
-
-        // options[0].fn(options[0].self);
-        // options[1].fn(options[1].self);
-
-        // arq_push_uint32_t(68);
-        // options[2].fn(options[2].self);
-
-        
         return 0;
 }

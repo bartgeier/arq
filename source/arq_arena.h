@@ -11,10 +11,10 @@ typedef struct {
         uint32_t stack_size;
         char *stack;
         char at[1];
-} ArqArena;
+} Arq_Arena;
 
-ArqArena *arq_arena_init(void *buffer, uint32_t const size);
-void *arq_arena_malloc(ArqArena *m, uint32_t const num_of_bytes);
-void *arq_arena_malloc_rest(ArqArena *m, uint32_t const size_of_header, uint32_t const size_of_element, uint32_t *num_of_elements);
+Arq_Arena *arq_arena_init(void *buffer, uint32_t const size);
+void *arq_arena_malloc(Arq_Arena *m, uint32_t const num_of_bytes);
+void *arq_arena_malloc_rest(Arq_Arena *m, uint32_t const size_of_header, uint32_t const size_of_element, uint32_t *num_of_elements);
 
 #endif
