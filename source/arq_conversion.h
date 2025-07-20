@@ -13,10 +13,17 @@ typedef struct {
         uint32_t u32;
 } uint32_to;
 
+#ifdef __cplusplus
+exter "C" {
+#endif
+
 uint32_to arq_tok_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_uint32_t_to_uint32_t(Arq_Token const *token);
 bool arq_is_a_uint32_t(Arq_Token const *token);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

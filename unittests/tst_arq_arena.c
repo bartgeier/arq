@@ -21,11 +21,9 @@ TEST(arq_arena, init) {
                 uint32_t const size_of_header = offsetof(Arq_Arena, at);
 
                 EXPECT_EQ((char*)arena, (char*)(buffer + padding(offset)));
-                EXPECT_EQ((uint32_t)size_of_header, (uint32_t)24);
+                EXPECT_EQ((uint32_t)size_of_header, (uint32_t)8);
                 EXPECT_EQ(arena->SIZE, sizeof(array) - offset - padding(offset) - size_of_header);
-                EXPECT_EQ(arena->stack_size, (uint32_t)0);
                 EXPECT_EQ(arena->size, (uint32_t)0);
-                // EXPECT_EQ(arena->SIZE, (uint32_t)60);
         }
 }
 
@@ -34,11 +32,10 @@ TEST(arq_arena, malloc) {
                 char array[100] = {0};
                 Arq_Arena *arena = arq_arena_init(&array, sizeof(array));
                 uint32_t const size_of_header = offsetof(Arq_Arena, at);
-                EXPECT_EQ(size_of_header, (uint32_t)24);
+                EXPECT_EQ(size_of_header, (uint32_t)8);
                 for (uint32_t i = 1; i < 10; i++) {
                         (void)arq_arena_malloc(arena, 5);
                         EXPECT_EQ(arena->SIZE, (uint32_t)100 - size_of_header);
-                        EXPECT_EQ(arena->stack_size, (uint32_t)0);
                         EXPECT_EQ(arena->size, (uint32_t)(i * ARQ_ARENA_SIZE_OF_PADDING));
                 }
         }
@@ -47,10 +44,9 @@ TEST(arq_arena, malloc) {
                         char array[100] = {0};
                         Arq_Arena *arena = arq_arena_init(&array, sizeof(array));
                         uint32_t const size_of_header = offsetof(Arq_Arena, at);
-                        EXPECT_EQ(size_of_header, (uint32_t)24);
+                        EXPECT_EQ(size_of_header, (uint32_t)8);
                         (void)arq_arena_malloc(arena, n);
                         EXPECT_EQ(arena->SIZE, (uint32_t)100 - size_of_header);
-                        EXPECT_EQ(arena->stack_size, (uint32_t)0);
                         EXPECT_EQ(arena->size, (uint32_t)(ARQ_ARENA_SIZE_OF_PADDING * ((n + ARQ_ARENA_SIZE_OF_PADDING - 1) / ARQ_ARENA_SIZE_OF_PADDING)));
                 }
         }
@@ -58,12 +54,11 @@ TEST(arq_arena, malloc) {
                 char array[100] = {0};
                 Arq_Arena *arena = arq_arena_init(&array, sizeof(array));
                 uint32_t const size_of_header = offsetof(Arq_Arena, at);
-                EXPECT_EQ(size_of_header, (uint32_t)24);
+                EXPECT_EQ(size_of_header, (uint32_t)8);
                 EXPECT_EQ(arena->SIZE, (uint32_t)sizeof(array) - size_of_header);
                 (void)arq_arena_malloc(arena, arena->SIZE);
                 EXPECT_EQ(arena->size, arena->SIZE);
-                EXPECT_EQ(arena->size, (uint32_t)76);
-                EXPECT_EQ(arena->stack_size, (uint32_t)0);
+                EXPECT_EQ(arena->size, (uint32_t)92);
         }
 }
 
@@ -71,14 +66,14 @@ TEST(arq_arena, malloc_rest) {
         char buffer[100] = {0};
         Arq_Arena *arena = arq_arena_init(&buffer, sizeof(buffer));
         assert((char *)buffer == (char *)arena);
-        uint32_t const arena_header = offsetof(Arq_Arena, at);
-        EXPECT_EQ(arena_header, (uint32_t)24);
+        uint32_t const size_of_header = offsetof(Arq_Arena, at);
+        EXPECT_EQ(size_of_header, (uint32_t)8);
         {
                 uint32_t NUM_OF_TOKEN;
                 uint32_t const offset = 0;
                 uint32_t const size_of_element = 1;
                 (void)arq_arena_malloc_rest(arena, offset, size_of_element, &NUM_OF_TOKEN);
-                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)76);
-                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)sizeof(buffer) - arena_header);
+                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)92);
+                EXPECT_EQ(NUM_OF_TOKEN, (uint32_t)sizeof(buffer) - size_of_header);
         }
 }

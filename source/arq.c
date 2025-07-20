@@ -162,12 +162,13 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
 
         uint32_t row = 0;
         bool found = false;
-        uint32_t j = 0;
-        uint32_t i = 0;
+        hier gehts weiter mit der immediate Funktionalität
+        uint32_t j = 0; // arq_imm_reset_vec(cmd) Arq_Vector needs read_idx
+        uint32_t i = 0; // arq_imm_reset_list(options) Arq_List_Vector needs row_idx 
         while(j < cmd->num_of_token) {
-                if (!found && cmd->at[j].id == ARQ_CMD_LONG_OPTION) {
-                        printf("ARQ_CMD_LONG_OPTION\n");
-                        for (uint32_t o = 0; o < num_of_options; o++) {
+                if (!found && cmd->at[j].id == ARQ_CMD_LONG_OPTION) {                         // arq_imm_is_long_option(cmd); arq_imm_is_short_option(cmd); arq_imm_is_end(cmd);
+                        printf("ARQ_CMD_LONG_OPTION\n");                                      // Arq_Vector *opt = arq_imm_found(cmd, options);
+                        for (uint32_t o = 0; o < num_of_options; o++) {                       // arq_imm_next(cmd); arq_imm_next(opt);
                                 if (string_eq(&cmd->at[j], options[o].name)) {
                                         found = true;
                                         row = o;

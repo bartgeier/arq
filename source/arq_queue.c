@@ -1,28 +1,35 @@
 #include "arq_queue.h"
 #include "arq.h"
-#include "arq_symbols.h"
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
 
-
+#ifdef __cplusplus
+#include <new>
+#endif
 
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena) {
         uint32_t NUM_OF_ARGUMENTS;
-        uint32_t const shrink = arena->size;
+        uint32_t const shrink_snapshot = arena->size;
         Arq_Queue *queue = (Arq_Queue *)arq_arena_malloc_rest(arena, offsetof(Arq_Queue, at), sizeof(Arq_Argument), &NUM_OF_ARGUMENTS);
-        Arq_Argument dummy = {
-                .type_id = ARQ_PARA_UINT16_T,
-                .u16 = 0,
-        };
-        Arq_Queue a = {
-                .shrink = shrink,
+        #ifdef __cplusplus
+            new (queue) Arq_Queue{
+                shrink_snapshot,
+                NUM_OF_ARGUMENTS,
+                0,
+                0,
+                {{ ARQ_PARA_UINT16_T, 0 }}
+            };
+        #else
+            Arq_Queue a = {
+                .shrink = shrink_snapshot,
                 .NUM_OF_ARGUMENTS = NUM_OF_ARGUMENTS,
                 .read_idx = 0,
                 .write_idx = 0,
-                .at = {dummy}
-        };
-        memcpy(queue, &a, sizeof(Arq_Queue));
+                .at = {{ .type_id = ARQ_PARA_UINT16_T, .u16 = 0 }}
+            };
+            memcpy(queue, &a, sizeof(Arq_Queue));
+        #endif
         return queue;
 }
 

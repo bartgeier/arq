@@ -15,8 +15,11 @@ typedef struct {
         const char *arguments;   // "uint8_t, bool = false"
 } Arq_Option;
 
-void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options);
 void arq_unused(Arq_Queue *queue);
 uint8_t arq_uint8_t(Arq_Queue *queue);
 uint16_t arq_uint16_t(Arq_Queue *queue);
@@ -27,4 +30,7 @@ int16_t arq_int16_t(Arq_Queue *queue);
 int32_t arq_int32_t(Arq_Queue *queue);
 char const *arq_cstr_t(Arq_Queue *queue);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

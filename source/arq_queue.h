@@ -28,6 +28,10 @@ typedef struct Arq_QueueStruct{
         Arq_Argument at[1];
 } Arq_Queue;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena);
 
 void arq_push_uint8_t(Arq_Queue *queue, uint8_t n);
@@ -40,4 +44,7 @@ void arq_push_int32_t(Arq_Queue *queue, int32_t n);
 void arq_push_int64_t(Arq_Queue *queue, int64_t n);
 void arq_push_cstr_t(Arq_Queue *queue, char const *cstr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -4,8 +4,15 @@
 #include "arq.h"
 #include "arq_conversion.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint32_t arq_option_parameter_idx(Arq_Option const *option);
 void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const num_of_token);
 uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
