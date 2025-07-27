@@ -6,7 +6,7 @@
 #include <inttypes.h>
 
 
-bool string_eq(Arq_Token *token, char const *cstr) {
+bool string_eq(Arq_Token const *token, char const *cstr) {
         if (strlen(cstr) != token->size) {
                 return false;
         }
@@ -60,11 +60,11 @@ uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg
         return result;
 }
 
-uint32_to arq_tok_uint32_t_to_uint32_t(Arq_Token const *token) {
-        uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
-        assert(num.error == false);
-        return num;
-}
+//uint32_to arq_tok_uint32_t_to_uint32_t(Arq_Token const *token) {
+//        uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
+//        assert(num.error == false);
+//        return num;
+//}
 
 bool arq_is_a_uint32_t(Arq_Token const *token) {
         uint32_to num = arq_tok_to_uint32_t(token, NULL, "");

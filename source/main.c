@@ -4,6 +4,7 @@
 
 #include "arq.h"
 #include "arq_arena.h"
+#include <memory.h>
 
 typedef struct {
         bool help;
@@ -51,7 +52,8 @@ int main(int argc, char **argv) {
                 {'t', "test",  fn_test, &ctx, "uint32_t, uint32_t"},
                 {'c', "cstring", fn_cstring, &ctx, "cstr_t , cstr_t = NULL"},
         };
-        char *buffer[10000] = {0};
+        char buffer[10000];
+        memset(buffer, 0xFF, sizeof(buffer));
         Arq_Arena *arena = arq_arena_init(&buffer, sizeof(buffer));
         arq_fn(argc, argv, arena, options, sizeof(options)/sizeof(Arq_Option));
         return 0;

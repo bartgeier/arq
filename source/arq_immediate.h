@@ -1,0 +1,31 @@
+#ifndef ARQ_IMMEDIATE_H
+#define ARQ_IMMEDIATE_H
+
+#include "arq.h"
+#include "arq_symbols.h"
+#include "arq_token.h"
+#include "arq_conversion.h"
+#include <stdbool.h>
+
+bool arq_imm_cmd_has_token_left(Arq_Vector *cmd);
+bool arq_imm_cmd_is_long_option(Arq_Vector *cmd);
+bool arq_imm_cmd_is_short_option(Arq_Vector *cmd);
+
+Arq_Vector *arq_imm_get_long(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector const *cmd
+);
+Arq_Vector *arq_imm_get_short(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector const *cmd
+);
+
+void arq_imm_next(Arq_Vector *v);
+
+bool arq_imm_opt_is(Arq_Vector *opt, Arq_SymbolID const id);
+
+uint32_to arq_imm_opt_uint32_t(Arq_Vector *opt);
+
+#endif 

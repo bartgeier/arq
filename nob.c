@@ -29,6 +29,7 @@ void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/arq_conversion.c");
         nob_cmd_append(&source_paths, "./source/arq_msg.c");
         nob_cmd_append(&source_paths, "./source/arq_arena.c");
+        nob_cmd_append(&source_paths, "./source/arq_immediate.c");
 }
 
 bool arq_build(bool const clean) {

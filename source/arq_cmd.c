@@ -151,6 +151,8 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
         assert(argc >= 1);
         argv += 1;
         argc -= 1;
+        v->num_of_token = 0;
+        v->idx = 0;
         bool bundling = false;
         bool option = true;
         for (int i = 0; i < argc; i++) {
