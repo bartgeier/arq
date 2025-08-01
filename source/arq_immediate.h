@@ -27,7 +27,10 @@ void arq_imm_next(Arq_Vector *v);
 bool arq_imm_type(Arq_Vector *opt, Arq_SymbolID const id);
 bool arq_imm_assignment_equal(Arq_Vector *opt);
 uint32_to arq_imm_default_uint32_t(Arq_Vector *opt);
+char const *arq_imm_default_cstr_t(Arq_Vector *opt);
 
-bool arq_imm_cmd_spot_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
+bool arq_imm_if_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
+void arq_imm_if_cstr_t(Arq_Vector *cmd, char const **cstr);
+uint32_to arq_imm_take_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg);
 
 #endif 

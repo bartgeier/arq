@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool string_eq(Arq_Token const *token, char const *cstr);
 
 typedef struct {
         bool error;
@@ -17,9 +16,8 @@ typedef struct {
 exter "C" {
 #endif
 
-uint32_to arq_tok_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+bool string_eq(Arq_Token const *token, char const *cstr);
 uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
-//uint32_to arq_tok_uint32_t_to_uint32_t(Arq_Token const *token);
 bool arq_is_a_uint32_t(Arq_Token const *token);
 
 #ifdef __cplusplus

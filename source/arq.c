@@ -187,20 +187,72 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 uint32_to num;
                                 if (arq_imm_assignment_equal(opt)) {
                                         num = arq_imm_default_uint32_t(opt);
-                                        if (arq_imm_cmd_spot_uint32_t(cmd, &num, &error_msg)) {
-                                                end(&error_msg, &options[option_list->row]);
+                                        if (arq_imm_if_uint32_t(cmd, &num, &error_msg)) {
+                                                // number conversion failed
+                                                end(&error_msg, &options[option_list->row]); 
                                         }
                                 } else {
-                                        arq_imm_next(opt);
-                                        num = arq_tok_to_uint32_t(&cmd->at[cmd->idx], &error_msg, "CMD line failure:\n");
-                                        if (num.error) { end(&error_msg, &options[option_list->row]); }
-                                        arq_imm_next(cmd);
+                                        num = arq_imm_take_uint32_t(cmd, &error_msg);
+                                        if (num.error) { 
+                                                // wasn't an uint32_t or number or conversion failed
+                                                end(&error_msg, &options[option_list->row]); 
+                                        }
                                 }
                                 arq_push_uint32_t(queue, num.u32);
                                 printf("u32 %d\n", num.u32);
                                 continue;
                         }
 
+#if 1
+                        if (arq_imm_type(opt, ARQ_PARA_CSTR_T)) {
+                                printf("ARQ_PARA_CSTR_T\n");
+                                char const *cstr; 
+                                if (arq_imm_assignment_equal(opt)) {
+                                        // for a cstr optional argument is not always possible with bundling 
+                                        // if it can't know is the next character another short option or an cstr
+                                        // {'c', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
+                                        // failure: -abcShello
+                                        // ok:      -abcS hello
+                                        // ok:      -abcS69       // number can't be an option therefor it must be an argument
+                                        cstr = arq_imm_default_cstr_t(opt);
+                                        arq_imm_if_cstr_t(cmd, &cstr);
+                                        arq_push_cstr_t(queue, cstr);
+                                } else {
+                                        // for a cstr argument is possible with bundling 
+                                        // {'c', "cstring", fn_cstring, &ctx, "cstr_t"},
+                                        // 'hello' is the argument
+                                        // ok: -abcShello
+                                        // ok: -abcS hello
+                                        
+                                        //cstr = arq_imm_take_uint32_t(cmd, &error_msg);
+                                        if (cmd->at[cmd->idx].id == ARQ_END) {
+                                                arq_msg_append_cstr(&error_msg, "CMD line failure:\n");
+                                                arq_msg_append_cstr(&error_msg, "Token '");
+                                                arq_msg_append_str(&error_msg, cmd->at[cmd->idx].at, cmd->at[cmd->idx].size);
+                                                arq_msg_append_cstr(&error_msg, "' is not a c string");
+                                                arq_msg_append_lf(&error_msg);
+                                                end(&error_msg, &options[option_list->row]);
+                                        } 
+
+                                        // it looks like a short or long option but it is not it expects an argument
+                                        char c = cmd->at[cmd->idx].at[-1];
+                                        if (cmd->at[cmd->idx].id == ARQ_CMD_SHORT_OPTION) {
+                                                if (c == '-') {
+                                                        cmd->at[cmd->idx].at -= 1;    // -foo
+                                                        cmd->at[cmd->idx].size += 1;
+                                                }
+                                        } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
+                                             printf("helli\n");
+                                             cmd->at[cmd->idx].at -= 2;   // --foo
+                                             cmd->at[cmd->idx].size += 2;
+                                        }
+                                        char const *cstr = cmd->at[cmd->idx].at;
+                                        next_bundle_idx(cmd);
+                                        arq_push_cstr_t(queue, cstr);
+                                }
+                                continue;
+                        }
+#else
                         if (arq_imm_type(opt, ARQ_PARA_CSTR_T)) {
                                 printf("ARQ_PARA_CSTR_T\n");
                                 if (arq_imm_assignment_equal(opt)) {
@@ -220,7 +272,6 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                         }
                                         arq_push_cstr_t(queue, cstr);
                                 } else {
-                                        arq_imm_next(opt);
                                         // for a cstr argument is possible with bundling 
                                         // {'c', "cstring", fn_cstring, &ctx, "cstr_t"},
                                         // 'hello' is the argument
@@ -253,6 +304,7 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 }
                                 continue;
                         }
+#endif
 
                         if (opt->at[opt->idx].id == ARQ_PARA_COMMA) {
                                 printf("ARQ_PARA_COMMA\n");
