@@ -34,8 +34,15 @@ void fn_test(void *context, Arq_Queue *queue) {
 void fn_cstring(void *context, Arq_Queue *queue) {
         (void)context;
         char const *cstr_a = arq_cstr_t(queue);
+        printf("fn_cstring cstr_a: %s\n", cstr_a);
+        //printf("fn_cstring\n");
+}
+
+void fn_sstring(void *context, Arq_Queue *queue) {
+        (void)context;
+        char const *cstr_a = arq_cstr_t(queue);
         char const *cstr_b = arq_cstr_t(queue);
-        printf("fn_cstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b);
+        printf("fn_sstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b);
         //printf("fn_cstring\n");
 }
 
@@ -50,7 +57,8 @@ int main(int argc, char **argv) {
                 {'v', "version", fn_version, &ctx, ""},
                 {'p', "print", fn_print, &ctx, "uint32_t=3, uint32_t = 4"},
                 {'t', "test",  fn_test, &ctx, "uint32_t, uint32_t"},
-                {'c', "cstring", fn_cstring, &ctx, "cstr_t , cstr_t = NULL"},
+                {'c', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
+                {'s', "sstring", fn_sstring, &ctx, "cstr_t, cstr_t = NULL"},
         };
         char buffer[10000];
         memset(buffer, 0xFF, sizeof(buffer));

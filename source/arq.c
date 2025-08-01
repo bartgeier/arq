@@ -70,16 +70,23 @@ static void call_option_fn(Arq_Option const * option, Arq_Queue *queue) {
         option->fn(option->context, queue);
 }
 
-static uint32_t next_bundle_idx(Arq_Vector *v, uint32_t idx) {
-        char const *const begin = v->at[idx].at;
+// jumps over a bundel of short options
+// -shello
+// s is a short option
+// if s take no argument then 'h' and maybe 'ello' are all short options
+// if s takes an argument then 'hello' is the argument
+//     'next_bundle_idx' over jumps 'hello' because in the vector they all bundled short options
+//     'hello' should be a cstring in the vector but it isn't.
+//     That's why we have to increment idx for every char (short option) in the bundle 'hello'
+static void next_bundle_idx(Arq_Vector *v) {
+        char const *const begin = v->at[v->idx].at;
         char const *const end = begin + strlen(begin);
         assert(*end == 0);
         char const *x = begin;
-        while ((idx < v->num_of_token - 1) && (x >= begin) && (x < end)) {
-                idx++;
-                x = v->at[idx].at;
+        while ((v->idx < v->num_of_token - 1) && (x >= begin) && (x < end)) {
+                v->idx++;
+                x = v->at[v->idx].at;
         }
-        return idx;
 }
 
 void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options) {
@@ -175,26 +182,14 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                 }
                 arq_imm_next(cmd);
                 while (true) {
-                        if (arq_imm_opt_is(opt, ARQ_PARA_UINT32_T)) {
+                        if (arq_imm_type(opt, ARQ_PARA_UINT32_T)) {
                                 printf("ARQ_PARA_UINT32_T\n");
                                 uint32_to num;
-                                if (arq_imm_opt_is(opt, ARQ_PARA_EQ)) {
-                                        num = arq_imm_opt_uint32_t(opt);
-                                        hier gehts weiter!
-
-                                        if (arq_imm_cmd_has(cmd, ARQ_P_NUMBER, &num, &error_msg)) {
-                                                if (num.error) { end(&error_msg, &options[option_list->row]); }
-                                                // arq_imm_next(cmd);
+                                if (arq_imm_assignment_equal(opt)) {
+                                        num = arq_imm_default_uint32_t(opt);
+                                        if (arq_imm_cmd_spot_uint32_t(cmd, &num, &error_msg)) {
+                                                end(&error_msg, &options[option_list->row]);
                                         }
-
-                                        das obige ersetzt das untige:
-
-                                        if (cmd->at[cmd->idx].id == ARQ_P_NUMBER) {
-                                                num = arq_tok_pNumber_to_uint32_t(&cmd->at[cmd->idx], &error_msg, "CMD line failure:\n");
-                                                if (num.error) { end(&error_msg, &options[option_list->row]); }
-                                                arq_imm_next(cmd);
-                                        }
-
                                 } else {
                                         arq_imm_next(opt);
                                         num = arq_tok_to_uint32_t(&cmd->at[cmd->idx], &error_msg, "CMD line failure:\n");
@@ -206,19 +201,31 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 continue;
                         }
 
-                        if (opt->at[opt->idx].id == ARQ_PARA_CSTR_T) {
-                                arq_imm_next(opt);
+                        if (arq_imm_type(opt, ARQ_PARA_CSTR_T)) {
                                 printf("ARQ_PARA_CSTR_T\n");
-                                if (opt->at[opt->idx].id == ARQ_PARA_EQ) {
-                                        arq_imm_next(opt);
-                                        char const *cstr = (cmd->at[cmd->idx].id != ARQ_CMD_LONG_OPTION && cmd->at[cmd->idx].id != ARQ_CMD_SHORT_OPTION) ? cmd->at[cmd->idx].at : NULL;
+                                if (arq_imm_assignment_equal(opt)) {
+                                        //arq_imm_next(opt);
+                                        // for a cstr optional argument is not possible with bundling 
+                                        // {'c', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
+                                        // failure: -abcShello
+                                        // ok:      -abcS hello
+                                        char const *cstr 
+                                        = (cmd->at[cmd->idx].id != ARQ_CMD_LONG_OPTION 
+                                        && cmd->at[cmd->idx].id != ARQ_CMD_SHORT_OPTION) 
+                                                ? cmd->at[cmd->idx].at 
+                                                : NULL;
                                         arq_imm_next(opt);
                                         if (cstr != NULL) {
-                                                cmd->idx = next_bundle_idx(cmd, cmd->idx);
+                                                next_bundle_idx(cmd);
                                         }
                                         arq_push_cstr_t(queue, cstr);
                                 } else {
                                         arq_imm_next(opt);
+                                        // for a cstr argument is possible with bundling 
+                                        // {'c', "cstring", fn_cstring, &ctx, "cstr_t"},
+                                        // 'hello' is the argument
+                                        // ok: -abcShello
+                                        // ok: -abcS hello
                                         if (cmd->at[cmd->idx].id == ARQ_END) {
                                                 arq_msg_append_cstr(&error_msg, "CMD line failure:\n");
                                                 arq_msg_append_cstr(&error_msg, "Token '");
@@ -227,15 +234,21 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                                 arq_msg_append_lf(&error_msg);
                                                 end(&error_msg, &options[option_list->row]);
                                         } 
+
+                                        // it looks like a short or long option but it is not it expects an argument
+                                        char c = cmd->at[cmd->idx].at[-1];
                                         if (cmd->at[cmd->idx].id == ARQ_CMD_SHORT_OPTION) {
-                                             cmd->at[cmd->idx].at -= 1;    // -foo
-                                             cmd->at[cmd->idx].size += 1;
+                                                if (c == '-') {
+                                                        cmd->at[cmd->idx].at -= 1;    // -foo
+                                                        cmd->at[cmd->idx].size += 1;
+                                                }
                                         } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
+                                             printf("helli\n");
                                              cmd->at[cmd->idx].at -= 2;   // --foo
                                              cmd->at[cmd->idx].size += 2;
                                         }
                                         char const *cstr = cmd->at[cmd->idx].at;
-                                        cmd->idx = next_bundle_idx(cmd, cmd->idx);
+                                        next_bundle_idx(cmd);
                                         arq_push_cstr_t(queue, cstr);
                                 }
                                 continue;

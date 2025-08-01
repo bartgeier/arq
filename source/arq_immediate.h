@@ -24,8 +24,10 @@ Arq_Vector *arq_imm_get_short(
 
 void arq_imm_next(Arq_Vector *v);
 
-bool arq_imm_opt_is(Arq_Vector *opt, Arq_SymbolID const id);
+bool arq_imm_type(Arq_Vector *opt, Arq_SymbolID const id);
+bool arq_imm_assignment_equal(Arq_Vector *opt);
+uint32_to arq_imm_default_uint32_t(Arq_Vector *opt);
 
-uint32_to arq_imm_opt_uint32_t(Arq_Vector *opt);
+bool arq_imm_cmd_spot_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 
 #endif 
