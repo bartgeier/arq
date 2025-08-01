@@ -126,10 +126,13 @@ static void next_bundle_idx(Arq_Vector *v) {
 }
 
 void arq_imm_if_cstr_t(Arq_Vector *cmd, char const **cstr) {
-        if (cmd->at[cmd->idx].id != ARQ_CMD_LONG_OPTION 
-        && cmd->at[cmd->idx].id != ARQ_CMD_SHORT_OPTION) {
-                *cstr = cmd->at[cmd->idx].at;
-                next_bundle_idx(cmd);
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        if (token->id != ARQ_CMD_LONG_OPTION 
+        && token->id != ARQ_CMD_SHORT_OPTION) {
+                *cstr = token->at;
+                if (*cstr != NULL) {
+                        next_bundle_idx(cmd);
+                }
         }
 }
 
@@ -152,3 +155,33 @@ uint32_to arq_imm_take_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         arq_imm_next(cmd);
         return result;
 }
+
+char const *arq_imm_take_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
+        Arq_Token *token = &cmd->at[cmd->idx];
+        char const *result;
+        if (cmd->at[cmd->idx].id == ARQ_END) {
+                arq_msg_append_cstr(error_msg, "CMD line failure:\n");
+                arq_msg_append_cstr(error_msg, "Token '");
+                arq_msg_append_str(error_msg, cmd->at[cmd->idx].at, cmd->at[cmd->idx].size);
+                arq_msg_append_cstr(error_msg, "' is not a c string");
+                arq_msg_append_lf(error_msg);
+                result = NULL;
+                return result;
+        } 
+
+        // Even it looks like a short or long option but it is not it expects an argument
+        char const chr = token->at[-1];
+        if (token->id == ARQ_CMD_SHORT_OPTION) {
+                if (chr == '-') {
+                        token->at -= 1;    // -foo
+                        token->size += 1;
+                }
+        } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
+             token->at -= 2;   // --foo
+             token->size += 2;
+        }
+        result = token->at;
+        next_bundle_idx(cmd);
+        return result;
+}
+

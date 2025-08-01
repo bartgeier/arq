@@ -32,5 +32,6 @@ char const *arq_imm_default_cstr_t(Arq_Vector *opt);
 bool arq_imm_if_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 void arq_imm_if_cstr_t(Arq_Vector *cmd, char const **cstr);
 uint32_to arq_imm_take_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg);
+char const *arq_imm_take_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg);
 
 #endif 
