@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
         Arq_Option options[] = {
                 {'v', "version", fn_version, &ctx, ""},
                 {'p', "print", fn_print, &ctx, "uint32_t=3, uint32_t = 4"},
-                {'t', "test",  fn_test, &ctx, "uint32_t, uint32_t"},
+                {'t', "test",  fn_test, &ctx, "uint32_t, uint32_t     "},
                 {'c', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
                 {'s', "sstring", fn_sstring, &ctx, "cstr_t"},
         };

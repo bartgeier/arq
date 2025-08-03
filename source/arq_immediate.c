@@ -7,104 +7,59 @@
 #include <assert.h>
 #include <string.h>
 
-bool arq_imm_cmd_has_token_left(Arq_Vector *cmd) {
-        return cmd->idx < cmd->num_of_token;
-}
 
-bool arq_imm_cmd_is_long_option(Arq_Vector *cmd) {
-        const bool b = (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION);
-        return b;
-        //v->idx += b ? 1 : 0;
-}
+///////////////////////////////////////////////////////////////////////////////
 
-bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
-        const bool b = (cmd->at[cmd->idx].id == ARQ_CMD_SHORT_OPTION);
-        return b;
-        //v->idx += b ? 1 : 0;
-}
-
-Arq_Vector *arq_imm_get_long(
-        Arq_List *option_list,
-        Arq_Option const *options,
-        Arq_Vector const *cmd
-) {
-        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
-                Arq_Token const *cmd_token = &cmd->at[cmd->idx];
-                char const * opt_name = options[i].name;
-                if (string_eq(cmd_token, opt_name)) {
-                        option_list->row = i;
-                        Arq_Vector *opt = option_list->at[option_list->row];
-                        opt->idx = 0;
-                        return opt;
-                }
-        }
-        return NULL;
-}
-
-Arq_Vector *arq_imm_get_short(
-        Arq_List *option_list,
-        Arq_Option const *options,
-        Arq_Vector const *cmd
-) {
-        //assert(strlen(cmd->at[cmd->idx].at) == 1);
-        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
-                char cmd_token = cmd->at[cmd->idx].at[0];
-                char opt_short_name = options[i].chr;
-                if (cmd_token == opt_short_name) {
-                        option_list->row = i;
-                        Arq_Vector *opt = option_list->at[option_list->row];
-                        opt->idx = 0;
-                        return opt;
-                }
-        }
-        return NULL;
-}
-
-void arq_imm_next(Arq_Vector *v) {
-        if (v->idx + 1 < v->num_of_token) {
-                v->idx++;
+void arq_imm_opt_next(Arq_OptVector *opt) {
+        if (opt->idx + 1 < opt->num_of_token) {
+                opt->idx++;
         }
 }
 
-bool arq_imm_type(Arq_Vector *opt, Arq_SymbolID const id) {
-        const bool b = (opt->at[opt->idx].id == id);
-        opt->idx += b ? 1 : 0;
+bool arq_imm_type(Arq_OptVector *opt, Arq_SymbolID const id) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == id);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
         return b;
 }
 
-bool arq_imm_assignment_equal(Arq_Vector *opt) {
-        const bool b = (opt->at[opt->idx].id == ARQ_PARA_EQ);
-        //opt->idx += b ? 1 : 0;
-        arq_imm_next(opt);
+bool arq_imm_equal(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_EQ);
+        arq_imm_opt_next(opt);
         return b;
 }
 
-uint32_to arq_imm_default_uint32_t(Arq_Vector *opt) {
+bool arq_imm_comma(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_COMMA);
+        arq_imm_opt_next(opt);
+        return b;
+}
+
+bool arq_imm_terminator(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_TERMINATOR);
+        return b;
+}
+
+uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
         assert(num.error == false);
-        arq_imm_next(opt);
+        arq_imm_opt_next(opt);
         return num;
 }
 
-char const *arq_imm_default_cstr_t(Arq_Vector *opt) {
-        arq_imm_next(opt);
+char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {
+        arq_imm_opt_next(opt);
         return NULL;
 }
 
-// return true in case of an error in converting the number
-bool arq_imm_if_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg) {
-        if (cmd->at[cmd->idx].id != ARQ_P_NUMBER) {
-                return false;
-        }
-        *num = arq_tok_pNumber_to_uint32_t(&cmd->at[cmd->idx], error_msg, "CMD line failure:\n");
-        if (num->error == false) {
-                arq_imm_next(cmd);
-                return true;
-        } else {
-                return false;
-        }
-}
+///////////////////////////////////////////////////////////////////////////////
+
 
 // jumps over a bundel of short options
 // -shello
@@ -125,7 +80,97 @@ static void next_bundle_idx(Arq_Vector *v) {
         }
 }
 
-void arq_imm_if_cstr_t(Arq_Vector *cmd, char const **cstr) {
+void arq_imm_cmd_next(Arq_Vector *cmd) {
+        if (cmd->idx + 1 < cmd->num_of_token) {
+                cmd->idx++;
+        }
+}
+
+bool arq_imm_cmd_has_token_left(Arq_Vector *cmd) {
+        return cmd->idx < cmd->num_of_token;
+}
+
+bool arq_imm_cmd_is_long_option(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_CMD_LONG_OPTION);
+        if (b) {
+                // arq_imm_cmd_next(cmd);
+        }
+        return b;
+}
+
+bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_CMD_SHORT_OPTION);
+        if (b) {
+                // arq_imm_cmd_next(cmd);
+        }
+        return b;
+}
+
+Arq_OptVector *arq_imm_get_long(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector *cmd
+) {
+        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
+                Arq_Token const *cmd_token = &cmd->at[cmd->idx];
+                char const * opt_name = options[i].name;
+                if (string_eq(cmd_token, opt_name)) {
+                        option_list->row = i;
+                        Arq_OptVector *opt = option_list->at[option_list->row];
+                        opt->idx = 0;
+                        arq_imm_cmd_next(cmd);
+                        return opt;
+                }
+        }
+        arq_imm_cmd_next(cmd);
+        return NULL;
+}
+
+Arq_OptVector *arq_imm_get_short(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector *cmd
+) {
+        //assert(strlen(cmd->at[cmd->idx].at) == 1);
+        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
+                char cmd_token = cmd->at[cmd->idx].at[0];
+                char opt_short_name = options[i].chr;
+                if (cmd_token == opt_short_name) {
+                        option_list->row = i;
+                        Arq_OptVector *opt = option_list->at[option_list->row];
+                        opt->idx = 0;
+                        arq_imm_cmd_next(cmd);
+                        return opt;
+                }
+        }
+        arq_imm_cmd_next(cmd);
+        return NULL;
+}
+
+bool arq_imm_end_of_line(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_CMD_END_OF_LINE);
+        return b;
+}
+
+// return true in case of an error in converting the number
+bool arq_imm_optionl_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        if (token->id != ARQ_P_NUMBER) {
+                return false;
+        }
+        *num = arq_tok_pNumber_to_uint32_t(token, error_msg, "CMD line failure:\n");
+        if (num->error == false) {
+                arq_imm_cmd_next(cmd);
+                return true;
+        } else {
+                return false;
+        }
+}
+
+bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         if (token->id != ARQ_CMD_LONG_OPTION 
         && token->id != ARQ_CMD_SHORT_OPTION) {
@@ -134,9 +179,10 @@ void arq_imm_if_cstr_t(Arq_Vector *cmd, char const **cstr) {
                         next_bundle_idx(cmd);
                 }
         }
+        return true;
 }
 
-uint32_to arq_imm_take_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
+uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         uint32_to result = {0};
         char const *cstr = "CMD line failure:\n";
@@ -152,14 +198,14 @@ uint32_to arq_imm_take_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
                 return result;
         }
         result = arq_tok_pNumber_to_uint32_t(token, error_msg, cstr);
-        arq_imm_next(cmd);
+        arq_imm_cmd_next(cmd);
         return result;
 }
 
-char const *arq_imm_take_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
+char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token *token = &cmd->at[cmd->idx];
         char const *result;
-        if (cmd->at[cmd->idx].id == ARQ_END) {
+        if (cmd->at[cmd->idx].id == ARQ_CMD_END_OF_LINE) {
                 arq_msg_append_cstr(error_msg, "CMD line failure:\n");
                 arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, cmd->at[cmd->idx].at, cmd->at[cmd->idx].size);

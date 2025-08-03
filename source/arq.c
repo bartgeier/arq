@@ -71,7 +71,7 @@ static void call_option_fn(Arq_Option const * option, Arq_Queue *queue) {
 }
 
 void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options) {
-        Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_Vector *));
+        Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
         option_list->num_of_Vec = 0;
         option_list->row = 0;
 
@@ -79,11 +79,11 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
         for (uint32_t i = 0; i < num_of_options; i++) {
                 uint32_t NUM_OF_TOKEN;
                 uint32_t const shrink = arena->size;
-                Arq_Vector *v = arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+                Arq_OptVector *v = arq_arena_malloc_rest(arena, offsetof(Arq_OptVector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
                 arena->size = shrink;
 
                 arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
-                Arq_Vector *vb = arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + v->num_of_token * sizeof(Arq_Token));
+                Arq_OptVector *vb = arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
                 assert(v == vb);
 
                 printf("Option %d:\n", i);
@@ -126,19 +126,11 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
 ///////////////////////////////////////////////////////////////////////////////
 
         printf("\n-------- interpreter --------------\n\n");
-        // {
-        //         uint32_t NUM_OF_TOKEN;
-        //         uint32_t const shrink = arena->size;
-        //         Arq_Vector *queue = arq_arena_malloc_rest(arena, offsetof(Stack, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
-        //         arena->size = shrink;
-
-        //         // arq_stack_push_uint32_t(num.u32);
-        // }
         Arq_Queue *queue = arq_queue_malloc(arena);
         printf("Max possible arguments %d\n", queue->NUM_OF_ARGUMENTS);
 
         while(arq_imm_cmd_has_token_left(cmd)) {
-                Arq_Vector *opt = NULL;
+                Arq_OptVector *opt = NULL;
                 if (arq_imm_cmd_is_long_option(cmd)) {
                         printf("ARQ_CMD_LONG_OPTION\n");
                         opt = arq_imm_get_long(option_list, options, cmd);
@@ -154,28 +146,27 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 Error_msg_cmd_failure(&error_msg, "'-", &cmd->at[cmd->idx], "' unknown short option");
                                 end(&error_msg, NULL);
                         }
-                } else if (cmd->at[cmd->idx].id == ARQ_END) {
+                } else if (arq_imm_end_of_line(cmd)) {
                         printf("cmd end!\n");
                         return;
                 } else {
                         Error_msg_cmd_failure(&error_msg, "'", &cmd->at[cmd->idx], "' is not an option");
                         end(&error_msg, NULL);
                 }
-                arq_imm_next(cmd);
                 while (true) {
-                        if (arq_imm_type(opt, ARQ_PARA_UINT32_T)) {
-                                printf("ARQ_PARA_UINT32_T\n");
+                        if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
+                                printf("ARQ_OPT_UINT32_T\n");
                                 uint32_to num;
-                                if (arq_imm_assignment_equal(opt)) {
+                                if (arq_imm_equal(opt)) {
                                         num = arq_imm_default_uint32_t(opt);
-                                        if (arq_imm_if_uint32_t(cmd, &num, &error_msg)) {
-                                                // number conversion failed
+                                        if (arq_imm_optionl_argument_uint32_t(cmd, &num, &error_msg)) {
+                                                // overflow
                                                 end(&error_msg, &options[option_list->row]); 
                                         }
                                 } else {
-                                        num = arq_imm_take_uint32_t(cmd, &error_msg);
+                                        num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
-                                                // wasn't an uint32_t or number or conversion failed
+                                                // wasn't an uint32_t number or overflow
                                                 end(&error_msg, &options[option_list->row]); 
                                         }
                                 }
@@ -184,20 +175,20 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 continue;
                         }
 
-                        if (arq_imm_type(opt, ARQ_PARA_CSTR_T)) {
-                                printf("ARQ_PARA_CSTR_T\n");
+                        if (arq_imm_type(opt, ARQ_OPT_CSTR_T)) {
+                                printf("ARQ_OPT_CSTR_T\n");
                                 char const *cstr; 
-                                if (arq_imm_assignment_equal(opt)) {
+                                if (arq_imm_equal(opt)) {
                                         // For a short option with an optional cstr_t as an argument.
                                         // It is not always possible to include the argument immediately after the option.
                                         // This is the case whether the next character is a bundled option or a character from a cstr_t.
                                         // If the next character is a number, then it is an argument => here is it possible.
                                         // {'S', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
-                                        // failure: -abcShello    => the 'h' would is interpreted as short option part of the bundle (no space) thats why failure
+                                        // failure: -abcShello    => the 'h' is interpreted as short option part of the bundle (no space) thats why failure
                                         // ok:      -abcS hello   => is string token fine
                                         // ok:      -abcS69       => 69 is a number fine can't be a short option
                                         cstr = arq_imm_default_cstr_t(opt);
-                                        arq_imm_if_cstr_t(cmd, &cstr);
+                                        (void)arq_imm_optional_argument_cstr_t(cmd, &cstr);
                                         arq_push_cstr_t(queue, cstr);
                                 } else {
                                         // A short option with a mandatory argument allows the argument to be included immediately after the option.
@@ -208,7 +199,7 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                         // ok: -abcS hello   => 'hello' is the argument
                                         // ok: -abcS--hello  => '--hello' is the argument
                                         // ok: -abcS-hello   => '-hello' is the argument
-                                        cstr = arq_imm_take_csrt_t(cmd, &error_msg);
+                                        cstr = arq_imm_argument_csrt_t(cmd, &error_msg);
                                         if (cstr == NULL) {
                                                 end(&error_msg, &options[option_list->row]);
                                         }
@@ -217,17 +208,17 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                 continue;
                         }
 
-                        if (opt->at[opt->idx].id == ARQ_PARA_COMMA) {
+                        if (arq_imm_comma(opt)) {
                                 printf("ARQ_PARA_COMMA\n");
-                                arq_imm_next(opt);
+                                arq_imm_opt_next(opt);
                                 continue;
                         }
 
-                        if (opt->at[opt->idx].id == ARQ_END) {
+                        if (arq_imm_terminator(opt)) {
                                 printf("ARQ_END\n\n");
                                 call_option_fn(&options[option_list->row], queue);
                                 opt = NULL;
-                                if (cmd->at[cmd->idx].id == ARQ_END) {
+                                if (arq_imm_end_of_line(cmd)) {
                                         return;
                                 } else {
                                         break;

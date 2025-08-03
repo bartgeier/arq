@@ -11,16 +11,16 @@ typedef struct {
 } KeyWord;
 
 static KeyWord const key_words[] = {
-        {  ARQ_PARA_NULL,  "NULL" },
-        {  ARQ_PARA_CSTR_T,  "cstr_t" },
-        {  ARQ_PARA_UINT8_T,  "uint8_t" },
-        {  ARQ_PARA_UINT16_T, "uint16_t" },
-        {  ARQ_PARA_UINT32_T, "uint32_t" },
-        {  ARQ_PARA_UINT64_T, "uint64_t" },
-        {  ARQ_PARA_INT8_T,   "int8_t" },
-        {  ARQ_PARA_INT16_T,  "int16_t" },
-        {  ARQ_PARA_INT32_T,  "int32_t" },
-        {  ARQ_PARA_INT64_T,  "int64_t" },
+        {  ARQ_OPT_NULL,  "NULL" },
+        {  ARQ_OPT_CSTR_T,  "cstr_t" },
+        {  ARQ_OPT_UINT8_T,  "uint8_t" },
+        {  ARQ_OPT_UINT16_T, "uint16_t" },
+        {  ARQ_OPT_UINT32_T, "uint32_t" },
+        {  ARQ_OPT_UINT64_T, "uint64_t" },
+        {  ARQ_OPT_INT8_T,   "int8_t" },
+        {  ARQ_OPT_INT16_T,  "int16_t" },
+        {  ARQ_OPT_INT32_T,  "int32_t" },
+        {  ARQ_OPT_INT64_T,  "int64_t" },
 };
 
 static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
@@ -60,14 +60,15 @@ static Arq_Token next_token(Lexer *l) {
         skip_space(l);
         t.at = l->at;
         if (l->cursor_idx == l->SIZE ) {
-                t.id = ARQ_PARA_SPACE_TAIL; 
+                // space tail
+                t.id = ARQ_OPT_NO_TOKEN;
                 t.at = &l->at[l->cursor_idx];
                 t.size = 0;
                 return t;
         }
 
         if (l->at[l->cursor_idx] == '=') {
-                t.id = ARQ_PARA_EQ; 
+                t.id = ARQ_OPT_EQ; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -75,7 +76,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (l->at[l->cursor_idx] == ',') {
-                t.id = ARQ_PARA_COMMA; 
+                t.id = ARQ_OPT_COMMA; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -83,7 +84,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (l->at[l->cursor_idx] == 0) {
-                t.id = ARQ_END; 
+                t.id = ARQ_OPT_TERMINATOR; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -91,7 +92,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (is_identifier_start(l->at[l->cursor_idx])) {
-                t.id = ARQ_PARA_IDENTFIER; 
+                t.id = ARQ_OPT_IDENTFIER; 
                 t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
@@ -132,7 +133,7 @@ static Arq_Token next_token(Lexer *l) {
         }
 
         if (l->cursor_idx < l->SIZE) {
-                t.id = ARQ_PARA_UNKNOWN; 
+                t.id = ARQ_OPT_UNKNOWN; 
                 t.at = &l->at[l->cursor_idx];
                 t.size = 0;
                 while (l->cursor_idx < l->SIZE && !isspace(l->at[l->cursor_idx])) {
@@ -155,19 +156,19 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         return result;
 }
 
-uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg) {
+uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_msg) {
         uint32_t i = 0;
         while (i < tokens->num_of_token) {
-                if (tokens->at[i].id == ARQ_PARA_UINT32_T) {
+                if (tokens->at[i].id == ARQ_OPT_UINT32_T) {
                         i++;
-                        if (tokens->at[i].id == ARQ_PARA_EQ) {
+                        if (tokens->at[i].id == ARQ_OPT_EQ) {
                                 i++;
                                 if (arq_is_a_uint32_t(&tokens->at[i])) {
                                         i++;
-                                        if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                        if (tokens->at[i].id == ARQ_OPT_COMMA) {
                                                 i++;
                                                 continue;
-                                        } else if (tokens->at[i].id == ARQ_END) {
+                                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                                                 i++;
                                                 break;
                                         } else {
@@ -186,10 +187,10 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                                         uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                         return idx;
                                 }
-                        } else if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                        } else if (tokens->at[i].id == ARQ_OPT_COMMA) {
                                 i++;
                                 continue;
-                        } else if (tokens->at[i].id == ARQ_END) {
+                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                                 i++;
                                 break;
                         } else {
@@ -200,16 +201,16 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                                 uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
                                 return idx;
                         }
-                } else if (tokens->at[i].id == ARQ_PARA_CSTR_T) {
+                } else if (tokens->at[i].id == ARQ_OPT_CSTR_T) {
                         i++;
-                        if (tokens->at[i].id == ARQ_PARA_EQ) {
+                        if (tokens->at[i].id == ARQ_OPT_EQ) {
                                 i++;
-                                if (tokens->at[i].id == ARQ_PARA_NULL) {
+                                if (tokens->at[i].id == ARQ_OPT_NULL) {
                                         i++;
-                                        if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                                        if (tokens->at[i].id == ARQ_OPT_COMMA) {
                                                 i++;
                                                 continue;
-                                        } else if (tokens->at[i].id == ARQ_END) {
+                                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                                                 i++;
                                                 break;
                                         } else {
@@ -229,10 +230,10 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                                         return idx;
                                 }
 
-                        } else if (tokens->at[i].id == ARQ_PARA_COMMA) {
+                        } else if (tokens->at[i].id == ARQ_OPT_COMMA) {
                                 i++;
                                 continue;
-                        } else if (tokens->at[i].id == ARQ_END) {
+                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                                 i++;
                                 break;
                         } else {
@@ -244,7 +245,7 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
                                 return idx;
                         }
 
-                } else if (tokens->at[i].id == ARQ_END) {
+                } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                         break;
                 } else {
                         arq_msg_append_cstr(error_msg, "Assert Option:\n");
@@ -260,7 +261,7 @@ uint32_to arq_option_verify_vector(Arq_Vector const *tokens, Arq_msg *error_msg)
 }
 
 
-void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const NUM_OF_TOKEN) {
+void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t const NUM_OF_TOKEN) {
         v->num_of_token = 0;
         v->idx = 0;
         uint32_t len = strlen(option->arguments);
@@ -272,9 +273,10 @@ void arq_option_tokenize(Arq_Option const *option, Arq_Vector *v, uint32_t const
         while (l.cursor_idx < l.SIZE) {
                 assert(v->num_of_token < NUM_OF_TOKEN);
                 Arq_Token t = next_token(&l);
+                if (t.id == ARQ_OPT_NO_TOKEN) continue;
                 v->at[v->num_of_token++] = t;
         }
-        Arq_Token t = { .id = ARQ_END, .at = &l.at[l.SIZE], .size = 0 };
+        Arq_Token t = { .id = ARQ_OPT_TERMINATOR, .at = &l.at[l.SIZE], .size = 0 };
         assert(v->num_of_token < NUM_OF_TOKEN);
         v->at[v->num_of_token++] = t;
 }

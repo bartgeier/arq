@@ -167,10 +167,9 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
 
                 if (t.id == ARQ_CMD_ARGUMENT_MODE) {
                         option = !option;
-                } else if (t.id != ARQ_INIT) {
-                        assert(v->num_of_token < num_of_token);
-                        v->at[v->num_of_token++] = t;
-                }
+                } 
+                assert(v->num_of_token < num_of_token);
+                v->at[v->num_of_token++] = t;
                 bundling = lexer.cursor_idx < lexer.SIZE;
                 while (bundling) { 
                         // Option clustering
@@ -185,7 +184,7 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
                 }
         }
         Arq_Token t = {
-                .id = ARQ_END,
+                .id = ARQ_CMD_END_OF_LINE,
                 .at = NULL,
                 .size = 0,
         };
