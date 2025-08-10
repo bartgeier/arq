@@ -172,6 +172,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                                 i++;
                                                 break;
                                         } else {
+                                                arq_msg_clear(error_msg);
                                                 arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                                 arq_msg_append_cstr(error_msg, "token '");
                                                 arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -180,6 +181,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                                 return idx;
                                         }
                                 } else {
+                                        arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                         arq_msg_append_cstr(error_msg, "token '");
                                         arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -194,6 +196,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                 i++;
                                 break;
                         } else {
+                                arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                 arq_msg_append_cstr(error_msg, "token '");
                                 arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -214,6 +217,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                                 i++;
                                                 break;
                                         } else {
+                                                arq_msg_clear(error_msg);
                                                 arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                                 arq_msg_append_cstr(error_msg, "token '");
                                                 arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -222,6 +226,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                                 return idx;
                                         }
                                 } else {
+                                        arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                         arq_msg_append_cstr(error_msg, "token '");
                                         arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -237,6 +242,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                                 i++;
                                 break;
                         } else {
+                                arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, "Assert Option:\n");
                                 arq_msg_append_cstr(error_msg, "token '");
                                 arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);
@@ -248,6 +254,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_m
                 } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
                         break;
                 } else {
+                        arq_msg_clear(error_msg);
                         arq_msg_append_cstr(error_msg, "Assert Option:\n");
                         arq_msg_append_cstr(error_msg, "token '");
                         arq_msg_append_str(error_msg, tokens->at[i].at, tokens->at[i].size);

@@ -27,6 +27,7 @@ uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg
                         if (error_msg != NULL) {
                                 char buffer[12];
                                 sprintf(buffer, "%" PRIu32, UINT32_MAX);
+                                arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
                                 arq_msg_append_cstr(error_msg, "Token '");
                                 arq_msg_append_str(error_msg, token->at, token->size);

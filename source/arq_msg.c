@@ -2,6 +2,10 @@
 #include <assert.h>
 #include <string.h>
 
+void arq_msg_clear(Arq_msg *m) {
+        m->size = 0;
+}
+
 void arq_msg_format(Arq_msg *m) {
         uint32_t number_of_lf = 0;
         for (uint32_t i = 0; i < m->size; i++) {

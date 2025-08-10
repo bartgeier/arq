@@ -4,7 +4,7 @@
 #include "arq_arena.h"
 #include <stdint.h>
 
-typedef struct Arq_QueueStruct Arq_Queue;
+typedef struct Arq_Queue_tag Arq_Queue;
 
 typedef void (*function_pointer_t)(void *context, Arq_Queue *queue);
 typedef struct {
@@ -20,6 +20,8 @@ extern "C" {
 #endif
 
 void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options);
+void arq_error_msg_callback(char const *error_msg);
+
 void arq_unused(Arq_Queue *queue);
 uint8_t arq_uint8_t(Arq_Queue *queue);
 uint16_t arq_uint16_t(Arq_Queue *queue);

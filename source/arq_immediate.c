@@ -28,14 +28,18 @@ bool arq_imm_type(Arq_OptVector *opt, Arq_SymbolID const id) {
 bool arq_imm_equal(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_EQ);
-        arq_imm_opt_next(opt);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
         return b;
 }
 
 bool arq_imm_comma(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_COMMA);
-        arq_imm_opt_next(opt);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
         return b;
 }
 
@@ -155,19 +159,17 @@ bool arq_imm_end_of_line(Arq_Vector *cmd) {
         return b;
 }
 
-// return true in case of an error in converting the number
-bool arq_imm_optionl_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg) {
+bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         if (token->id != ARQ_P_NUMBER) {
                 return false;
         }
         *num = arq_tok_pNumber_to_uint32_t(token, error_msg, "CMD line failure:\n");
-        if (num->error == false) {
-                arq_imm_cmd_next(cmd);
-                return true;
-        } else {
-                return false;
-        }
+        if (num->error) {
+                return true; // overflow
+        } 
+        arq_imm_cmd_next(cmd);
+        return false;
 }
 
 bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
@@ -188,6 +190,7 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         char const *cstr = "CMD line failure:\n";
         if (token->id != ARQ_P_NUMBER) {
                 if (error_msg != NULL) {
+                        arq_msg_clear(error_msg);
                         arq_msg_append_cstr(error_msg, cstr);
                         arq_msg_append_cstr(error_msg, "Token '");
                         arq_msg_append_str(error_msg, token->at, token->size);
@@ -206,6 +209,7 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token *token = &cmd->at[cmd->idx];
         char const *result;
         if (cmd->at[cmd->idx].id == ARQ_CMD_END_OF_LINE) {
+                arq_msg_clear(error_msg);
                 arq_msg_append_cstr(error_msg, "CMD line failure:\n");
                 arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, cmd->at[cmd->idx].at, cmd->at[cmd->idx].size);

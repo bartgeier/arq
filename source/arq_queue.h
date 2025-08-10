@@ -20,7 +20,7 @@ typedef struct {
         };
 } Arq_Argument;
 
-typedef struct Arq_QueueStruct{
+typedef struct Arq_Queue_tag{
         uint32_t const shrink;
         uint32_t const NUM_OF_ARGUMENTS;
         uint32_t read_idx;

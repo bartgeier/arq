@@ -40,7 +40,7 @@ Arq_OptVector *arq_imm_get_short(
 bool arq_imm_cmd_is_long_option(Arq_Vector *cmd);
 bool arq_imm_cmd_is_short_option(Arq_Vector *cmd);
 
-bool arq_imm_optionl_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
+bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr);
 
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg);

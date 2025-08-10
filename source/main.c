@@ -53,6 +53,10 @@ void fn_sstring(void *context, Arq_Queue *queue) {
         }
 }
 
+void arq_error_msg_callback(char const *error_msg) {
+        printf("%s\n", error_msg);
+}
+
 int main(int argc, char **argv) {
         // printf("%s\n", argv[1]);
         // return 0;

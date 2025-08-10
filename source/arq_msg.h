@@ -13,6 +13,7 @@ typedef struct {
 exter "C" {
 #endif
 
+void arq_msg_clear(Arq_msg *m);
 void arq_msg_format(Arq_msg *m);
 void arq_msg_append_lf(Arq_msg *m);
 void arq_msg_append_chr(Arq_msg *m, char const chr);
