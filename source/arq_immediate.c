@@ -128,8 +128,7 @@ Arq_OptVector *arq_imm_get_long(
                         return opt;
                 }
         }
-        arq_imm_cmd_next(cmd);
-        return NULL;
+        return NULL; // unknown long option
 }
 
 Arq_OptVector *arq_imm_get_short(
@@ -149,8 +148,7 @@ Arq_OptVector *arq_imm_get_short(
                         return opt;
                 }
         }
-        arq_imm_cmd_next(cmd);
-        return NULL;
+        return NULL; // unknown short option
 }
 
 bool arq_imm_end_of_line(Arq_Vector *cmd) {
@@ -190,10 +188,11 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         char const *cstr = "CMD line failure:\n";
         if (token->id != ARQ_P_NUMBER) {
                 if (error_msg != NULL) {
+                        Arq_Token const tok = *token;
                         arq_msg_clear(error_msg);
                         arq_msg_append_cstr(error_msg, cstr);
                         arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, token->at, token->size);
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
                         arq_msg_append_cstr(error_msg, "' is not a positiv number");
                         arq_msg_append_lf(error_msg);
                 }
@@ -208,11 +207,12 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
 char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token *token = &cmd->at[cmd->idx];
         char const *result;
-        if (cmd->at[cmd->idx].id == ARQ_CMD_END_OF_LINE) {
+        if (token->id == ARQ_CMD_END_OF_LINE) {
+                Arq_Token const tok = *token;
                 arq_msg_clear(error_msg);
                 arq_msg_append_cstr(error_msg, "CMD line failure:\n");
                 arq_msg_append_cstr(error_msg, "Token '");
-                arq_msg_append_str(error_msg, cmd->at[cmd->idx].at, cmd->at[cmd->idx].size);
+                arq_msg_append_str(error_msg, tok.at, tok.size);
                 arq_msg_append_cstr(error_msg, "' is not a c string");
                 arq_msg_append_lf(error_msg);
                 result = NULL;

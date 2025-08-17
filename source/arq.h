@@ -1,17 +1,15 @@
 #ifndef ARQ_H
 #define ARQ_H
 
-#include "arq_arena.h"
 #include <stdint.h>
 
 typedef struct Arq_Queue_tag Arq_Queue;
 
-typedef void (*function_pointer_t)(void *context, Arq_Queue *queue);
+typedef void (*function_pointer_t)(Arq_Queue *queue);
 typedef struct {
         char chr;                // -v
         const char *name;        // --version
         function_pointer_t fn;
-        void* context;
         const char *arguments;   // "uint8_t, bool = false"
 } Arq_Option;
 
@@ -19,8 +17,11 @@ typedef struct {
 extern "C" {
 #endif
 
-void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options);
-void arq_error_msg_callback(char const *error_msg);
+uint32_t arq_fn(
+        int argc, char **argv, 
+        char *arena_buffer, uint32_t const buffer_size,
+        Arq_Option const *options, uint32_t const num_of_options
+);
 
 void arq_unused(Arq_Queue *queue);
 uint8_t arq_uint8_t(Arq_Queue *queue);

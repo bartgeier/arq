@@ -658,13 +658,13 @@ stack_size</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>288</x>
-      <y>12</y>
-      <w>1044</w>
-      <h>36</h>
+      <x>1308</x>
+      <y>36</y>
+      <w>36</w>
+      <h>72</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>850.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
@@ -823,8 +823,8 @@ stack_size</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>876</x>
-      <y>768</y>
+      <x>468</x>
+      <y>756</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -838,45 +838,25 @@ layer=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>996</x>
-      <y>780</y>
-      <w>132</w>
-      <h>132</h>
+      <x>456</x>
+      <y>768</y>
+      <w>192</w>
+      <h>108</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>90.0;90.0;90.0;10.0;10.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;.
+building place</panel_attributes>
+    <additional_attributes>40.0;70.0;40.0;20.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>660</x>
-      <y>780</y>
-      <w>240</w>
-      <h>96</h>
+      <x>72</x>
+      <y>768</y>
+      <w>420</w>
+      <h>144</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0;180.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>816</x>
-      <y>780</y>
-      <w>36</w>
-      <h>96</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>924</x>
-      <y>792</y>
-      <w>36</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;.
+when arq_fn return</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;50.0;210.0;50.0;330.0;10.0</additional_attributes>
   </element>
 </diagram>

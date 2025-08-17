@@ -34,13 +34,17 @@ static void add_option_msg(Arq_msg *error_msg, Arq_Option const *o) {
         arq_msg_append_lf(error_msg);
 }
 
-static void error_msg_callback(Arq_msg *error_msg, Arq_Option const *o) {
+static void error_msg_print_buffer(Arq_msg *error_msg, Arq_Option const *o, char *arena_buffer) {
         if (o != NULL) {
-                add_option_msg(error_msg, o);
+               add_option_msg(error_msg, o);
         }
         arq_msg_format(error_msg);
-        arq_error_msg_callback(error_msg->at);
-        error_msg->at[0] = 0;
+
+        for (uint32_t i = 0; i < error_msg->size; i++) {
+                arena_buffer[i] = error_msg->at[i];
+        }
+        arena_buffer[error_msg->size] = 0;
+        assert(arena_buffer[error_msg->size] == 0);
 }
 
 static void print_token(Arq_Token *t) {
@@ -48,29 +52,50 @@ static void print_token(Arq_Token *t) {
         for (uint32_t i = 0; i < t->size; i++) {
                 putchar(t->at[i]);
         }
-        printf("\n");
+        printf(" %d\n",t->size);
 }
 
-static void Error_msg_cmd_failure(Arq_msg *error_msg, char const *cstrA, Arq_Token const *token, char const *cstrB) {
+static void Error_msg_cmd_failure(Arq_msg *error_msg, char const *cstrA, Arq_Token const token, char const *cstrB) {
         arq_msg_clear(error_msg);
         arq_msg_append_cstr(error_msg, "CMD line failure:\n");
         arq_msg_append_cstr(error_msg, cstrA);
-        arq_msg_append_str(error_msg, token->at, token->size);
+        arq_msg_append_str(error_msg, token.at, token.size);
         arq_msg_append_cstr(error_msg, cstrB);
         arq_msg_append_lf(error_msg);
 }
 
 static void call_back_function(Arq_Option const *options, Arq_List const *option_list, Arq_Queue *queue) {
         Arq_Option const *option = &options[option_list->row];
-        option->fn(option->context, queue);
+        option->fn(queue);
+        assert(queue->read_idx == queue->write_idx && "Queue is not empty, there are still arguments in the queue!");
 }
 
-void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, uint32_t const num_of_options) {
+uint32_t arq_fn(
+        int argc, char **argv, 
+        char *arena_buffer, uint32_t const buffer_size,
+        Arq_Option const *options, uint32_t const num_of_options
+) {
+        Arq_Arena *arena = arq_arena_init(arena_buffer, buffer_size);
+
         Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
         option_list->num_of_Vec = 0;
         option_list->row = 0;
 
+        Arq_msg error_msg;
+        {
+                uint32_t SIZE_OF_ERROR_MSG;
+                uint32_t const shrink = arena->size;
+                char *chr = arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
+                arena->size = shrink;
+                Arq_msg e_msg = {
+                        .SIZE = SIZE_OF_ERROR_MSG,
+                        .size = 0,
+                        .at = chr,
+                };
+                memcpy(&error_msg, &e_msg, sizeof(Arq_msg));
+        }
 
+        // Arq_OptVector
         for (uint32_t i = 0; i < num_of_options; i++) {
                 uint32_t NUM_OF_TOKEN;
                 uint32_t const shrink = arena->size;
@@ -86,28 +111,14 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                         print_token(&v->at[j]);
                 }
 
-                Arq_msg error_msg;
-                {
-                        uint32_t SIZE_OF_ERROR_MSG;
-                        uint32_t const shrink = arena->size;
-                        char *chr = arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
-                        arena->size = shrink;
-                        Arq_msg e_msg = {
-                                .SIZE = SIZE_OF_ERROR_MSG,
-                                .size = 0,
-                                .at = chr,
-                        };
-                        memcpy(&error_msg, &e_msg, sizeof(Arq_msg));
-                }
-
                 uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
                         add_option_msg(&error_msg, &options[i]);
                         uint32_t const n = arq_option_parameter_idx(&options[i]) + 1 + ups.u32;
                         arq_msg_append_nchr(&error_msg, ' ', n);
                         arq_msg_append_cstr(&error_msg, "^\n");
-                        error_msg_callback(&error_msg, NULL);
-                        return;
+                        error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                        return error_msg.size;
                 }
 
                 assert(option_list->num_of_Vec < num_of_options);
@@ -139,12 +150,6 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
         Arq_Queue *queue = arq_queue_malloc(arena);
         printf("Max possible arguments %d\n", queue->NUM_OF_ARGUMENTS);
 
-        Arq_msg error_msg = {
-                .SIZE = sizeof(Arq_Argument) * queue->NUM_OF_ARGUMENTS,
-                .size = 0,
-                .at = (char *)queue->at,
-        };
-
         while(arq_imm_cmd_has_token_left(cmd)) {
                 printf("\n");
                 Arq_OptVector *opt = NULL;
@@ -152,25 +157,26 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                         printf("ARQ_CMD_LONG_OPTION\n");
                         opt = arq_imm_get_long(option_list, options, cmd);
                         if (opt == NULL) {
-                                Error_msg_cmd_failure(&error_msg, "'--", &cmd->at[cmd->idx], "' unknown long option ");
-                                error_msg_callback(&error_msg, NULL);
-                                return;
+                                Error_msg_cmd_failure(&error_msg, "'--", cmd->at[cmd->idx], "' unknown long option ");
+                                error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                                return error_msg.size;
                         }
                 } else if (arq_imm_cmd_is_short_option(cmd)) {
                         printf("ARQ_CMD_SHORT_OPTION\n");
                         opt = arq_imm_get_short(option_list, options, cmd);
                         if (opt == NULL) {
-                                Error_msg_cmd_failure(&error_msg, "'-", &cmd->at[cmd->idx], "' unknown short option");
-                                error_msg_callback(&error_msg, NULL);
-                                return;
+                                Error_msg_cmd_failure(&error_msg, "'-", cmd->at[cmd->idx], "' unknown short option");
+                                error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                                return error_msg.size;
                         }
                 } else if (arq_imm_end_of_line(cmd)) {
                         printf("cmd end!\n");
-                        return;
+                        arena_buffer[0] = 0;
+                        return 0;
                 } else {
-                        Error_msg_cmd_failure(&error_msg, "'", &cmd->at[cmd->idx], "' is not an option");
-                        error_msg_callback(&error_msg, NULL);
-                        return;
+                        Error_msg_cmd_failure(&error_msg, "'", cmd->at[cmd->idx], "' is not an option");
+                        error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                        return error_msg.size;
                 }
                 while (true) {
                         if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
@@ -180,15 +186,15 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                         num = arq_imm_default_uint32_t(opt);
                                         if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
                                                 // overflow
-                                                error_msg_callback(&error_msg, &options[option_list->row]); 
-                                                return;
+                                                error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
                                         }
                                 } else {
                                         num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
                                                 // wasn't an uint32_t number or overflow
-                                                error_msg_callback(&error_msg, &options[option_list->row]); 
-                                                return;
+                                                error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
                                         }
                                 }
                                 arq_push_uint32_t(queue, num.u32);
@@ -223,8 +229,8 @@ void arq_fn(int argc, char **argv, Arq_Arena *arena, Arq_Option const *options, 
                                         // ok: -abcS-hello   => '-hello' is the argument
                                         cstr = arq_imm_argument_csrt_t(cmd, &error_msg);
                                         if (cstr == NULL) {
-                                                error_msg_callback(&error_msg, &options[option_list->row]);
-                                                return;
+                                                error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer);
+                                                return error_msg.size;
                                         }
                                         arq_push_cstr_t(queue, cstr);
                                 }
@@ -240,4 +246,6 @@ terminator:
                         assert(false);
                 } // while 
         } // while
+        arena_buffer[0] = 0;
+        return 0;
 }
