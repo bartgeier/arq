@@ -51,15 +51,17 @@ int main(int argc, char **argv) {
 
         Arq_Option options[] = {
                 {'v', "version", fn_version, ""},
-                {'p', "print", fn_print, "uint32_t=3, uint32_t = 4"},
+                {'p', "print", fn_print, "uint32_t = 5, uint32_t = 4"},
                 {'t', "test",  fn_test, "uint32_t, uint32_t"},
                 {'c', "cstring", fn_cstring, "cstr_t = NULL"},
                 {'s', "sstring", fn_sstring, "cstr_t"},
         };
 
-        char buffer[600];
+        // testen mit
+        // ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello 
+       char buffer[600];
 
-        if (0 == arq_fn(
+        if (0 < arq_fn(
                 argc, argv, 
                 buffer, sizeof(buffer),
                 options, sizeof(options)/sizeof(Arq_Option))

@@ -1,9 +1,11 @@
 #include "arq_options.h"
 #include "arq_symbols.h"
+#include "arq_immediate.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdio.h>
 
 typedef struct {
     uint32_t id;
@@ -156,121 +158,56 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         return result;
 }
 
-uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_msg) {
-        uint32_t i = 0;
-        while (i < tokens->num_of_token) {
-                if (tokens->at[i].id == ARQ_OPT_UINT32_T) {
-                        i++;
-                        if (tokens->at[i].id == ARQ_OPT_EQ) {
-                                i++;
-                                if (arq_is_a_uint32_t(&tokens->at[i])) {
-                                        i++;
-                                        if (tokens->at[i].id == ARQ_OPT_COMMA) {
-                                                i++;
-                                                continue;
-                                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
-                                                i++;
-                                                break;
-                                        } else {
-                                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                                Arq_Token token = tokens->at[i];
-                                                arq_msg_clear(error_msg);
-                                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                                arq_msg_append_cstr(error_msg, "token '");
-                                                arq_msg_append_str(error_msg, token.at, token.size);
-                                                arq_msg_append_cstr(error_msg, "' but expected ',' or ''\n");
-                                                return idx;
-                                        }
-                                } else {
-                                        uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                        Arq_Token token = tokens->at[i];
-                                        arq_msg_clear(error_msg);
-                                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                        arq_msg_append_cstr(error_msg, "token '");
-                                        arq_msg_append_str(error_msg, token.at, token.size);
-                                        arq_msg_append_cstr(error_msg, "' is not a positive number\n");
-                                        return idx;
+uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
+        tokens->idx = 0;
+        char *error_str = NULL;
+        while (tokens->idx < tokens->num_of_token) {
+                if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
+                        if (arq_imm_equal(tokens)) {
+                                if (false == arq_imm_is_a_uint32_t(tokens)) {
+                                        error_str = "' is not a positive number\n";
+                                        break; // error
                                 }
-                        } else if (tokens->at[i].id == ARQ_OPT_COMMA) {
-                                i++;
-                                continue;
-                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
-                                i++;
-                                break;
+                                error_str = "' but expected ',' or ''\n";
                         } else {
-                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                Arq_Token token = tokens->at[i];
-                                arq_msg_clear(error_msg);
-                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                arq_msg_append_cstr(error_msg, "token '");
-                                arq_msg_append_str(error_msg, token.at, token.size);
-                                arq_msg_append_cstr(error_msg, "' but expected ',' or '=' or ''\n");
-                                return idx;
+                                error_str = "' but expected ',' or '=' or ''\n";
                         }
-                } else if (tokens->at[i].id == ARQ_OPT_CSTR_T) {
-                        i++;
-                        if (tokens->at[i].id == ARQ_OPT_EQ) {
-                                i++;
-                                if (tokens->at[i].id == ARQ_OPT_NULL) {
-                                        i++;
-                                        if (tokens->at[i].id == ARQ_OPT_COMMA) {
-                                                i++;
-                                                continue;
-                                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
-                                                i++;
-                                                break;
-                                        } else {
-                                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                                Arq_Token token = tokens->at[i];
-                                                arq_msg_clear(error_msg);
-                                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                                arq_msg_append_cstr(error_msg, "token '");
-                                                arq_msg_append_str(error_msg, token.at, token.size);
-                                                arq_msg_append_cstr(error_msg, "' but expected ',' or ''\n");
-                                                return idx;
-                                        }
-                                } else {
-                                        uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                        Arq_Token token = tokens->at[i];
-                                        arq_msg_clear(error_msg);
-                                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                        arq_msg_append_cstr(error_msg, "token '");
-                                        arq_msg_append_str(error_msg, token.at, token.size);
-                                        arq_msg_append_cstr(error_msg, "' must be NULL\n");
-                                        return idx;
-                                }
-
-                        } else if (tokens->at[i].id == ARQ_OPT_COMMA) {
-                                i++;
-                                continue;
-                        } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
-                                i++;
-                                break;
-                        } else {
-                                uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                                Arq_Token token = tokens->at[i];
-                                arq_msg_clear(error_msg);
-                                arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                                arq_msg_append_cstr(error_msg, "token '");
-                                arq_msg_append_str(error_msg, token.at, token.size);
-                                arq_msg_append_cstr(error_msg, "' but expected ',' or '=' or ''\n");
-                                return idx;
-                        }
-
-                } else if (tokens->at[i].id == ARQ_OPT_TERMINATOR) {
-                        break;
-                } else {
-                        uint32_to const idx = { .error = true, .u32 = tokens->at[i].at - tokens->at[0].at };
-                        Arq_Token token = tokens->at[i];
-                        arq_msg_clear(error_msg);
-                        arq_msg_append_cstr(error_msg, "Assert Option:\n");
-                        arq_msg_append_cstr(error_msg, "token '");
-                        arq_msg_append_str(error_msg, token.at, token.size);
-                        arq_msg_append_cstr(error_msg, "' is not a type\n");
-                        return idx;
+                        goto next_argument;
                 }
-        }
-        uint32_to const idx = { .error = false, .u32 = 0 };
+
+                if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
+                        if (arq_imm_equal(tokens)) {
+                                if (false == arq_imm_is_a_NULL(tokens)) {
+                                        error_str =  "' must be NULL\n";
+                                        break; // error 
+                                }
+                                error_str = "' but expected ',' or ''\n";
+                        } else {
+                                error_str = "' but expected ',' or '=' or ''\n";
+                        }
+                        goto next_argument;
+                } 
+
+                error_str = "' is not a type\n";
+next_argument:
+                if (arq_imm_comma(tokens)) {
+                        continue;
+                }
+                if (arq_imm_terminator(tokens)) {
+                        uint32_to const idx = { .error = false, .u32 = 0 };
+                        return idx;
+                } 
+                break; // error
+        } 
+
+        // error
+        uint32_to const idx = { .error = true, .u32 = tokens->at[tokens->idx].at - tokens->at[0].at };
+        Arq_Token token = tokens->at[tokens->idx];
+        arq_msg_clear(error_msg);
+        arq_msg_append_cstr(error_msg, "Assert Option:\n");
+        arq_msg_append_cstr(error_msg, "token '");
+        arq_msg_append_str(error_msg, token.at, token.size);
+        arq_msg_append_cstr(error_msg, error_str);
         return idx;
 }
 

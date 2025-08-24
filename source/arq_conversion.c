@@ -44,10 +44,3 @@ uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg
         return result;
 }
 
-bool arq_is_a_uint32_t(Arq_Token const *token) {
-        if (token->id != ARQ_P_NUMBER) {
-                return false;
-        }
-        uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
-        return !num.error;
-}

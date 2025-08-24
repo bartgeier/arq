@@ -18,7 +18,6 @@ exter "C" {
 
 bool string_eq(Arq_Token const *token, char const *cstr);
 uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
-bool arq_is_a_uint32_t(Arq_Token const *token);
 
 #ifdef __cplusplus
 }

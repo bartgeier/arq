@@ -49,12 +49,34 @@ bool arq_imm_terminator(Arq_OptVector *opt) {
         return b;
 }
 
+bool arq_imm_is_a_uint32_t(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        if (token->id != ARQ_P_NUMBER) {
+                return false;
+        }
+        uint32_to const num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
+        bool const success = !num.error;
+        if (success) {
+                arq_imm_opt_next(opt);
+        }
+        return success;
+}
+
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         uint32_to num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
         assert(num.error == false);
         arq_imm_opt_next(opt);
         return num;
+}
+
+bool arq_imm_is_a_NULL(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        if (token->id != ARQ_OPT_NULL) {
+                return false;
+        }
+        arq_imm_opt_next(opt);
+        return true;
 }
 
 char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {

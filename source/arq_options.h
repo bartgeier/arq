@@ -10,7 +10,7 @@ extern "C" {
 
 uint32_t arq_option_parameter_idx(Arq_Option const *option);
 void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t const num_of_token);
-uint32_to arq_option_verify_vector(Arq_OptVector const *tokens, Arq_msg *error_msg);
+uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg);
 
 #ifdef __cplusplus
 }
