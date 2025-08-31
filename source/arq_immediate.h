@@ -24,6 +24,8 @@ char const *arq_imm_default_cstr_t(Arq_OptVector *opt);
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd, Arq_OptVector *opt);
+
 void arq_imm_cmd_next(Arq_Vector *cmd);
 bool arq_imm_cmd_has_token_left(Arq_Vector *cmd);
 bool arq_imm_end_of_line(Arq_Vector *cmd);

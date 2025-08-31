@@ -30,7 +30,7 @@ void fn_test(Arq_Queue *queue) {
 void fn_cstring(Arq_Queue *queue) {
         char const *cstr_a = arq_cstr_t(queue);
         if (cstr_a != NULL) {
-                printf("fn_sstring cstr_a: %s\n", cstr_a);
+                printf("fn_cstring cstr_a: %s\n", cstr_a);
         } else {
                 printf("fn_cstring\n");
         }
@@ -48,7 +48,6 @@ void fn_sstring(Arq_Queue *queue) {
 }
 
 int main(int argc, char **argv) {
-
         Arq_Option options[] = {
                 {'v', "version", fn_version, ""},
                 {'p', "print", fn_print, "uint32_t = 5, uint32_t = 4"},

@@ -86,6 +86,15 @@ char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd, Arq_OptVector *opt) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_CMD_DASHDASH);
+        if (b) {
+                arq_imm_cmd_next(cmd);
+                arq_imm_opt_next(opt);
+        }
+        return b;
+}
 
 // jumps over a bundel of short options
 // -shello

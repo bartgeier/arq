@@ -62,35 +62,6 @@ static bool start_n_number(Arq_Token *t, Lexer *l) {
         return false;
 }
 
-static Arq_Token next_argument_token(Lexer *l) {
-        Arq_Token t = {0};
-
-        if (start_p_number(&t, l)) {
-                return t;
-        }
-
-        if (l->at[l->cursor_idx] == '-') {
-                t.at = &l->at[l->cursor_idx];
-                l->cursor_idx++;
-                t.size = 1;
-                if (start_n_number(&t, l)) {
-                        return t;
-                }
-                if (l->at[l->cursor_idx] == '-') {
-                        set_token_RAW_STR(&t ,l);
-                        if (t.size == 2) {
-                                t.id = ARQ_CMD_ARGUMENT_MODE; 
-                        }
-                        return t; 
-                }
-                set_token_RAW_STR(&t ,l);
-                return t;
-        }
-        t.at = &l->at[l->cursor_idx]; 
-        set_token_RAW_STR(&t ,l);
-        return t;
-}
-
 static Arq_Token next_token(Lexer *l, bool const bundling) {
         Arq_Token t = {0};
 
@@ -134,7 +105,7 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                         if (t.size == 0) {
                                 t.at = t.at - 2;
                                 t.size = 2;
-                                t.id = ARQ_CMD_ARGUMENT_MODE; 
+                                t.id = ARQ_CMD_DASHDASH; 
                         }
                         return t; 
                 }
@@ -154,21 +125,14 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
         v->num_of_token = 0;
         v->idx = 0;
         bool bundling = false;
-        bool option = true;
         for (int i = 0; i < argc; i++) {
                 Lexer lexer = {
                         .SIZE = strlen(argv[i]),
                         .cursor_idx = 0,
                         .at = argv[i],
                 };
-                Arq_Token const t = option
-                ? next_token(&lexer, bundling)
-                : next_argument_token(&lexer);
-
-                if (t.id == ARQ_CMD_ARGUMENT_MODE) {
-                        option = !option;
-                } 
-                assert(v->num_of_token < num_of_token);
+                Arq_Token const t =  next_token(&lexer, bundling);
+                assert( v->num_of_token < num_of_token);
                 v->at[v->num_of_token++] = t;
                 bundling = lexer.cursor_idx < lexer.SIZE;
                 while (bundling) { 

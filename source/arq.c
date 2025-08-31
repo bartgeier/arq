@@ -207,16 +207,27 @@ uint32_t arq_fn(
                                 printf("ARQ_OPT_CSTR_T\n");
                                 char const *cstr; 
                                 if (arq_imm_equal(opt)) {
-                                        // For a short option with an optional cstr_t as an argument.
-                                        // It is not always possible to include the argument immediately after the option.
-                                        // This is the case whether the next character is a bundled option or a character from a cstr_t.
-                                        // If the next character is a number, then it is an argument => here is it possible.
-                                        // {'S', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
-                                        // failure: -abcShello    => the 'h' is interpreted as short option part of the bundle (no space) thats why failure
-                                        // ok:      -abcS hello   => is string token fine
-                                        // ok:      -abcS69       => 69 is a number fine can't be a short option
-                                        cstr = arq_imm_default_cstr_t(opt);
-                                        (void)arq_imm_optional_argument_cstr_t(cmd, &cstr);
+                                        if (arq_imm_cmd_is_dashdash(cmd, opt)) {
+                                                cstr = arq_imm_argument_csrt_t(cmd, &error_msg);
+                                                if (cstr == NULL) {
+                                                        arq_msg_append_cstr(&error_msg, "'--' allows you to set an argument that looks like an option -- --hello\n");
+                                                        arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
+                                                        arq_msg_append_cstr(&error_msg, "'--' undoes optional behavior in case of an cstr_t = NULL\n");
+                                                        error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer);
+                                                        return error_msg.size;
+                                                }
+                                        } else {
+                                                // For a short option with an optional cstr_t as an argument.
+                                                // It is not always possible to include the argument immediately after the option.
+                                                // This is the case whether the next character is a bundled option or a character from a cstr_t.
+                                                // If the next character is a number, then it is an argument => here is it possible.
+                                                // {'S', "cstring", fn_cstring, &ctx, "cstr_t = NULL"},
+                                                // failure: -abcShello    => the 'h' is interpreted as short option part of the bundle (no space) thats why failure
+                                                // ok:      -abcS hello   => is string token fine
+                                                // ok:      -abcS69       => 69 is a number fine can't be a short option
+                                                cstr = arq_imm_default_cstr_t(opt);
+                                                (void)arq_imm_optional_argument_cstr_t(cmd, &cstr);
+                                        }
                                         arq_push_cstr_t(queue, cstr);
                                 } else {
                                         // A short option with a mandatory argument allows the argument to be included immediately after the option.

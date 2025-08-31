@@ -34,7 +34,7 @@
         /* command line tokens */                \
         X(ARQ_CMD_SHORT_OPTION)                  \
         X(ARQ_CMD_LONG_OPTION)                   \
-        X(ARQ_CMD_ARGUMENT_MODE)                 \
+        X(ARQ_CMD_DASHDASH)                      \
         X(ARQ_CMD_END_OF_LINE)                   \
 
 #define X(name)name,
