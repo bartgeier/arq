@@ -67,6 +67,15 @@ bool arq_imm_terminator(Arq_OptVector *opt) {
         return b;
 }
 
+bool arq_imm_not_identifier(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_IDENTFIER);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
+        return !b;
+}
+
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         if (token->id != ARQ_P_NUMBER) {

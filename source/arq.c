@@ -180,6 +180,7 @@ uint32_t arq_fn(
                 while (true) {
                         if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
                                 printf("ARQ_OPT_UINT32_T\n");
+                                (void)arq_imm_not_identifier(opt);
                                 uint32_to num;
                                 if (arq_imm_equal(opt)) {
                                         num = arq_imm_default_uint32_t(opt);
@@ -204,6 +205,7 @@ uint32_t arq_fn(
 
                         if (arq_imm_type(opt, ARQ_OPT_CSTR_T)) {
                                 printf("ARQ_OPT_CSTR_T\n");
+                                (void)arq_imm_not_identifier(opt);
                                 char const *cstr; 
                                 if (arq_imm_equal(opt)) {
                                         if (arq_imm_cmd_is_dashdash(cmd, opt)) {

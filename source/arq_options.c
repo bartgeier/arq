@@ -180,6 +180,11 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         if (arq_imm_L_parenthesis(tokens)) {
                 while (tokens->idx < tokens->num_of_token) {
                         if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; // error
+
+                                }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_uint32_t(tokens)) {
                                                 error_str = "' is not a positive number\n";
@@ -196,6 +201,11 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                         }
 
                         if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; // error
+
+                                }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_NULL(tokens)) {
                                                 error_str =  "' must be NULL\n";

@@ -19,6 +19,8 @@ bool arq_imm_L_parenthesis(Arq_OptVector *opt);
 bool arq_imm_R_parenthesis(Arq_OptVector *opt);
 bool arq_imm_terminator(Arq_OptVector *opt);
 
+bool arq_imm_not_identifier(Arq_OptVector *opt);
+
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt); 
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt);
 bool arq_imm_is_a_NULL(Arq_OptVector *opt);

@@ -50,10 +50,10 @@ void fn_sstring(Arq_Queue *queue) {
 int main(int argc, char **argv) {
         Arq_Option options[] = {
                 {'v', "version", fn_version, "()"},
-                {'p', "print", fn_print, "(uint32_t = 5, uint32_t = 4)"},
-                {'t', "test",  fn_test, "(uint32_t, uint32_t)"},
-                {'c', "cstring", fn_cstring, "(cstr_t = NULL)"},
-                {'s', "sstring", fn_sstring, "(cstr_t)"},
+                {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = 1200)"},
+                {'t', "test",    fn_test,    "(uint32_t number, uint32_t offset)"},
+                {'c', "cstring", fn_cstring, "(cstr_t cstring = NULL)"},
+                {'s', "sstring", fn_sstring, "(cstr_t sstring)"},
         };
 
         // testen mit
