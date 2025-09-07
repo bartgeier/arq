@@ -27,9 +27,7 @@ static void add_option_msg(Arq_msg *error_msg, Arq_Option const *o) {
                 arq_msg_append_cstr(error_msg, " ");
         }
         if (strlen(o->arguments ) != 0) {
-                arq_msg_append_cstr(error_msg, "(");
                 arq_msg_append_cstr(error_msg, o->arguments);
-                arq_msg_append_cstr(error_msg, ")");
         }
         arq_msg_append_lf(error_msg);
 }
@@ -114,7 +112,7 @@ uint32_t arq_fn(
                 uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
                         add_option_msg(&error_msg, &options[i]);
-                        uint32_t const n = arq_option_parameter_idx(&options[i]) + 1 + ups.u32;
+                        uint32_t const n = arq_option_parameter_idx(&options[i]) + ups.u32;
                         arq_msg_append_nchr(&error_msg, ' ', n);
                         arq_msg_append_cstr(&error_msg, "^\n");
                         error_msg_print_buffer(&error_msg, NULL, arena_buffer);
@@ -148,7 +146,7 @@ uint32_t arq_fn(
 
         printf("\n-------- interpreter --------------\n\n");
         Arq_Queue *queue = arq_queue_malloc(arena);
-        printf("Max possible arguments %d\n", queue->NUM_OF_ARGUMENTS);
+        printf("Max possible arguments to put in queue %d\n", queue->NUM_OF_ARGUMENTS);
 
         while(arq_imm_cmd_has_token_left(cmd)) {
                 printf("\n");
@@ -178,6 +176,7 @@ uint32_t arq_fn(
                         error_msg_print_buffer(&error_msg, NULL, arena_buffer);
                         return error_msg.size;
                 }
+                (void)arq_imm_L_parenthesis(opt);
                 while (true) {
                         if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
                                 printf("ARQ_OPT_UINT32_T\n");
@@ -249,7 +248,7 @@ uint32_t arq_fn(
                                 goto terminator;
                         }
 terminator:
-                        if (arq_imm_terminator(opt)) {
+                        if (arq_imm_R_parenthesis(opt)) {
                                 printf("ARQ_OPTION_END\n");
                                 call_back_function(options, option_list, queue);
                                 break;

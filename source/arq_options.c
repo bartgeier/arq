@@ -85,6 +85,22 @@ static Arq_Token next_token(Lexer *l) {
                 return t; 
         }
 
+        if (l->at[l->cursor_idx] == '(') {
+                t.id = ARQ_OPT_L_PARENTHESIS; 
+                t.at = &l->at[l->cursor_idx];
+                l->cursor_idx++;
+                t.size = 1;
+                return t; 
+        }
+
+        if (l->at[l->cursor_idx] == ')') {
+                t.id = ARQ_OPT_R_PARENTHESIS; 
+                t.at = &l->at[l->cursor_idx];
+                l->cursor_idx++;
+                t.size = 1;
+                return t; 
+        }
+
         if (l->at[l->cursor_idx] == 0) {
                 t.id = ARQ_OPT_TERMINATOR; 
                 t.at = &l->at[l->cursor_idx];
@@ -160,45 +176,53 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
 
 uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         tokens->idx = 0;
-        char *error_str = NULL;
-        while (tokens->idx < tokens->num_of_token) {
-                if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
-                        if (arq_imm_equal(tokens)) {
-                                if (false == arq_imm_is_a_uint32_t(tokens)) {
-                                        error_str = "' is not a positive number\n";
-                                        break; // error
+        char *error_str = "' missing open parenthesis '('\n";
+        if (arq_imm_L_parenthesis(tokens)) {
+                while (tokens->idx < tokens->num_of_token) {
+                        if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_uint32_t(tokens)) {
+                                                error_str = "' is not a positive number\n";
+                                                break; // error
+                                        }
+                                        error_str = "' but expected ',' or ''\n";
+                                } else {
+                                        error_str = "' but expected ',' or '=' or ''\n";
                                 }
-                                error_str = "' but expected ',' or ''\n";
-                        } else {
-                                error_str = "' but expected ',' or '=' or ''\n";
-                        }
-                        goto next_argument;
-                }
-
-                if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
-                        if (arq_imm_equal(tokens)) {
-                                if (false == arq_imm_is_a_NULL(tokens)) {
-                                        error_str =  "' must be NULL\n";
-                                        break; // error 
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
                                 }
-                                error_str = "' but expected ',' or ''\n";
-                        } else {
-                                error_str = "' but expected ',' or '=' or ''\n";
+                                goto next_argument;
                         }
-                        goto next_argument;
-                } 
 
-                error_str = "' is not a type\n";
-next_argument:
-                if (arq_imm_comma(tokens)) {
-                        continue;
-                }
-                if (arq_imm_terminator(tokens)) {
-                        uint32_to const idx = { .error = false, .u32 = 0 };
-                        return idx;
-                } 
-                break; // error
-        } 
+                        if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_NULL(tokens)) {
+                                                error_str =  "' must be NULL\n";
+                                                break; // error 
+                                        }
+                                        error_str = "' but expected ',' or ''\n";
+                                } else {
+                                        error_str = "' but expected ',' or '=' or ''\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        } 
+
+                        error_str = "' is not a type\n";
+        next_argument:
+                        if (arq_imm_R_parenthesis(tokens)) {
+                                error_str = "' after ')' no tokens allowed!\n";
+                                if (arq_imm_terminator(tokens)) {
+                                        uint32_to const idx = { .error = false, .u32 = 0 };
+                                        return idx;
+                                } 
+                        }
+                        break; // error
+                } // while
+        }
 
         // error
         uint32_to const idx = { .error = true, .u32 = tokens->at[tokens->idx].at - tokens->at[0].at };

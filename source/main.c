@@ -49,16 +49,16 @@ void fn_sstring(Arq_Queue *queue) {
 
 int main(int argc, char **argv) {
         Arq_Option options[] = {
-                {'v', "version", fn_version, ""},
-                {'p', "print", fn_print, "uint32_t = 5, uint32_t = 4"},
-                {'t', "test",  fn_test, "uint32_t, uint32_t"},
-                {'c', "cstring", fn_cstring, "cstr_t = NULL"},
-                {'s', "sstring", fn_sstring, "cstr_t"},
+                {'v', "version", fn_version, "()"},
+                {'p', "print", fn_print, "(uint32_t = 5, uint32_t = 4)"},
+                {'t', "test",  fn_test, "(uint32_t, uint32_t)"},
+                {'c', "cstring", fn_cstring, "(cstr_t = NULL)"},
+                {'s', "sstring", fn_sstring, "(cstr_t)"},
         };
 
         // testen mit
         // ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello 
-       char buffer[600];
+       char buffer[1000];
 
         if (0 < arq_fn(
                 argc, argv, 

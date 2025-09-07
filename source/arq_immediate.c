@@ -43,6 +43,24 @@ bool arq_imm_comma(Arq_OptVector *opt) {
         return b;
 }
 
+bool arq_imm_L_parenthesis(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_L_PARENTHESIS);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
+        return b;
+}
+
+bool arq_imm_R_parenthesis(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_R_PARENTHESIS);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
+        return b;
+}
+
 bool arq_imm_terminator(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_TERMINATOR);

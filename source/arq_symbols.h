@@ -15,6 +15,8 @@
         /* option operators */                   \
         X(ARQ_OPT_EQ)                            \
         X(ARQ_OPT_COMMA)                         \
+        X(ARQ_OPT_L_PARENTHESIS)                 \
+        X(ARQ_OPT_R_PARENTHESIS)                 \
         X(ARQ_OPT_TERMINATOR)                    \
         X(ARQ_OPT_UNKNOWN)                       \
                                                  \
