@@ -247,7 +247,7 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         if (token->id != ARQ_P_NUMBER) {
                 if (error_msg != NULL) {
                         Arq_Token const tok = *token;
-                        arq_msg_clear(error_msg);
+                        // arq_msg_clear(error_msg);
                         arq_msg_append_cstr(error_msg, cstr);
                         arq_msg_append_cstr(error_msg, "Token '");
                         arq_msg_append_str(error_msg, tok.at, tok.size);
@@ -267,7 +267,7 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         char const *result;
         if (token->id == ARQ_CMD_END_OF_LINE) {
                 Arq_Token const tok = *token;
-                arq_msg_clear(error_msg);
+                // arq_msg_clear(error_msg);
                 arq_msg_append_cstr(error_msg, "CMD line failure:\n");
                 arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, tok.at, tok.size);

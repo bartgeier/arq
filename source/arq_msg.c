@@ -55,6 +55,52 @@ void arq_msg_append_cstr(Arq_msg *m, char const *cstr) {
         }
 }
 
+void arq_msg_insert_ln_argv(Arq_msg *m, uint32_t line_nr, int argc, char **argv) {
+        uint32_t ln_count = 0;
+        uint32_t a_idx = 0; 
+        for (uint32_t i = 0; i < m->size; i++) {
+                if (m->at[i] == '\n') {
+                        ln_count++;
+                        if (line_nr == ln_count) {
+                                a_idx = i + 1;
+                        }
+                }
+        }
+
+        uint32_t const b_idx = m->size;
+        for (int i = 0; i < argc; i++) {
+                // render argv to calculate argv_len 
+                arq_msg_append_cstr(m, argv[i]);
+                arq_msg_append_chr(m, '_');
+        }
+        arq_msg_append_lf(m);
+        uint32_t const c_idx = m->size;
+        uint32_t const argv_len = c_idx - b_idx;
+
+        uint32_t const shift_right = b_idx - a_idx;
+        for (uint32_t i = 0; i < shift_right; i++) {
+                uint32_t const idx = b_idx - 1 - i;
+                m->at[idx + argv_len] = m->at[idx];
+        }
+
+        uint32_t const d_idx = m->size;
+        for (int i = 0; i < argc; i++) {
+                // render argv once more for moving argv
+                arq_msg_append_cstr(m, argv[i]);
+                arq_msg_append_chr(m, ' ');
+        }
+        arq_msg_append_lf(m);
+
+        {
+                // moving rendered argv 
+                for (uint32_t i = 0; i < argv_len; i++) {
+                        m->at[i + a_idx] =  m->at[i + d_idx];
+                }
+                //delete argv 
+                m->size = d_idx;
+        }
+}
+
 void arq_msg_append_str(Arq_msg *m, char const *str, uint32_t const size) {
         for (uint32_t i = 0; i < size; i++) {
                 arq_msg_append_chr(m, str[i]);

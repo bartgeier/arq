@@ -19,6 +19,7 @@ void arq_msg_append_lf(Arq_msg *m);
 void arq_msg_append_chr(Arq_msg *m, char const chr);
 void arq_msg_append_nchr(Arq_msg *m, char const chr, uint32_t const num_of_chr);
 void arq_msg_append_cstr(Arq_msg *m, char const *cstr);
+void arq_msg_insert_ln_argv(Arq_msg *m, uint32_t line_nr, int argc, char **argv);
 void arq_msg_append_str(Arq_msg *m, char const *str, uint32_t const size);
 
 #ifdef __cplusplus

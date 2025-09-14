@@ -33,9 +33,18 @@ static void add_option_msg(Arq_msg *error_msg, Arq_Option const *o) {
 }
 
 static void error_msg_print_buffer(Arq_msg *error_msg, Arq_Option const *o, char *arena_buffer) {
-        if (o != NULL) {
-               add_option_msg(error_msg, o);
+        add_option_msg(error_msg, o);
+
+        arq_msg_format(error_msg);
+
+        for (uint32_t i = 0; i < error_msg->size; i++) {
+                arena_buffer[i] = error_msg->at[i];
         }
+        arena_buffer[error_msg->size] = 0;
+        assert(arena_buffer[error_msg->size] == 0);
+}
+
+static void option_error_msg_print_buffer(Arq_msg *error_msg, char *arena_buffer) {
         arq_msg_format(error_msg);
 
         for (uint32_t i = 0; i < error_msg->size; i++) {
@@ -115,7 +124,7 @@ uint32_t arq_fn(
                         uint32_t const n = arq_option_parameter_idx(&options[i]) + ups.u32;
                         arq_msg_append_nchr(&error_msg, ' ', n);
                         arq_msg_append_cstr(&error_msg, "^\n");
-                        error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                        option_error_msg_print_buffer(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
 
@@ -156,7 +165,7 @@ uint32_t arq_fn(
                         opt = arq_imm_get_long(option_list, options, cmd);
                         if (opt == NULL) {
                                 Error_msg_cmd_failure(&error_msg, "'--", cmd->at[cmd->idx], "' unknown long option ");
-                                error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                                option_error_msg_print_buffer(&error_msg, arena_buffer);
                                 return error_msg.size;
                         }
                 } else if (arq_imm_cmd_is_short_option(cmd)) {
@@ -164,7 +173,7 @@ uint32_t arq_fn(
                         opt = arq_imm_get_short(option_list, options, cmd);
                         if (opt == NULL) {
                                 Error_msg_cmd_failure(&error_msg, "'-", cmd->at[cmd->idx], "' unknown short option");
-                                error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                                option_error_msg_print_buffer(&error_msg, arena_buffer);
                                 return error_msg.size;
                         }
                 } else if (arq_imm_end_of_line(cmd)) {
@@ -173,7 +182,7 @@ uint32_t arq_fn(
                         return 0;
                 } else {
                         Error_msg_cmd_failure(&error_msg, "'", cmd->at[cmd->idx], "' is not an option");
-                        error_msg_print_buffer(&error_msg, NULL, arena_buffer);
+                        option_error_msg_print_buffer(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
                 (void)arq_imm_L_parenthesis(opt);
@@ -193,6 +202,7 @@ uint32_t arq_fn(
                                         num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
                                                 // wasn't an uint32_t number or overflow
+                                                arq_msg_insert_ln_argv(&error_msg, 2, argc, argv);
                                                 error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer); 
                                                 return error_msg.size;
                                         }
