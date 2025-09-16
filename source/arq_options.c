@@ -238,7 +238,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         uint32_to const idx = { .error = true, .u32 = tokens->at[tokens->idx].at - tokens->at[0].at };
         Arq_Token token = tokens->at[tokens->idx];
         arq_msg_clear(error_msg);
-        arq_msg_append_cstr(error_msg, "Assert Option:\n");
+        arq_msg_append_cstr(error_msg, "Option failure:\n");
         arq_msg_append_cstr(error_msg, "token '");
         arq_msg_append_str(error_msg, token.at, token.size);
         arq_msg_append_cstr(error_msg, error_str);

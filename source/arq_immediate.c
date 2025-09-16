@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <string.h>
 
-
+#define CMD_LINE_FAILURE "CMD line failure:\n"
 ///////////////////////////////////////////////////////////////////////////////
 
 void arq_imm_opt_next(Arq_OptVector *opt) {
@@ -173,7 +173,8 @@ bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
 Arq_OptVector *arq_imm_get_long(
         Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd
+        Arq_Vector *cmd ,
+        Arq_msg *error_msg
 ) {
         for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
                 Arq_Token const *cmd_token = &cmd->at[cmd->idx];
@@ -186,13 +187,20 @@ Arq_OptVector *arq_imm_get_long(
                         return opt;
                 }
         }
-        return NULL; // unknown long option
+        Arq_Token const token = cmd->at[cmd->idx];
+        arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
+        arq_msg_append_cstr(error_msg, "'--");
+        arq_msg_append_str(error_msg, token.at, token.size);
+        arq_msg_append_cstr(error_msg, "' unknown long option ");
+        arq_msg_append_lf(error_msg);
+        return NULL;
 }
 
 Arq_OptVector *arq_imm_get_short(
         Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd
+        Arq_Vector *cmd,
+        Arq_msg *error_msg
 ) {
         //assert(strlen(cmd->at[cmd->idx].at) == 1);
         for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
@@ -206,7 +214,22 @@ Arq_OptVector *arq_imm_get_short(
                         return opt;
                 }
         }
-        return NULL; // unknown short option
+        Arq_Token const token = cmd->at[cmd->idx];
+        arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
+        arq_msg_append_cstr(error_msg, "'-");
+        arq_msg_append_str(error_msg, token.at, token.size);
+        arq_msg_append_cstr(error_msg, "' unknown short option ");
+        arq_msg_append_lf(error_msg);
+        return NULL; 
+}
+
+void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg) {
+        Arq_Token const token = cmd->at[cmd->idx];
+        arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
+        arq_msg_append_cstr(error_msg, "'");
+        arq_msg_append_str(error_msg, token.at, token.size);
+        arq_msg_append_cstr(error_msg, "' is not an option");
+        arq_msg_append_lf(error_msg);
 }
 
 bool arq_imm_end_of_line(Arq_Vector *cmd) {
@@ -220,7 +243,7 @@ bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg
         if (token->id != ARQ_P_NUMBER) {
                 return false;
         }
-        *num = arq_tok_pNumber_to_uint32_t(token, error_msg, "CMD line failure:\n");
+        *num = arq_tok_pNumber_to_uint32_t(token, error_msg, CMD_LINE_FAILURE);
         if (num->error) {
                 return true; // overflow
         } 
@@ -243,7 +266,7 @@ bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         uint32_to result = {0};
-        char const *cstr = "CMD line failure:\n";
+        char const *cstr = CMD_LINE_FAILURE;
         if (token->id != ARQ_P_NUMBER) {
                 if (error_msg != NULL) {
                         Arq_Token const tok = *token;
@@ -268,10 +291,10 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         if (token->id == ARQ_CMD_END_OF_LINE) {
                 Arq_Token const tok = *token;
                 // arq_msg_clear(error_msg);
-                arq_msg_append_cstr(error_msg, "CMD line failure:\n");
+                arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
                 arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, tok.at, tok.size);
-                arq_msg_append_cstr(error_msg, "' is not a c string");
+                arq_msg_append_cstr(error_msg, "' is not a c string => expected an argument");
                 arq_msg_append_lf(error_msg);
                 result = NULL;
                 return result;

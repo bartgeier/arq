@@ -848,15 +848,4 @@ building place</panel_attributes>
 when arq_fn return</panel_attributes>
     <additional_attributes>10.0;100.0;10.0;50.0;210.0;50.0;330.0;10.0</additional_attributes>
   </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>885</x>
-      <y>315</y>
-      <w>45</w>
-      <h>75</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
-  </element>
 </diagram>

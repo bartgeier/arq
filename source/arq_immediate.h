@@ -37,13 +37,16 @@ bool arq_imm_end_of_line(Arq_Vector *cmd);
 Arq_OptVector *arq_imm_get_long(
         Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd
+        Arq_Vector *cmd,
+        Arq_msg *error_msg
 );
 Arq_OptVector *arq_imm_get_short(
         Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd
+        Arq_Vector *cmd,
+        Arq_msg *error_msg
 );
+void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg);
 
 bool arq_imm_cmd_is_long_option(Arq_Vector *cmd);
 bool arq_imm_cmd_is_short_option(Arq_Vector *cmd);
