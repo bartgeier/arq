@@ -5,7 +5,7 @@
 #include "arq_cmd.h"
 #include "arq_token.h"
 #include "arq_conversion.h"
-#include "arq_msg.h"
+//#include "arq_msg.h"
 #include "arq_immediate.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -202,7 +202,8 @@ uint32_t arq_fn(
                                         num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
                                                 // wasn't an uint32_t number or overflow
-                                                arq_msg_insert_ln_argv(&error_msg, 2, argc, argv);
+                                                //arq_msg_insert_ln_argv(&error_msg, 1, argc, argv);
+                                                arq_msg_insert_cmd_ln(&error_msg, 1, cmd);
                                                 error_msg_print_buffer(&error_msg, &options[option_list->row], arena_buffer); 
                                                 return error_msg.size;
                                         }

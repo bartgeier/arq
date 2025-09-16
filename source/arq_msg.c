@@ -1,4 +1,5 @@
 #include "arq_msg.h"
+#include "arq_symbols.h"
 #include <assert.h>
 #include <string.h>
 
@@ -55,7 +56,7 @@ void arq_msg_append_cstr(Arq_msg *m, char const *cstr) {
         }
 }
 
-void arq_msg_insert_ln_argv(Arq_msg *m, uint32_t line_nr, int argc, char **argv) {
+void arq_msg_insert_cmd_ln(Arq_msg *m, uint32_t line_nr, Arq_Vector *cmd) {
         uint32_t ln_count = 0;
         uint32_t a_idx = 0; 
         for (uint32_t i = 0; i < m->size; i++) {
@@ -68,10 +69,20 @@ void arq_msg_insert_ln_argv(Arq_msg *m, uint32_t line_nr, int argc, char **argv)
         }
 
         uint32_t const b_idx = m->size;
-        for (int i = 0; i < argc; i++) {
+        for (uint32_t i = 0; i <= cmd->idx; i++) {
                 // render argv to calculate argv_len 
-                arq_msg_append_cstr(m, argv[i]);
-                arq_msg_append_chr(m, '_');
+                if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
+                        arq_msg_append_chr(m, '-');
+                        arq_msg_append_chr(m, cmd->at[i].at[0]);
+                        arq_msg_append_chr(m, '_');
+                } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
+                        arq_msg_append_nchr(m, '-', 2);
+                        arq_msg_append_cstr(m, cmd->at[i].at);
+                        arq_msg_append_chr(m, '_');
+                } else {
+                        arq_msg_append_cstr(m, cmd->at[i].at);
+                        arq_msg_append_chr(m, '_');
+                }
         }
         arq_msg_append_lf(m);
         uint32_t const c_idx = m->size;
@@ -84,10 +95,20 @@ void arq_msg_insert_ln_argv(Arq_msg *m, uint32_t line_nr, int argc, char **argv)
         }
 
         uint32_t const d_idx = m->size;
-        for (int i = 0; i < argc; i++) {
+        for (uint32_t i = 0; i <= cmd->idx; i++) {
                 // render argv once more for moving argv
-                arq_msg_append_cstr(m, argv[i]);
-                arq_msg_append_chr(m, ' ');
+                if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
+                        arq_msg_append_chr(m, '-');
+                        arq_msg_append_chr(m, cmd->at[i].at[0]);
+                        arq_msg_append_chr(m, ' ');
+                } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
+                        arq_msg_append_nchr(m, '-', 2);
+                        arq_msg_append_cstr(m, cmd->at[i].at);
+                        arq_msg_append_chr(m, ' ');
+                } else {
+                        arq_msg_append_cstr(m, cmd->at[i].at);
+                        arq_msg_append_chr(m, ' ');
+                }
         }
         arq_msg_append_lf(m);
 
