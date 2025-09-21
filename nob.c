@@ -40,8 +40,15 @@ bool arq_build(bool const clean) {
         Nob_Cmd c_ompiler = {0};
         //nob_cmd_append(&cmd, "gcc", "-O0", "-ggdb", "-pedantic");
         //nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wno-parentheses"); 
+#if 0
         nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
-
+#endif
+#if 1
+        nob_cmd_append(&c_ompiler, "gcc", "-DARQ_LOG_TOKENIZER", "-DARQ_LOG_INFO", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
+#endif
+#if 0
+        nob_cmd_append(&c_ompiler, "gcc", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
+#endif
         Nob_Cmd cmd = {0};
         nob_cmd_append_cmd(&cmd, &c_ompiler);
         nob_cmd_append_cmd(&cmd, &include_paths);
@@ -190,9 +197,9 @@ int main(int argc, char **argv) {
         //ok &= unittests_build(flag.clean);
 
         if (!ok) {
-                nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms", nob_millis() - t_start);
+                nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n", nob_millis() - t_start);
                 return false;
         }
-        nob_log(NOB_INFO ,"Successful done! %llu ms", nob_millis() - t_start);
+        nob_log(NOB_INFO ,"Successful done! %llu ms\n", nob_millis() - t_start);
         return  0;
 }

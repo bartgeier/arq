@@ -6,6 +6,7 @@
 #include "arq_token.h"
 #include "arq_conversion.h"
 #include "arq_immediate.h"
+#include "arq_log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,14 +132,6 @@ static void output_cmd_line_conversion_failure(Arq_msg *error_msg, Arq_Option co
         assert(arena_buffer[error_msg->size] == 0);
 }
 
-static void print_token(Arq_Token *t) {
-        printf("%3d %30s -> ", t->size, symbol_names[t->id]);
-        for (uint32_t i = 0; i < t->size; i++) {
-                putchar(t->at[i]);
-        }
-        printf(" %d\n",t->size);
-}
-
 static void call_back_function(Arq_Option const *options, Arq_List const *option_list, Arq_Queue *queue) {
         Arq_Option const *option = &options[option_list->row];
         option->fn(queue);
@@ -150,11 +143,21 @@ uint32_t arq_fn(
         char *arena_buffer, uint32_t const buffer_size,
         Arq_Option const *options, uint32_t const num_of_options
 ) {
+        log_arq_mem("Buffer capacity %d byte", buffer_size);
         Arq_Arena *arena = arq_arena_init(arena_buffer, buffer_size);
+        log_arq_mem("Arena capacity %d byte,                             arena.size = %4d byte", arena->SIZE, arena->size);
 
         Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
         option_list->num_of_Vec = 0;
         option_list->row = 0;
+
+        log_arq_mem("Options list        %2d + %2d pVect * %2d = %3d byte => arena.size = %4d byte",
+                (int)offsetof(Arq_List,at),
+                num_of_options,
+                (int)sizeof(option_list->at),
+                (int)offsetof(Arq_List,at) + (int)(num_of_options * sizeof(option_list->at)),
+                arena->size
+        );
 
         Arq_msg error_msg;
         {
@@ -180,11 +183,15 @@ uint32_t arq_fn(
                 arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
                 Arq_OptVector *vb = arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
                 assert(v == vb);
+                log_arq_mem("      Option vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
+                        (int)offsetof(Arq_Token, at),
+                        vb->num_of_token,
+                        (int)sizeof(vb->at[0]),
+                        (int)offsetof(Arq_Token, at) + (int)(vb->num_of_token * sizeof(vb->at[0])),
+                        arena->size
+                );
 
-                printf("Option %d:\n", i);
-                for (uint32_t j = 0; j < v->num_of_token; j++) {
-                        print_token(&v->at[j]);
-                }
+                log_arq_option_token(v, i);
 
                 uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
@@ -200,7 +207,6 @@ uint32_t arq_fn(
                 option_list->at[option_list->num_of_Vec++] = v;
 
         }
-        printf("\n");
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -213,17 +219,28 @@ uint32_t arq_fn(
                 arq_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
                 Arq_Vector *cmd_b = arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + cmd->num_of_token * sizeof(Arq_Token));
                 assert(cmd == cmd_b);
+                log_arq_mem("Command line vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
+                        (int)offsetof(Arq_Vector, at),
+                        cmd->num_of_token, 
+                        (int)sizeof(cmd->at[0]), 
+                        (int)offsetof(Arq_Vector, at) + (int)(cmd->num_of_token * sizeof(cmd->at[0])), 
+                        arena->size
+                );
         }
-        printf("Command line: %d \n", cmd->num_of_token);
-        for (uint32_t i = 0; i < cmd->num_of_token; i++) {
-                print_token(&cmd->at[i]);
-        }
+        log_arq_cmd_line_token(cmd);
 
 ///////////////////////////////////////////////////////////////////////////////
-
-        printf("\n-------- interpreter --------------\n\n");
+        log_arq_banner("interpreter");
         Arq_Queue *queue = arq_queue_malloc(arena);
-        printf("Max possible arguments to put in queue %d\n", queue->NUM_OF_ARGUMENTS);
+        // printf("Max possible arguments to put in queue %d\n", queue->NUM_OF_ARGUMENTS);
+        log_arq_mem("Argument queue      %2d + %2d argum * %2d = %3d byte => arena.size = %4d byte", 
+                (int)offsetof(Arq_Queue, at),
+                queue->NUM_OF_ARGUMENTS,
+                (int)sizeof(queue->at[0]),
+                (int)offsetof(Arq_Queue, at) + (int)(queue->NUM_OF_ARGUMENTS * sizeof(queue->at[0])),
+                arena->size
+        );
+        log_arq_mem("%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS);
 
         while(arq_imm_cmd_has_token_left(cmd)) {
                 printf("\n");
