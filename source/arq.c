@@ -143,15 +143,15 @@ uint32_t arq_fn(
         char *arena_buffer, uint32_t const buffer_size,
         Arq_Option const *options, uint32_t const num_of_options
 ) {
-        log_arq_mem("Buffer capacity %d byte", buffer_size);
+        log_memory("Buffer capacity %d byte", buffer_size);
         Arq_Arena *arena = arq_arena_init(arena_buffer, buffer_size);
-        log_arq_mem("Arena capacity %d byte,                             arena.size = %4d byte", arena->SIZE, arena->size);
+        log_memory("Arena capacity %d byte,                             arena.size = %4d byte", arena->SIZE, arena->size);
 
         Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
         option_list->num_of_Vec = 0;
         option_list->row = 0;
 
-        log_arq_mem("Options list        %2d + %2d pVect * %2d = %3d byte => arena.size = %4d byte",
+        log_memory("Options list        %2d + %2d pVect * %2d = %3d byte => arena.size = %4d byte",
                 (int)offsetof(Arq_List,at),
                 num_of_options,
                 (int)sizeof(option_list->at),
@@ -183,7 +183,7 @@ uint32_t arq_fn(
                 arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
                 Arq_OptVector *vb = arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
                 assert(v == vb);
-                log_arq_mem("      Option vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
+                log_memory("      Option vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
                         (int)offsetof(Arq_Token, at),
                         vb->num_of_token,
                         (int)sizeof(vb->at[0]),
@@ -191,7 +191,7 @@ uint32_t arq_fn(
                         arena->size
                 );
 
-                log_arq_option_token(v, i);
+                log_tokenizer_option(v, i);
 
                 uint32_to ups = arq_option_verify_vector(v, &error_msg);
                 if (ups.error) {
@@ -219,7 +219,7 @@ uint32_t arq_fn(
                 arq_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
                 Arq_Vector *cmd_b = arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + cmd->num_of_token * sizeof(Arq_Token));
                 assert(cmd == cmd_b);
-                log_arq_mem("Command line vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
+                log_memory("Command line vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
                         (int)offsetof(Arq_Vector, at),
                         cmd->num_of_token, 
                         (int)sizeof(cmd->at[0]), 
@@ -227,26 +227,25 @@ uint32_t arq_fn(
                         arena->size
                 );
         }
-        log_arq_cmd_line_token(cmd);
+        log_tokenizer_cmd_line(cmd);
 
 ///////////////////////////////////////////////////////////////////////////////
-        log_arq_banner("interpreter");
+        log_int_banner("interpreter");
         Arq_Queue *queue = arq_queue_malloc(arena);
-        // printf("Max possible arguments to put in queue %d\n", queue->NUM_OF_ARGUMENTS);
-        log_arq_mem("Argument queue      %2d + %2d argum * %2d = %3d byte => arena.size = %4d byte", 
+        log_memory("Argument queue      %2d + %2d argum * %2d = %3d byte => arena.size = %4d byte", 
                 (int)offsetof(Arq_Queue, at),
                 queue->NUM_OF_ARGUMENTS,
                 (int)sizeof(queue->at[0]),
                 (int)offsetof(Arq_Queue, at) + (int)(queue->NUM_OF_ARGUMENTS * sizeof(queue->at[0])),
                 arena->size
         );
-        log_arq_mem("%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS);
+        log_memory("%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS);
 
         while(arq_imm_cmd_has_token_left(cmd)) {
-                printf("\n");
+                log_int_ln();
                 Arq_OptVector *opt = NULL;
                 if (arq_imm_cmd_is_long_option(cmd)) {
-                        printf("ARQ_CMD_LONG_OPTION\n");
+                        log_int_token(ARQ_CMD_LONG_OPTION);
                         opt = arq_imm_get_long(option_list, options, cmd, &error_msg);
                         if (opt == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -254,7 +253,7 @@ uint32_t arq_fn(
                                 return error_msg.size;
                         }
                 } else if (arq_imm_cmd_is_short_option(cmd)) {
-                        printf("ARQ_CMD_SHORT_OPTION\n");
+                        log_int_token(ARQ_CMD_SHORT_OPTION);
                         opt = arq_imm_get_short(option_list, options, cmd, &error_msg);
                         if (opt == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -262,7 +261,7 @@ uint32_t arq_fn(
                                 return error_msg.size;
                         }
                 } else if (arq_imm_end_of_line(cmd)) {
-                        printf("cmd end!\n");
+                        log_int_token(ARQ_CMD_END_OF_LINE);
                         arena_buffer[0] = 0;
                         return 0;
                 } else {
@@ -274,7 +273,7 @@ uint32_t arq_fn(
                 (void)arq_imm_L_parenthesis(opt);
                 while (true) {
                         if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
-                                printf("ARQ_OPT_UINT32_T\n");
+                                log_int_token_indent(ARQ_OPT_UINT32_T);
                                 (void)arq_imm_not_identifier(opt);
                                 uint32_to num;
                                 if (arq_imm_equal(opt)) {
@@ -295,13 +294,13 @@ uint32_t arq_fn(
                                         }
                                 }
                                 arq_push_uint32_t(queue, num.u32);
-                                printf("u32 %d\n", num.u32);
+                                log_inta("u32 %d", num.u32);
                                 if (arq_imm_comma(opt)) continue;
                                 goto terminator;
                         }
 
                         if (arq_imm_type(opt, ARQ_OPT_CSTR_T)) {
-                                printf("ARQ_OPT_CSTR_T\n");
+                                log_int_token_indent(ARQ_OPT_CSTR_T);
                                 (void)arq_imm_not_identifier(opt);
                                 char const *cstr; 
                                 if (arq_imm_equal(opt)) {
@@ -350,7 +349,7 @@ uint32_t arq_fn(
                         }
 terminator:
                         if (arq_imm_R_parenthesis(opt)) {
-                                printf("ARQ_OPTION_END\n");
+                                log_int_comment("call_back_function");
                                 call_back_function(options, option_list, queue);
                                 break;
                         }
