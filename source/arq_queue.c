@@ -33,14 +33,16 @@ Arq_Queue *arq_queue_malloc(Arq_Arena *arena) {
         return queue;
 }
 
+void arq_queue_clear(Arq_Queue *queue) {
+        queue->read_idx = 0;
+        queue->write_idx = 0;
+}
+
 static Arq_Argument pop(Arq_Queue *queue) {
-        assert(queue->read_idx != queue->write_idx && "queue is empty");
+        assert(queue->read_idx < queue->write_idx && "queue is empty");
         assert(queue->read_idx < queue->NUM_OF_ARGUMENTS);
         Arq_Argument argument = queue->at[queue->read_idx];
         queue->read_idx++;
-        if (queue->read_idx == queue->NUM_OF_ARGUMENTS) {
-                queue->read_idx = 0;
-        }
         return argument;
 }
 
@@ -48,10 +50,6 @@ static void push(Arq_Queue *queue, Arq_Argument const *argument) {
         assert(queue->write_idx < queue->NUM_OF_ARGUMENTS);
         queue->at[queue->write_idx] = *argument;
         queue->write_idx++;
-        if (queue->write_idx == queue->NUM_OF_ARGUMENTS) {
-                queue->write_idx = 0;
-        }
-        assert(queue->write_idx != queue->read_idx && "queue ringbuffer overflow");
 }
 
 void arq_unused(Arq_Queue *queue) {

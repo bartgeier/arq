@@ -33,6 +33,7 @@ extern "C" {
 #endif
 
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena);
+void arq_queue_clear(Arq_Queue *queue);
 
 void arq_push_uint8_t(Arq_Queue *queue, uint8_t n);
 void arq_push_uint16_t(Arq_Queue *queue, uint16_t n);

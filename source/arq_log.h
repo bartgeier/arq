@@ -1,6 +1,13 @@
 #ifndef ARQ_LOG_H
 #define ARQ_LOG_H
 
+#ifdef ARQ_LOG_MEMORY
+        #include <stdio.h>
+        #define log_memory(fmt, ...) \
+                do { printf(fmt "\n", ##__VA_ARGS__); } while (0)
+#else
+        #define log_memory(fmt, ...) do {} while (0)
+#endif
 
 #ifdef ARQ_LOG_TOKENIZER
         #include <stdio.h>
@@ -34,15 +41,8 @@
         #define log_tokenizer_cmd_line(v) ((void)0)
 #endif
 
-#ifdef ARQ_LOG_MEMORY
-        #include <stdio.h>
-        #define log_memory(fmt, ...) \
-                do { printf(fmt "\n", ##__VA_ARGS__); } while (0)
-#else
-        #define log_memory(fmt, ...) do {} while (0)
-#endif
-
-#ifdef ARQ_LOG_INTERPETER
+#ifdef ARQ_LOG_TOKENIZER
+        // used for interpreter logging
         #include <stdio.h>
         #define log_int_banner(fmt) \
                 do { printf("---------" fmt "------------\n"); } while (0)

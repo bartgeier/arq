@@ -190,9 +190,9 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                                 error_str = "' is not a positive number\n";
                                                 break; // error
                                         }
-                                        error_str = "' but expected ',' or ''\n";
+                                        error_str = "' but expected ',' or ')'\n";
                                 } else {
-                                        error_str = "' but expected ',' or '=' or ''\n";
+                                        error_str = "' but expected ',' or '=' or ')'\n";
                                 }
                                 if (arq_imm_comma(tokens)) {
                                         continue;
@@ -211,9 +211,9 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                                 error_str =  "' must be NULL\n";
                                                 break; // error 
                                         }
-                                        error_str = "' but expected ',' or ''\n";
+                                        error_str = "' but expected ',' or ')'\n";
                                 } else {
-                                        error_str = "' but expected ',' or '=' or ''\n";
+                                        error_str = "' but expected ',' or '=' or ')'\n";
                                 }
                                 if (arq_imm_comma(tokens)) {
                                         continue;

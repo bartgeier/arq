@@ -136,6 +136,7 @@ static void call_back_function(Arq_Option const *options, Arq_List const *option
         Arq_Option const *option = &options[option_list->row];
         option->fn(queue);
         assert(queue->read_idx == queue->write_idx && "Queue is not empty, there are still arguments in the queue!");
+        arq_queue_clear(queue);
 }
 
 uint32_t arq_fn(
@@ -145,7 +146,11 @@ uint32_t arq_fn(
 ) {
         log_memory("Buffer capacity %d byte", buffer_size);
         Arq_Arena *arena = arq_arena_init(arena_buffer, buffer_size);
-        log_memory("Arena capacity %d byte,                             arena.size = %4d byte", arena->SIZE, arena->size);
+        log_memory("Arena head %d byte, capacity %d byte,                arena.size = %4d byte", 
+                (int)offsetof(Arq_Arena,at),
+                arena->SIZE, 
+                arena->size
+        );
 
         Arq_List *option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
         option_list->num_of_Vec = 0;
