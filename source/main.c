@@ -22,8 +22,13 @@ void fn_version(Arq_Queue *queue) {
 }
 
 void fn_array(Arq_Queue *queue) {
-        (void) queue;
-        printf("array \n");
+        printf("fn_array {\n");
+        uint32_t array_size = arq_array_size(queue);
+        printf("    array_size: %d\n", array_size);
+        for (uint32_t i = 0; i < array_size; i++) {
+                printf("        argument %d: %d\n", i, arq_uint32_t(queue));
+        }
+        printf("}\n");
 }
 
 void fn_test(Arq_Queue *queue) {
@@ -55,7 +60,7 @@ void fn_sstring(Arq_Queue *queue) {
 int main(int argc, char **argv) {
         Arq_Option options[] = {
                 {'v', "version", fn_version, "()"},
-                {'a', "array",   fn_array,   "(uint32_t numbers)"},
+                {'a', "array",   fn_array,   "(uint32_t numbers[])"},
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = 1200)"},
                 {'t', "test",    fn_test,    "(uint32_t number, uint32_t offset)"},
                 {'c', "cstring", fn_cstring, "(cstr_t cstring = NULL)"},

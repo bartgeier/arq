@@ -43,10 +43,10 @@ bool arq_build(bool const clean) {
 #if 0
         nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
-#if 0
+#if 1
         nob_cmd_append(&c_ompiler, "gcc", "-DARQ_LOG_TOKENIZER", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
-#if 1
+#if 0
         nob_cmd_append(&c_ompiler, "gcc", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
         Nob_Cmd cmd = {0};

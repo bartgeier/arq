@@ -38,6 +38,7 @@ void arq_queue_clear(Arq_Queue *queue);
 void arq_push_uint8_t(Arq_Queue *queue, uint8_t n);
 void arq_push_uint16_t(Arq_Queue *queue, uint16_t n);
 void arq_push_uint32_t(Arq_Queue *queue, uint32_t n);
+uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n);
 void arq_push_uint64_t(Arq_Queue *queue, uint64_t n);
 void arq_push_int8_t(Arq_Queue *queue, int8_t n);
 void arq_push_int16_t(Arq_Queue *queue, int16_t n);

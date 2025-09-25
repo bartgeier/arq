@@ -14,6 +14,7 @@ void arq_imm_opt_next(Arq_OptVector *opt);
 bool arq_imm_type(Arq_OptVector *opt, Arq_SymbolID const id);
 
 bool arq_imm_equal(Arq_OptVector *opt);
+bool arq_imm_array(Arq_OptVector *opt);
 bool arq_imm_comma(Arq_OptVector *opt);
 bool arq_imm_L_parenthesis(Arq_OptVector *opt);
 bool arq_imm_R_parenthesis(Arq_OptVector *opt);
@@ -50,6 +51,7 @@ void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg);
 
 bool arq_imm_cmd_is_long_option(Arq_Vector *cmd);
 bool arq_imm_cmd_is_short_option(Arq_Vector *cmd);
+bool arq_imm_is_p_number(Arq_Vector *cmd);
 
 bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr);

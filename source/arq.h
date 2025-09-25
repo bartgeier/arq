@@ -27,6 +27,7 @@ void arq_unused(Arq_Queue *queue);
 uint8_t arq_uint8_t(Arq_Queue *queue);
 uint16_t arq_uint16_t(Arq_Queue *queue);
 uint32_t arq_uint32_t(Arq_Queue *queue);
+uint32_t arq_array_size(Arq_Queue *queue);
 uint64_t arq_uint64_t(Arq_Queue *queue);
 int8_t arq_int8_t(Arq_Queue *queue);
 int16_t arq_int16_t(Arq_Queue *queue);

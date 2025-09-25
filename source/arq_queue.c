@@ -1,5 +1,6 @@
 #include "arq_queue.h"
 #include "arq.h"
+#include "arq_symbols.h"
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
@@ -74,6 +75,12 @@ uint32_t arq_uint32_t(Arq_Queue *queue) {
         return t.u32;
 }
 
+uint32_t arq_array_size(Arq_Queue *queue) {
+        Arq_Argument t = pop(queue);
+        assert(t.type_id == ARQ_OPT_ARRAY_SIZE_T);
+        return t.u32;
+}
+
 uint64_t arq_uint64_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_UINT64_T);
@@ -126,6 +133,16 @@ void arq_push_uint32_t(Arq_Queue *queue, uint32_t n) {
                 .u32 = n,
         };
         push(queue, &a);
+}
+
+uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
+        assert(queue->write_idx == 0); // counter can only be at[0]
+        Arq_Argument a = {
+                .type_id = ARQ_OPT_ARRAY_SIZE_T,
+                .u32 = n,
+        };
+        push(queue, &a);
+        return &queue->at[0].u32;
 }
 
 void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {

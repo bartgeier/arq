@@ -15,6 +15,7 @@
         /* option operators */                   \
         X(ARQ_OPT_EQ)                            \
         X(ARQ_OPT_COMMA)                         \
+        X(ARQ_OPT_ARRAY)                         \
         X(ARQ_OPT_L_PARENTHESIS)                 \
         X(ARQ_OPT_R_PARENTHESIS)                 \
         X(ARQ_OPT_TERMINATOR)                    \
@@ -27,6 +28,7 @@
         X(ARQ_OPT_UINT8_T)                       \
         X(ARQ_OPT_UINT16_T)                      \
         X(ARQ_OPT_UINT32_T)                      \
+        X(ARQ_OPT_ARRAY_SIZE_T)                  \
         X(ARQ_OPT_UINT64_T)                      \
         X(ARQ_OPT_INT8_T)                        \
         X(ARQ_OPT_INT16_T)                       \

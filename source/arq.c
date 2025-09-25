@@ -280,26 +280,42 @@ uint32_t arq_fn(
                         if (arq_imm_type(opt, ARQ_OPT_UINT32_T)) {
                                 log_int_token_indent(ARQ_OPT_UINT32_T);
                                 (void)arq_imm_not_identifier(opt);
-                                uint32_to num;
                                 if (arq_imm_equal(opt)) {
-                                        num = arq_imm_default_uint32_t(opt);
+                                        uint32_to num = arq_imm_default_uint32_t(opt);
                                         if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
                                                 // overflow
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
                                                 return error_msg.size;
                                         }
+                                        arq_push_uint32_t(queue, num.u32);
+                                        log_inta("u32 %d", num.u32);
+                                } else if (arq_imm_array(opt)) {
+                                        uint32_t *counter = arq_push_array_size(queue, 0);
+                                        log_inta("u32 %d", 0);
+                                        while (arq_imm_is_p_number(cmd)) {
+                                                uint32_to num = {0};
+                                                if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
+                                                        // overflow
+                                                        error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                        output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                        return error_msg.size;
+                                                }
+                                                *counter += 1;
+                                                arq_push_uint32_t(queue, num.u32);
+                                                log_inta("u32 %d", num.u32);
+                                        }
                                 } else {
-                                        num = arq_imm_argument_uint32_t(cmd, &error_msg);
+                                        uint32_to num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
                                                 // wasn't an uint32_t number or overflow
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
                                                 return error_msg.size;
                                         }
+                                        arq_push_uint32_t(queue, num.u32);
+                                        log_inta("u32 %d", num.u32);
                                 }
-                                arq_push_uint32_t(queue, num.u32);
-                                log_inta("u32 %d", num.u32);
                                 if (arq_imm_comma(opt)) continue;
                                 goto terminator;
                         }

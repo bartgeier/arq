@@ -85,6 +85,16 @@ static Arq_Token next_token(Lexer *l) {
                 return t; 
         }
 
+        if ((l->at[l->cursor_idx] == '[') 
+        && (l->cursor_idx + 1 < l->SIZE) 
+        && (l->at[l->cursor_idx + 1] == ']')) {
+                t.id = ARQ_OPT_ARRAY; 
+                t.at = &l->at[l->cursor_idx];
+                l->cursor_idx += 2;
+                t.size = 2;
+                return t; 
+        }
+
         if (l->at[l->cursor_idx] == '(') {
                 t.id = ARQ_OPT_L_PARENTHESIS; 
                 t.at = &l->at[l->cursor_idx];
@@ -180,6 +190,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         if (arq_imm_L_parenthesis(tokens)) {
                 while (tokens->idx < tokens->num_of_token) {
                         if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {
                                         error_str = "' is not a parameter name\n";
                                         break; // error
@@ -191,8 +202,8 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                                 break; // error
                                         }
                                         error_str = "' but expected ',' or ')'\n";
-                                } else {
-                                        error_str = "' but expected ',' or '=' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
                                 }
                                 if (arq_imm_comma(tokens)) {
                                         continue;
@@ -201,6 +212,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                         }
 
                         if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
+                                error_str = "' but expected '=' or '[x]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {
                                         error_str = "' is not a parameter name\n";
                                         break; // error
@@ -212,9 +224,9 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                                 break; // error 
                                         }
                                         error_str = "' but expected ',' or ')'\n";
-                                } else {
-                                        error_str = "' but expected ',' or '=' or ')'\n";
-                                }
+                                } // else if (arq_imm_array(tokens)) {
+
+                                // }
                                 if (arq_imm_comma(tokens)) {
                                         continue;
                                 }

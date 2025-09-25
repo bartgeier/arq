@@ -34,6 +34,15 @@ bool arq_imm_equal(Arq_OptVector *opt) {
         return b;
 }
 
+bool arq_imm_array(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        const bool b = (token->id == ARQ_OPT_ARRAY);
+        if (b) {
+                arq_imm_opt_next(opt);
+        }
+        return b;
+}
+
 bool arq_imm_comma(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_COMMA);
@@ -167,6 +176,12 @@ bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
         if (b) {
                 // arq_imm_cmd_next(cmd);
         }
+        return b;
+}
+
+bool arq_imm_is_p_number(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_P_NUMBER);
         return b;
 }
 
