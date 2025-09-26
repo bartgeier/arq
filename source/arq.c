@@ -291,8 +291,8 @@ uint32_t arq_fn(
                                         arq_push_uint32_t(queue, num.u32);
                                         log_inta("u32 %d", num.u32);
                                 } else if (arq_imm_array(opt)) {
-                                        uint32_t *counter = arq_push_array_size(queue, 0);
-                                        log_inta("u32 %d", 0);
+                                        uint32_t *array_size = arq_push_array_size(queue, 0);
+                                        log_inta("u32 %d // init array_size", *array_size);
                                         while (arq_imm_is_p_number(cmd)) {
                                                 uint32_to num = {0};
                                                 if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
@@ -301,12 +301,12 @@ uint32_t arq_fn(
                                                         output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
                                                         return error_msg.size;
                                                 }
-                                                *counter += 1;
+                                                *array_size += 1;
                                                 arq_push_uint32_t(queue, num.u32);
                                                 log_inta("u32 %d", num.u32);
                                         }
                                 } else {
-                                        uint32_to num = arq_imm_argument_uint32_t(cmd, &error_msg);
+                                        uint32_to const num = arq_imm_argument_uint32_t(cmd, &error_msg);
                                         if (num.error) { 
                                                 // wasn't an uint32_t number or overflow
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -325,12 +325,13 @@ uint32_t arq_fn(
                                 (void)arq_imm_not_identifier(opt);
                                 char const *cstr; 
                                 if (arq_imm_equal(opt)) {
-                                        if (arq_imm_cmd_is_dashdash(cmd, opt)) {
+                                        cstr = arq_imm_default_cstr_t(opt);
+                                        if (arq_imm_cmd_is_dashdash(cmd)) {
                                                 cstr = arq_imm_argument_csrt_t(cmd, &error_msg);
                                                 if (cstr == NULL) {
                                                         error_msg_insert_cmd_line(&error_msg, 1, cmd);
-                                                        arq_msg_append_cstr(&error_msg, "'--' allows you to set an argument that looks like an option -- --hello\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
+                                                        arq_msg_append_cstr(&error_msg, "'--' allows you to set an argument that looks like an option -- --hello\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' undoes optional behavior in case of an cstr_t = NULL\n");
                                                         output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer);
                                                         return error_msg.size;
@@ -344,10 +345,39 @@ uint32_t arq_fn(
                                                 // failure: -abcShello    => the 'h' is interpreted as short option part of the bundle (no space) thats why failure
                                                 // ok:      -abcS hello   => is string token fine
                                                 // ok:      -abcS69       => 69 is a number fine can't be a short option
-                                                cstr = arq_imm_default_cstr_t(opt);
+                                                //cstr = arq_imm_default_cstr_t(opt);
                                                 (void)arq_imm_optional_argument_cstr_t(cmd, &cstr);
                                         }
                                         arq_push_cstr_t(queue, cstr);
+                                } else if (arq_imm_array(opt)) {
+                                                uint32_t *array_size = arq_push_array_size(queue, 0);
+                                                log_inta("u32 %d // init array_size", *array_size);
+                                                struct {
+                                                        bool on;
+                                                        bool edge;
+                                                } dashdash = {0};
+                                                while (1) {
+                                                        dashdash.on |= arq_imm_cmd_is_dashdash(cmd);
+                                                        if (dashdash.on && !arq_imm_pick_cstr_t(cmd, &cstr)) { 
+                                                                if (dashdash.edge) { 
+                                                                        break; 
+                                                                }
+                                                                arq_msg_append_cstr(&error_msg, CMD_LINE_FAILURE);
+                                                                error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                                arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
+                                                                arq_msg_append_cstr(&error_msg, "'--' allows to set an argument that looks like an option -- --hello\n");
+                                                                arq_msg_append_cstr(&error_msg, "'--' switch to positional arguments in case of an cstr_t array\n");
+                                                                output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer);
+                                                                return error_msg.size;
+                                                        } 
+                                                        if (!dashdash.on && !arq_imm_optional_argument_cstr_t(cmd, &cstr)) { 
+                                                                break;
+                                                        }
+                                                        dashdash.edge = dashdash.on;
+                                                        *array_size += 1;
+                                                        arq_push_cstr_t(queue, cstr);
+                                                        log_inta("cstr %s", cstr);
+                                                }
                                 } else {
                                         // A short option with a mandatory argument allows the argument to be included immediately after the option.
                                         // However, this short option must be the last option in a bundle of options.

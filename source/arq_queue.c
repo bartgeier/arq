@@ -136,13 +136,12 @@ void arq_push_uint32_t(Arq_Queue *queue, uint32_t n) {
 }
 
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
-        assert(queue->write_idx == 0); // counter can only be at[0]
         Arq_Argument a = {
                 .type_id = ARQ_OPT_ARRAY_SIZE_T,
                 .u32 = n,
         };
         push(queue, &a);
-        return &queue->at[0].u32;
+        return &queue->at[queue->write_idx - 1].u32;
 }
 
 void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {

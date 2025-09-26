@@ -7,6 +7,7 @@
 #include "arq_conversion.h"
 #include <stdbool.h>
 
+#define CMD_LINE_FAILURE "CMD line failure:\n"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +30,7 @@ char const *arq_imm_default_cstr_t(Arq_OptVector *opt);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd, Arq_OptVector *opt);
+bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd);
 
 void arq_imm_cmd_next(Arq_Vector *cmd);
 bool arq_imm_cmd_has_token_left(Arq_Vector *cmd);
@@ -55,6 +56,7 @@ bool arq_imm_is_p_number(Arq_Vector *cmd);
 
 bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr);
+bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr);
 
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg);
 char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg);

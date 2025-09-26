@@ -7,7 +7,6 @@
 #include <assert.h>
 #include <string.h>
 
-#define CMD_LINE_FAILURE "CMD line failure:\n"
 ///////////////////////////////////////////////////////////////////////////////
 
 void arq_imm_opt_next(Arq_OptVector *opt) {
@@ -122,12 +121,12 @@ char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd, Arq_OptVector *opt) {
+bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_CMD_DASHDASH);
         if (b) {
                 arq_imm_cmd_next(cmd);
-                arq_imm_opt_next(opt);
+                // arq_imm_opt_next(opt);
         }
         return b;
 }
@@ -180,6 +179,12 @@ bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
 }
 
 bool arq_imm_is_p_number(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_P_NUMBER);
+        return b;
+}
+
+bool arq_imm_is_raw_str(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_P_NUMBER);
         return b;
@@ -273,11 +278,24 @@ bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
                 *cstr = token->at;
                 if (*cstr != NULL) {
                         next_bundle_idx(cmd);
+                        return true;
                 }
         }
-        return true;
+        return false;
 }
 
+bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        if (token->id != ARQ_CMD_END_OF_LINE) {
+                *cstr = arq_imm_argument_csrt_t(cmd, NULL);
+                //if (*cstr != NULL) {
+                        //next_bundle_idx(cmd);
+                        return true;
+                //}
+        }
+        *cstr = NULL;
+        return false;
+}
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         uint32_to result = {0};
