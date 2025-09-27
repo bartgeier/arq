@@ -1,9 +1,10 @@
 #ifndef ARQ_QUEUE_H
 #define ARQ_QUEUE_H
 
-#include <stdint.h>
+#include "arq.h"
 #include "arq_arena.h"
 #include "arq_symbols.h"
+//#include <stdint.h>
 
 typedef struct {
         Arq_SymbolID type_id;
@@ -17,16 +18,26 @@ typedef struct {
                 int32_t i32;
                 int64_t i64;
                 char const *cstr;
-        };
+        } value;
 } Arq_Argument;
 
-typedef struct Arq_Queue_tag{
+struct Arq_Queue_tag{
         uint32_t const shrink;
         uint32_t const NUM_OF_ARGUMENTS;
         uint32_t read_idx;
         uint32_t write_idx;
         Arq_Argument at[1];
-} Arq_Queue;
+};
+
+// typedef struct Arq_Queue_tag Arq_Queue;
+
+// typedef struct Arq_Queue_tag{
+//         uint32_t const shrink;
+//         uint32_t const NUM_OF_ARGUMENTS;
+//         uint32_t read_idx;
+//         uint32_t write_idx;
+//         Arq_Argument at[1];
+// } Arq_Queue;
 
 #ifdef __cplusplus
 extern "C" {
