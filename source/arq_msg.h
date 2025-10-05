@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef struct {
-        uint32_t SIZE; //sizeof(error_buffer),
+        uint32_t SIZE; /* sizeof(error_buffer), */
         uint32_t size;
         char *at;
 } Arq_msg;

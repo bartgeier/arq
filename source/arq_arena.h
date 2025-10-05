@@ -6,7 +6,7 @@
 #define ARQ_ARENA_SIZE_OF_PADDING sizeof(uint64_t)
 
 typedef struct {
-        uint32_t const SIZE;
+        uint32_t SIZE;
         uint32_t size;
         char at[1];
 } Arq_Arena;

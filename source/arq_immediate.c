@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <string.h>
 
-///////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////*/
 
 void arq_imm_opt_next(Arq_OptVector *opt) {
         if (opt->idx + 1 < opt->num_of_token) {
@@ -119,26 +119,25 @@ char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {
         return NULL;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////*/
 
 bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_CMD_DASHDASH);
         if (b) {
                 arq_imm_cmd_next(cmd);
-                // arq_imm_opt_next(opt);
         }
         return b;
 }
 
-// jumps over a bundel of short options
-// -shello
-// s is a short option
-// if s take no argument then 'h' and maybe 'ello' are all short options
-// if s takes an argument then 'hello' is the argument
-//     'next_bundle_idx' over jumps 'hello' because in the vector they all bundled short options
-//     'hello' should be a cstring in the vector but it isn't.
-//     That's why we have to increment idx for every char (short option) in the bundle 'hello'
+/* jumps over a bundel of short options */
+/* -shello */
+/* s is a short option */
+/* if s take no argument then 'h' and maybe 'ello' are all short options */
+/* if s takes an argument then 'hello' is the argument */
+/*     'next_bundle_idx' over jumps 'hello' because in the vector they all bundled short options */
+/*     'hello' should be a cstring in the vector but it isn't. */
+/*     That's why we have to increment idx for every char (short option) in the bundle 'hello' */
 static void next_bundle_idx(Arq_Vector *v) {
         char const *const begin = v->at[v->idx].at;
         char const *const end = begin + strlen(begin);
@@ -163,18 +162,12 @@ bool arq_imm_cmd_has_token_left(Arq_Vector *cmd) {
 bool arq_imm_cmd_is_long_option(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_CMD_LONG_OPTION);
-        if (b) {
-                // arq_imm_cmd_next(cmd);
-        }
         return b;
 }
 
 bool arq_imm_cmd_is_short_option(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_CMD_SHORT_OPTION);
-        if (b) {
-                // arq_imm_cmd_next(cmd);
-        }
         return b;
 }
 
@@ -222,7 +215,6 @@ Arq_OptVector *arq_imm_get_short(
         Arq_Vector *cmd,
         Arq_msg *error_msg
 ) {
-        //assert(strlen(cmd->at[cmd->idx].at) == 1);
         for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
                 char cmd_token = cmd->at[cmd->idx].at[0];
                 char opt_short_name = options[i].chr;
@@ -265,7 +257,7 @@ bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg
         }
         *num = arq_tok_pNumber_to_uint32_t(token, error_msg, CMD_LINE_FAILURE);
         if (num->error) {
-                return true; // overflow
+                return true; /* overflow */
         } 
         arq_imm_cmd_next(cmd);
         return false;
@@ -288,10 +280,7 @@ bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         if (token->id != ARQ_CMD_END_OF_LINE) {
                 *cstr = arq_imm_argument_csrt_t(cmd, NULL);
-                //if (*cstr != NULL) {
-                        //next_bundle_idx(cmd);
-                        return true;
-                //}
+                return true;
         }
         *cstr = NULL;
         return false;
@@ -303,7 +292,6 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         if (token->id != ARQ_P_NUMBER) {
                 if (error_msg != NULL) {
                         Arq_Token const tok = *token;
-                        // arq_msg_clear(error_msg);
                         arq_msg_append_cstr(error_msg, cstr);
                         arq_msg_append_cstr(error_msg, "Token '");
                         arq_msg_append_str(error_msg, tok.at, tok.size);
@@ -323,7 +311,6 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         char const *result;
         if (token->id == ARQ_CMD_END_OF_LINE) {
                 Arq_Token const tok = *token;
-                // arq_msg_clear(error_msg);
                 arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
                 arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, tok.at, tok.size);
@@ -333,15 +320,15 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
                 return result;
         } 
 
-        // Even it looks like a short or long option but it is not it expects an argument
+        /* Even it looks like a short or long option but it is not it expects an argument */
         char const chr = token->at[-1];
         if (token->id == ARQ_CMD_SHORT_OPTION) {
                 if (chr == '-') {
-                        token->at -= 1;    // -foo
+                        token->at -= 1;    /* -foo */
                         token->size += 1;
                 }
         } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
-             token->at -= 2;   // --foo
+             token->at -= 2;   /* --foo */
              token->size += 2;
         }
         result = token->at;

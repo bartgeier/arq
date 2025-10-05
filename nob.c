@@ -40,7 +40,7 @@ bool arq_build(bool const clean) {
         Nob_Cmd c_ompiler = {0};
         //nob_cmd_append(&cmd, "gcc", "-O0", "-ggdb", "-pedantic");
         //nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wno-parentheses"); 
-#if 1
+#if 0
         //nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
         nob_cmd_append(&c_ompiler, "gcc", "-std=c99", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
         nob_cmd_append(&c_ompiler, "-mshstk");
@@ -48,7 +48,7 @@ bool arq_build(bool const clean) {
 #if 0
         nob_cmd_append(&c_ompiler, "gcc", "-std=c99", "-DARQ_LOG_TOKENIZER", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
-#if 0
+#if 1
         nob_cmd_append(&c_ompiler, "gcc", "-std=c99", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
         Nob_Cmd cmd = {0};

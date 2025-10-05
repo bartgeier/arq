@@ -7,10 +7,10 @@ typedef struct Arq_Queue_tag Arq_Queue;
 
 typedef void (*function_pointer_t)(Arq_Queue *queue);
 typedef struct {
-        char chr;                // -v
-        const char *name;        // --version
+        char chr;                /* -v        */
+        const char *name;        /* --version */
         function_pointer_t fn;
-        const char *arguments;   // "uint8_t, bool = false"
+        const char *arguments;   /* "uint8_t, bool = false" */
 } Arq_Option;
 
 #ifdef __cplusplus

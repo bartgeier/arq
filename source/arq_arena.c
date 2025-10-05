@@ -4,33 +4,18 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-#include <new>
-#endif
-
 Arq_Arena *arq_arena_init(void *buffer, uint32_t const _size) {
         uint32_t const offset = (uintptr_t)buffer % ARQ_ARENA_SIZE_OF_PADDING;
-        uint32_t padding = offset > 0 ? ARQ_ARENA_SIZE_OF_PADDING - offset : 0;
+        uint32_t const padding = offset > 0 ? ARQ_ARENA_SIZE_OF_PADDING - offset : 0;
         uint32_t const size = _size - padding;
         uint32_t const header_size = offsetof(Arq_Arena, at);
-        assert(size > header_size);
-        uint32_t size_memory_that_is_usable = size - header_size;
         Arq_Arena *m = (Arq_Arena *)((char*)buffer + padding);
+        assert(_size > padding);
+        assert(size > header_size);
         assert((uintptr_t)m % ARQ_ARENA_SIZE_OF_PADDING == 0 && "buffer does not align");
-        #ifdef __cplusplus
-                new (m) Arq_Arena {
-                        size_memory_that_is_usable,
-                        0,
-                        0
-                };
-        #else
-                Arq_Arena a = {
-                        .SIZE = size_memory_that_is_usable,
-                        .size = 0,
-                        .at = {0},
-                };
-                memcpy(m, &a, sizeof(Arq_Arena));
-        #endif
+        m->SIZE = size - header_size;
+        m->size = 0;
+        m->at[0] = 0;
         return m;
 }
 

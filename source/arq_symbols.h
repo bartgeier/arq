@@ -44,6 +44,7 @@
 #define X(name)name,
 typedef enum {
         ARQ_LIST_OF_IDS
+        end
 } Arq_SymbolID;
 #undef X
 

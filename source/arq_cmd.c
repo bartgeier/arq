@@ -119,40 +119,42 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
 }
 
 void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
+        bool bundling = false;
+        int i;
         assert(argc >= 1);
         argv += 1;
         argc -= 1;
         v->num_of_token = 0;
         v->idx = 0;
-        bool bundling = false;
-        for (int i = 0; i < argc; i++) {
-                Lexer lexer = {
-                        .SIZE = strlen(argv[i]),
-                        .cursor_idx = 0,
-                        .at = argv[i],
-                };
-                Arq_Token const t =  next_token(&lexer, bundling);
+        for (i = 0; i < argc; i++) {
+                Lexer lexer;
+                lexer.SIZE = strlen(argv[i]);
+                lexer.cursor_idx = 0;
+                lexer.at = argv[i];
                 assert( v->num_of_token < num_of_token);
-                v->at[v->num_of_token++] = t;
+                v->at[v->num_of_token++] = next_token(&lexer, bundling);
                 bundling = lexer.cursor_idx < lexer.SIZE;
                 while (bundling) { 
-                        // Option clustering
+                        /* Option clustering */
                         lexer.SIZE -= lexer.cursor_idx;
                         lexer.at = &lexer.at[lexer.cursor_idx];
                         lexer.cursor_idx = 0;
-                        Arq_Token const t = next_token(&lexer, bundling);
-                        assert(v->num_of_token < num_of_token);
-                        v->at[v->num_of_token++] = t;
-                        bundling = (t.id == ARQ_CMD_SHORT_OPTION)
-                        && (lexer.cursor_idx < lexer.SIZE);
+                        {
+                                Arq_Token const t = next_token(&lexer, bundling);
+                                assert(v->num_of_token < num_of_token);
+                                v->at[v->num_of_token++] = t;
+                                bundling = (t.id == ARQ_CMD_SHORT_OPTION)
+                                && (lexer.cursor_idx < lexer.SIZE);
+                        }
                 }
         }
-        Arq_Token t = {
-                .id = ARQ_CMD_END_OF_LINE,
-                .at = NULL,
-                .size = 0,
-        };
-        assert(v->num_of_token < num_of_token);
-        v->at[v->num_of_token++] = t;
+        {
+                Arq_Token t;
+                t.id = ARQ_CMD_END_OF_LINE;
+                t.size = 0;
+                t.at = NULL;
+                assert(v->num_of_token < num_of_token);
+                v->at[v->num_of_token++] = t;
+        }
 }
 

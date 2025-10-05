@@ -3,10 +3,13 @@
 
 #ifdef ARQ_LOG_MEMORY
         #include <stdio.h>
-        #define log_memory(fmt, ...) \
-                do { printf(fmt "\n", ##__VA_ARGS__); } while (0)
+        #define log_memory(args) do {   \
+                        printf args;    \
+                        printf("\n");   \
+                } while (0)
+                /* do { printf(fmt "\n", ##__VA_ARGS__); } while (0) */
 #else
-        #define log_memory(fmt, ...) do {} while (0)
+        #define log_memory(args) do {} while (0)
 #endif
 
 #ifdef ARQ_LOG_TOKENIZER
@@ -54,15 +57,18 @@
                 do { printf("%s\n",symbol_names[fmt]); } while (0)
         #define log_int_token_indent(fmt) \
                 do { printf("    %s\n",symbol_names[fmt]); } while (0)
-        #define log_inta(fmt, ...) \
-                do { printf("    " fmt "\n", ##__VA_ARGS__); } while (0)
+        #define log_inta(args) do {     \
+                        printf("    "); \
+                        printf args;    \
+                        printf("\n");   \
+                } while (0)
 #else
         #define log_int_banner(fmt) do {} while (0)
         #define log_int_ln() do {} while (0)
         #define log_int_comment(fmt) do {} while (0)
         #define log_int_token(fmt) do {} while (0)
         #define log_int_token_indent(fmt) do {} while (0)
-        #define log_inta(fmt, ...) do {} while (0)
+        #define log_inta(args) do {} while (0)
 #endif
 
 #endif

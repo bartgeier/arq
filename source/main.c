@@ -25,15 +25,17 @@ void fn_array(Arq_Queue *queue) {
         printf("fn_array {\n");
         {
                 uint32_t const array_size = arq_array_size(queue);
+                uint32_t i;
                 printf("    numbers array_size: %d\n", array_size);
-                for (uint32_t i = 0; i < array_size; i++) {
+                for (i = 0; i < array_size; i++) {
                         printf("        argument[%d]: %d\n", i, arq_uint32_t(queue));
                 }
         } {
-                printf("\n");
                 uint32_t const array_size = arq_array_size(queue);
+                uint32_t i;
+                printf("\n");
                 printf("    foo array_size: %d\n", array_size);
-                for (uint32_t i = 0; i < array_size; i++) {
+                for (i = 0; i < array_size; i++) {
                         printf("        argument[%d]: %s\n", i, arq_cstr_t(queue));
                 }
         }
@@ -57,8 +59,8 @@ void fn_cstring(Arq_Queue *queue) {
 
 void fn_sstring(Arq_Queue *queue) {
         char const *cstr_a = arq_cstr_t(queue);
-        //char const *cstr_b = arq_cstr_t(queue);
-        //printf("fn_sstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b);
+        /* char const *cstr_b = arq_cstr_t(queue); */
+        /* printf("fn_sstring cstr_a: %s, cstr_b: %s\n", cstr_a, cstr_b); */
         if (cstr_a != NULL) {
                 printf("fn_sstring cstr_a: %s\n", cstr_a);
         } else {
@@ -76,8 +78,8 @@ int main(int argc, char **argv) {
                 {'s', "sstring", fn_sstring, "(cstr_t sstring)"},
         };
 
-        // testen mit
-        // ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello 
+        /* testen mit */
+        /* ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello */
        char buffer[10000];
 
         if (0 < arq_fn(
@@ -85,8 +87,8 @@ int main(int argc, char **argv) {
                 buffer, sizeof(buffer),
                 options, sizeof(options)/sizeof(Arq_Option))
         ) {
-                // arq_fn returns strlen of error msg
-                // print error msg
+                /* arq_fn returns strlen of error msg */
+                /* print error msg */
                 printf("%s\n", (char *)buffer);
         }
 
