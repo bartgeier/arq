@@ -1,7 +1,7 @@
 #ifndef ARQ_TOKEN_H
 #define ARQ_TOKEN_H
 
-#include <stdint.h>
+#include "arq_int.h"
 
 typedef struct {
         uint32_t id;

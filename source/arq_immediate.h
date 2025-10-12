@@ -5,7 +5,7 @@
 #include "arq_symbols.h"
 #include "arq_token.h"
 #include "arq_conversion.h"
-#include <stdbool.h>
+#include "arq_bool.h"
 
 #define CMD_LINE_FAILURE "CMD line failure:\n"
 

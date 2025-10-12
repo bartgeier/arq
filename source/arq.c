@@ -6,11 +6,11 @@
 #include "arq_conversion.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
+#include "arq_bool.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 
 static void error_msg_append_option(Arq_msg *error_msg, Arq_Option const *o) {

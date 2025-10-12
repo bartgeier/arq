@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include "arq_bool.h"
+#include "arq_int.h"
 
 #include "arq.h"
 #include <memory.h>
@@ -80,8 +80,9 @@ int main(int argc, char **argv) {
 
         /* testen mit */
         /* ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello */
-       char buffer[10000];
+        char buffer[10000];
 
+        printf("size of size_t %ld\n", sizeof(size_t));
         if (0 < arq_fn(
                 argc, argv, 
                 buffer, sizeof(buffer),

@@ -1,7 +1,7 @@
 #ifndef ARQ_CMD_H
 #define ARQ_CMD_H
 
-#include <stdint.h>
+#include "arq_int.h"
 #include "arq_token.h"
 
 #ifdef __cplusplus

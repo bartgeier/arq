@@ -4,7 +4,7 @@
 #include "arq.h"
 #include "arq_arena.h"
 #include "arq_symbols.h"
-#include <stdint.h>
+#include "arq_int.h"
 
 typedef struct {
         Arq_SymbolID type_id;
@@ -12,11 +12,11 @@ typedef struct {
                 uint8_t u8;
                 uint16_t u16;
                 uint32_t u32;
-                uint64_t u64;
+                /* uint64_t u64; */
                 int8_t i8;
                 int16_t i16;
                 int32_t i32;
-                int64_t i64;
+                /* int64_t i64; */
                 char const *cstr;
         } value;
 } Arq_Argument;
@@ -40,11 +40,11 @@ void arq_push_uint8_t(Arq_Queue *queue, uint8_t n);
 void arq_push_uint16_t(Arq_Queue *queue, uint16_t n);
 void arq_push_uint32_t(Arq_Queue *queue, uint32_t n);
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n);
-void arq_push_uint64_t(Arq_Queue *queue, uint64_t n);
+/* void arq_push_uint64_t(Arq_Queue *queue, uint64_t n); */
 void arq_push_int8_t(Arq_Queue *queue, int8_t n);
 void arq_push_int16_t(Arq_Queue *queue, int16_t n);
 void arq_push_int32_t(Arq_Queue *queue, int32_t n);
-void arq_push_int64_t(Arq_Queue *queue, int64_t n);
+/* void arq_push_int64_t(Arq_Queue *queue, int64_t n); */
 void arq_push_cstr_t(Arq_Queue *queue, char const *cstr);
 
 #ifdef __cplusplus

@@ -71,11 +71,13 @@ uint32_t arq_array_size(Arq_Queue *queue) {
         return t.value.u32;
 }
 
+#if 0
 uint64_t arq_uint64_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_UINT64_T);
         return t.value.u64;
 }
+#endif
 
 int8_t arq_int8_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
@@ -130,12 +132,14 @@ uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
         return &queue->at[queue->write_idx - 1].value.u32;
 }
 
+#if 0
 void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {
         Arq_Argument a;
         a.type_id = ARQ_OPT_UINT64_T;
         a.value.u64 = n;
         push(queue, &a);
 }
+#endif
 
 void arq_push_int8_t(Arq_Queue *queue, int8_t n) {
         Arq_Argument a;

@@ -1,7 +1,7 @@
 #ifndef ARQ_MSG_H
 #define ARQ_MSG_H
 
-#include <stdint.h>
+#include "arq_int.h"
 
 typedef struct {
         uint32_t SIZE; /* sizeof(error_buffer), */

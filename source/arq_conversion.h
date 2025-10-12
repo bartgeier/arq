@@ -3,8 +3,8 @@
 
 #include "arq_msg.h"
 #include "arq_token.h"
-#include <stdbool.h>
-#include <stdint.h>
+#include "arq_bool.h"
+#include "arq_int.h"
 
 
 typedef struct {

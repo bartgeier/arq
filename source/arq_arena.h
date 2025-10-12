@@ -1,9 +1,9 @@
 #ifndef ARQ_ARENA_H
 #define ARQ_ARENA_H
 
-#include <stdint.h>
+#include "arq_int.h"
 
-#define ARQ_ARENA_SIZE_OF_PADDING sizeof(uint64_t)
+#define ARQ_ARENA_SIZE_OF_PADDING sizeof(size_t)
 
 typedef struct {
         uint32_t SIZE;

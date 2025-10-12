@@ -3,7 +3,7 @@
 #include "arq_immediate.h"
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
+#include "arq_bool.h"
 #include <assert.h>
 /* #include <stdio.h> */
 

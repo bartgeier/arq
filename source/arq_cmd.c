@@ -1,7 +1,7 @@
 #include "arq_cmd.h"
 #include "arq_symbols.h"
-#include <stdint.h>
-#include <stdbool.h>
+#include "arq_int.h"
+#include "arq_bool.h"
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>

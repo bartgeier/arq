@@ -46,10 +46,10 @@ bool arq_build(bool const clean) {
         nob_cmd_append(&c_ompiler, "-mshstk");
 #endif
 #if 0
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c99", "-DARQ_LOG_TOKENIZER", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
+        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
 #endif
 #if 1
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
+        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic-errors", "-Wparentheses"); 
 #endif
         Nob_Cmd cmd = {0};
         nob_cmd_append_cmd(&cmd, &c_ompiler);
