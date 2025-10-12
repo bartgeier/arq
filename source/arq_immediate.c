@@ -89,12 +89,14 @@ bool arq_imm_is_a_uint32_t(Arq_OptVector *opt) {
         if (token->id != ARQ_P_NUMBER) {
                 return false;
         }
-        uint32_to const num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
-        bool const success = !num.error;
-        if (success) {
-                arq_imm_opt_next(opt);
+        {
+                uint32_to const num = arq_tok_pNumber_to_uint32_t(token, NULL, "");
+                bool const success = !num.error;
+                if (success) {
+                        arq_imm_opt_next(opt);
+                }
+                return success;
         }
-        return success;
 }
 
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
@@ -141,8 +143,8 @@ bool arq_imm_cmd_is_dashdash(Arq_Vector *cmd) {
 static void next_bundle_idx(Arq_Vector *v) {
         char const *const begin = v->at[v->idx].at;
         char const *const end = begin + strlen(begin);
-        assert(*end == 0);
         char const *x = begin;
+        assert(*end == 0);
         while ((v->idx < v->num_of_token - 1) && (x >= begin) && (x < end)) {
                 v->idx++;
                 x = v->at[v->idx].at;
@@ -189,21 +191,21 @@ Arq_OptVector *arq_imm_get_long(
         Arq_Vector *cmd ,
         Arq_msg *error_msg
 ) {
-        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
-                Arq_Token const *cmd_token = &cmd->at[cmd->idx];
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        uint32_t i;
+        for (i = 0; i < option_list->num_of_Vec; i++) {
                 char const * opt_name = options[i].name;
-                if (string_eq(cmd_token, opt_name)) {
+                if (string_eq(token, opt_name)) {
+                        Arq_OptVector *opt = option_list->at[i];
                         option_list->row = i;
-                        Arq_OptVector *opt = option_list->at[option_list->row];
                         opt->idx = 0;
                         arq_imm_cmd_next(cmd);
                         return opt;
                 }
         }
-        Arq_Token const token = cmd->at[cmd->idx];
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
         arq_msg_append_cstr(error_msg, "'--");
-        arq_msg_append_str(error_msg, token.at, token.size);
+        arq_msg_append_str(error_msg, token->at, token->size);
         arq_msg_append_cstr(error_msg, "' unknown long option ");
         arq_msg_append_lf(error_msg);
         return NULL;
@@ -215,18 +217,18 @@ Arq_OptVector *arq_imm_get_short(
         Arq_Vector *cmd,
         Arq_msg *error_msg
 ) {
-        for (uint32_t i = 0; i < option_list->num_of_Vec; i++) {
-                char cmd_token = cmd->at[cmd->idx].at[0];
+        Arq_Token const token = cmd->at[cmd->idx];
+        uint32_t i;
+        for (i = 0; i < option_list->num_of_Vec; i++) {
                 char opt_short_name = options[i].chr;
-                if (cmd_token == opt_short_name) {
+                if (token.at[0] == opt_short_name) {
+                        Arq_OptVector *opt = option_list->at[i];
                         option_list->row = i;
-                        Arq_OptVector *opt = option_list->at[option_list->row];
                         opt->idx = 0;
                         arq_imm_cmd_next(cmd);
                         return opt;
                 }
         }
-        Arq_Token const token = cmd->at[cmd->idx];
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
         arq_msg_append_cstr(error_msg, "'-");
         arq_msg_append_str(error_msg, token.at, token.size);
@@ -321,15 +323,12 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         } 
 
         /* Even it looks like a short or long option but it is not it expects an argument */
-        char const chr = token->at[-1];
         if (token->id == ARQ_CMD_SHORT_OPTION) {
-                if (chr == '-') {
-                        token->at -= 1;    /* -foo */
-                        token->size += 1;
-                }
+                token->at -= 1;    /* -foo */
+                token->size += 1;
         } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
-             token->at -= 2;   /* --foo */
-             token->size += 2;
+                token->at -= 2;   /* --foo */
+                token->size += 2;
         }
         result = token->at;
         next_bundle_idx(cmd);
