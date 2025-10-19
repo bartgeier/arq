@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <inttypes.h>
+#include <arq_inttypes.h>
 
 
 bool string_eq(Arq_Token const *token, char const *cstr) {

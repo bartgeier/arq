@@ -1,14 +1,18 @@
-
 #ifndef ARQ_STDINT_H
 #define ARQ_STDINT_H
 
-/* If C99 or later, include the standard header */
+#include <stddef.h>  /* for size_t, ptrdiff_t */
+
+/* ----------------- C99 detection ----------------- */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     #include <stdint.h>
+    #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
+        #define ARQ64
+    #else
+        #define ARQ32
+    #endif
 #else
-    /* C89 fallback definitions */
-
-    /* Exact-width integer types */
+    /* ----------------- Exact-width integer types ----------------- */
     typedef signed char        int8_t;
     typedef unsigned char      uint8_t;
 
@@ -18,33 +22,16 @@
     typedef int                int32_t;
     typedef unsigned int       uint32_t;
 
-#if 0
-#include <stddef.h>
-    typedef size_t uintptr_t;
-#endif
-
-    /* 64-bit types, only if the compiler supports long long */
-    #if defined(__GNUC__) || defined(_MSC_VER)
-        /* typedef long long           int64_t;  */
-        /* typedef unsigned long long  uint64_t; */
-    #endif
-
-    /* Optional: least types (at least N bits) */
-    typedef int8_t  int_least8_t;
-    typedef int16_t int_least16_t;
-    typedef int32_t int_least32_t;
-    #if defined(int64_t)
-        typedef int64_t int_least64_t;
-    #endif
+    /* ----------------- Least-width types ----------------- */
+    typedef int8_t   int_least8_t;
+    typedef int16_t  int_least16_t;
+    typedef int32_t  int_least32_t;
 
     typedef uint8_t  uint_least8_t;
     typedef uint16_t uint_least16_t;
     typedef uint32_t uint_least32_t;
-    #if defined(uint64_t)
-        typedef uint64_t uint_least64_t;
-    #endif
 
-    /* Optional: define limits if needed */
+    /* ----------------- Limits ----------------- */
     #define INT8_MIN   (-128)
     #define INT8_MAX   127
     #define UINT8_MAX  255
@@ -57,12 +44,31 @@
     #define INT32_MAX  2147483647
     #define UINT32_MAX 4294967295U
 
-    #if defined(int64_t)
-        #define INT64_MIN  (-9223372036854775807LL - 1)
-        #define INT64_MAX  9223372036854775807LL
-        #define UINT64_MAX 18446744073709551615ULL
+    /* ----------------- 32-bit vs 64-bit detection ----------------- */
+    #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
+        #define ARQ64
+        #ifndef UINT64_T_DEFINED
+            typedef size_t     uint64_t;
+            typedef ptrdiff_t  int64_t;
+            #define UINT64_T_DEFINED
+        #endif
+        #define UINT64_MAX ((size_t)-1)
+        #define INT64_MAX  ((ptrdiff_t)(UINT64_MAX >> 1))
+        #define INT64_MIN  (-INT64_MAX - 1)
+    #else
+        #define ARQ32
+    #endif
+
+    /* ----------------- Pointer-sized integer ----------------- */
+    #ifndef UINTPTR_T_DEFINED
+        #if defined(_MSC_VER)
+            typedef unsigned __int64 uintptr_t;  /* MSVC 64-bit safe */
+        #else
+            typedef size_t uintptr_t;            /* GCC/Clang: pointer size */
+        #endif
+        #define UINTPTR_T_DEFINED
     #endif
 
 #endif /* __STDC_VERSION__ >= 199901L */
 
-#endif
+#endif /* ARQ_STDINT_H */
