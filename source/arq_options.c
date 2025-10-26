@@ -138,6 +138,19 @@ static Arq_Token next_token(Lexer *l) {
                 return t;
         }
 
+#if 1
+        if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
+                t.id = ARQ_P_NUMBER; 
+                t.at = &l->at[l->cursor_idx];
+                l->cursor_idx++;
+                t.size = 1;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                return t;
+        }
+#else
         if (isdigit(l->at[l->cursor_idx])) {
                 t.id = ARQ_P_NUMBER; 
                 t.at = &l->at[l->cursor_idx];
@@ -149,7 +162,7 @@ static Arq_Token next_token(Lexer *l) {
                 }
                 return t;
         }
-
+#endif
         if (l->at[l->cursor_idx] == '-') {
                 t.id = ARQ_N_NUMBER; 
                 t.at = &l->at[l->cursor_idx];
@@ -192,6 +205,9 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         tokens->idx = 0;
         if (arq_imm_L_parenthesis(tokens)) {
                 while (tokens->idx < tokens->num_of_token) {
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
                                 error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {
@@ -213,7 +229,33 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 goto next_argument;
                         }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_INT32_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
 
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_int32_t(tokens)) {
+                                                error_str = "' is not a signed number\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
                                 error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {
@@ -235,7 +277,9 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 goto next_argument;
                         } 
-
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         error_str = "' is not a type\n";
         next_argument:
                         if (arq_imm_R_parenthesis(tokens)) {

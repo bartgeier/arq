@@ -12,12 +12,18 @@ typedef struct {
         uint32_t u32;
 } uint32_to;
 
+typedef struct {
+        bool error;
+        int32_t i32;
+} int32_to;
+
 #ifdef __cplusplus
 exter "C" {
 #endif
 
 bool string_eq(Arq_Token const *token, char const *cstr);
 uint32_to arq_tok_pNumber_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+int32_to arq_tok_pNumber_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
 #ifdef __cplusplus
 }

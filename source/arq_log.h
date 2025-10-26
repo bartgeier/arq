@@ -13,28 +13,34 @@
 #endif
 
 #ifdef ARQ_LOG_TOKENIZER
+        #include "arq_token.h"
+        #include "arq_symbols.h"
+        #include "arq_int.h"
         #include <stdio.h>
-        static inline void log_tokenizer(Arq_Token *t, uint32_t toknr) {
+        static void log_tokenizer(Arq_Token *t, uint32_t toknr) {
+                uint32_t i;
                 printf("%3d %30s -> ", toknr, symbol_names[t->id]);
                 printf("%2d ", t->size);
-                for (uint32_t i = 0; i < t->size; i++) {
+                for (i = 0; i < t->size; i++) {
                         putchar(t->at[i]);
                 }
                 printf("\n");
         }
 
-        static inline void log_tokenizer_option(Arq_OptVector *v, uint32_t number) {
+        static void log_tokenizer_option(Arq_OptVector *v, uint32_t number) {
+                uint32_t i;
                 printf("Option token %d:\n", number);
-                for (uint32_t j = 0; j < v->num_of_token; j++) {
-                        log_tokenizer(&v->at[j], j);
+                for (i = 0; i < v->num_of_token; i++) {
+                        log_tokenizer(&v->at[i], i);
                 }
                 printf("\n");
         }
 
-        static inline void log_tokenizer_cmd_line(Arq_Vector *v)  {
+        static void log_tokenizer_cmd_line(Arq_Vector *v)  {
+                uint32_t i;
                 printf("Command line token:\n");
-                for (uint32_t j = 0; j < v->num_of_token; j++) {
-                        log_tokenizer(&v->at[j], j);
+                for (i = 0; i < v->num_of_token; i++) {
+                        log_tokenizer(&v->at[i], i);
                 }
                 printf("\n");
         }
@@ -45,7 +51,7 @@
 #endif
 
 #ifdef ARQ_LOG_TOKENIZER
-        // used for interpreter logging
+        /* used for interpreter logging */
         #include <stdio.h>
         #define log_int_banner(fmt) \
                 do { printf("---------" fmt "------------\n"); } while (0)
