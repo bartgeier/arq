@@ -8,8 +8,9 @@
         X(ARQ_OPT_IDENTFIER)                     \
                                                  \
         /* literals */                           \
-        X(ARQ_P_NUMBER)                          \
-        X(ARQ_N_NUMBER)                          \
+        X(ARQ_P_DEZ)                             \
+        X(ARQ_N_DEZ)                             \
+        X(ARQ_HEX)                               \
         X(ARQ_CMD_RAW_STR)                       \
                                                  \
         /* option operators */                   \

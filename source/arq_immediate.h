@@ -54,8 +54,8 @@ void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg);
 
 bool arq_imm_cmd_is_long_option(Arq_Vector *cmd);
 bool arq_imm_cmd_is_short_option(Arq_Vector *cmd);
-bool arq_imm_is_p_number(Arq_Vector *cmd);
-bool arq_imm_is_n_number(Arq_Vector *cmd);
+bool arq_imm_is_p_dec(Arq_Vector *cmd);
+bool arq_imm_is_n_dec(Arq_Vector *cmd);
 
 bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_int32_t(Arq_Vector *cmd, int32_to *num, Arq_msg *error_msg);

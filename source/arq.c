@@ -291,6 +291,7 @@ uint32_t arq_fn(
                                 (void)arq_imm_not_identifier(opt);
                                 if (arq_imm_equal(opt)) {
                                         uint32_to num = arq_imm_default_uint32_t(opt);
+                                        printf("---------------------------------------------\n");
                                         if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
                                                 /* overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -302,7 +303,7 @@ uint32_t arq_fn(
                                 } else if (arq_imm_array(opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("u32 %u // init array_size", *array_size));
-                                        while (arq_imm_is_p_number(cmd)) {
+                                        while (arq_imm_is_p_dec(cmd)) {
                                                 uint32_to num = {0};
                                                 if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
                                                         /* overflow */
@@ -347,7 +348,7 @@ uint32_t arq_fn(
                                 } else if (arq_imm_array(opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("i32 %d // init array_size", *array_size));
-                                        while (arq_imm_is_p_number(cmd) || arq_imm_is_n_number(cmd)) {
+                                        while (arq_imm_is_p_dec(cmd) || arq_imm_is_n_dec(cmd)) {
                                                 int32_to num = {0};
                                                 if (arq_imm_optional_argument_int32_t(cmd, &num, &error_msg)) {
                                                         /* overflow */

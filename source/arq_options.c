@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "arq_bool.h"
 #include <assert.h>
-/* #include <stdio.h> */
+#include <stdio.h>
 
 typedef struct {
     uint32_t id;
@@ -52,6 +52,18 @@ typedef struct {
         char const *at;
 } Lexer;
 
+static bool is_hex_start(Lexer *l) {
+        uint32_t idx = l->cursor_idx;
+        if ((idx + 2 < l->SIZE)
+        && (l->at[idx + 0] == '0') 
+        && (l->at[idx + 1] == 'x' || l->at[idx + 1] == 'X') 
+        && isxdigit(l->at[idx + 2])) {
+                l->cursor_idx += 2;
+                return true;
+        }
+        return false;
+}
+
 static void skip_space(Lexer *l) {
     while (l->cursor_idx < l->SIZE && (l->at[l->cursor_idx] == 0 || isspace(l->at[l->cursor_idx]))) {
             l->cursor_idx++;
@@ -61,18 +73,16 @@ static void skip_space(Lexer *l) {
 static Arq_Token next_token(Lexer *l) {
         Arq_Token t = {0};
         skip_space(l);
-        t.at = l->at;
+        t.at = &l->at[l->cursor_idx];
         if (l->cursor_idx == l->SIZE ) {
                 /* space tail */
                 t.id = ARQ_OPT_NO_TOKEN;
-                t.at = &l->at[l->cursor_idx];
                 t.size = 0;
                 return t;
         }
 
         if (l->at[l->cursor_idx] == '=') {
                 t.id = ARQ_OPT_EQ; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
@@ -80,7 +90,6 @@ static Arq_Token next_token(Lexer *l) {
 
         if (l->at[l->cursor_idx] == ',') {
                 t.id = ARQ_OPT_COMMA; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
@@ -90,7 +99,6 @@ static Arq_Token next_token(Lexer *l) {
         && (l->cursor_idx + 1 < l->SIZE) 
         && (l->at[l->cursor_idx + 1] == ']')) {
                 t.id = ARQ_OPT_ARRAY; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx += 2;
                 t.size = 2;
                 return t; 
@@ -98,7 +106,6 @@ static Arq_Token next_token(Lexer *l) {
 
         if (l->at[l->cursor_idx] == '(') {
                 t.id = ARQ_OPT_L_PARENTHESIS; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
@@ -106,7 +113,6 @@ static Arq_Token next_token(Lexer *l) {
 
         if (l->at[l->cursor_idx] == ')') {
                 t.id = ARQ_OPT_R_PARENTHESIS; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
@@ -114,16 +120,24 @@ static Arq_Token next_token(Lexer *l) {
 
         if (l->at[l->cursor_idx] == 0) {
                 t.id = ARQ_OPT_TERMINATOR; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
         }
 
+        if (is_hex_start(l)) {
+                t.id = ARQ_HEX;
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                return t;
+        }
+
         if (is_identifier_start(l->at[l->cursor_idx])) {
                 uint32_t i;
                 t.id = ARQ_OPT_IDENTFIER; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
@@ -138,10 +152,8 @@ static Arq_Token next_token(Lexer *l) {
                 return t;
         }
 
-#if 1
         if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
-                t.id = ARQ_P_NUMBER; 
-                t.at = &l->at[l->cursor_idx];
+                t.id = ARQ_P_DEZ; 
                 l->cursor_idx++;
                 t.size = 1;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
@@ -150,22 +162,9 @@ static Arq_Token next_token(Lexer *l) {
                 }
                 return t;
         }
-#else
-        if (isdigit(l->at[l->cursor_idx])) {
-                t.id = ARQ_P_NUMBER; 
-                t.at = &l->at[l->cursor_idx];
-                l->cursor_idx++;
-                t.size = 1;
-                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
-                        l->cursor_idx++;
-                        t.size++;
-                }
-                return t;
-        }
-#endif
+
         if (l->at[l->cursor_idx] == '-') {
-                t.id = ARQ_N_NUMBER; 
-                t.at = &l->at[l->cursor_idx];
+                t.id = ARQ_N_DEZ; 
                 l->cursor_idx++;
                 t.size = 1;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
@@ -177,7 +176,6 @@ static Arq_Token next_token(Lexer *l) {
 
         if (l->cursor_idx < l->SIZE) {
                 t.id = ARQ_OPT_UNKNOWN; 
-                t.at = &l->at[l->cursor_idx];
                 t.size = 0;
                 while (l->cursor_idx < l->SIZE && !isspace(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
@@ -217,7 +215,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_uint32_t(tokens)) {
-                                                error_str = "' is not a positive number\n";
+                                                error_str = "' is not a uint32_t\n";
                                                 break; /* error */
                                         }
                                         error_str = "' but expected ',' or ')'\n";
@@ -241,7 +239,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_int32_t(tokens)) {
-                                                error_str = "' is not a signed number\n";
+                                                error_str = "' is not a int32_t\n";
                                                 break; /* error */
                                         }
                                         error_str = "' but expected ',' or ')'\n";

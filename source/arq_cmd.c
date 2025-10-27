@@ -29,7 +29,7 @@ static void set_token_RAW_STR(Arq_Token *t, Lexer *l) {
 
 static bool start_p_number(Arq_Token *t, Lexer *l) {
         if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
-                t->id = ARQ_P_NUMBER; 
+                t->id = ARQ_P_DEZ; 
                 t->at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t->size = 1;
@@ -47,7 +47,7 @@ static bool start_p_number(Arq_Token *t, Lexer *l) {
 
 static bool start_n_number(Arq_Token *t, Lexer *l) {
         if (isdigit(l->at[l->cursor_idx])) {
-                t->id = ARQ_N_NUMBER; 
+                t->id = ARQ_N_DEZ; 
                 l->cursor_idx++;
                 t->size++;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
