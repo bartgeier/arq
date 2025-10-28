@@ -21,7 +21,7 @@ typedef struct {
 exter "C" {
 #endif
 
-bool string_eq(Arq_Token const *token, char const *cstr);
+bool token_long_option_eq(Arq_Token const *token, char const *cstr);
 uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 int32_to arq_tok_nDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);

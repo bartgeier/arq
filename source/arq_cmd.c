@@ -27,36 +27,47 @@ static void set_token_RAW_STR(Arq_Token *t, Lexer *l) {
         l->cursor_idx = l->SIZE;
 }
 
-static bool start_p_number(Arq_Token *t, Lexer *l) {
+static bool start_p_number(Lexer *l) {
         if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
-                t->id = ARQ_P_DEZ; 
-                t->at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
-                t->size = 1;
-                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
-                        l->cursor_idx++;
-                        t->size++;
-                }
-                if (l->cursor_idx < l->SIZE) {
-                        set_token_RAW_STR(t, l);
-                }
                 return true;
         }
         return false;
 }
 
-static bool start_n_number(Arq_Token *t, Lexer *l) {
-        if (isdigit(l->at[l->cursor_idx])) {
-                t->id = ARQ_N_DEZ; 
-                l->cursor_idx++;
-                t->size++;
-                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
-                        l->cursor_idx++;
-                        t->size++;
-                }
-                if (l->cursor_idx < l->SIZE) {
-                        set_token_RAW_STR(t, l);
-                }
+static bool start_n_number(Lexer *l) {
+        if (l->at[l->cursor_idx] == '-'
+        && isdigit(l->at[l->cursor_idx + 1])) {
+                l->cursor_idx += 2;
+                return true;
+        }
+        return false;
+}
+
+static bool start_short_identifier(Lexer *l) {
+        if (l->at[l->cursor_idx] == '-'
+        && is_short_identifier(l->at[l->cursor_idx + 1])) {
+                l->cursor_idx += 2;
+                return true;
+        }
+        return false;
+}
+
+static bool start_long_identifier(Lexer *l) {
+        if (l->at[l->cursor_idx] == '-'
+        && l->at[l->cursor_idx + 1] == '-'
+        && is_long_identifier(l->at[l->cursor_idx + 2])) {
+                l->cursor_idx += 3;
+                return true;
+        }
+        return false;
+}
+
+static bool start_dash_dash(Lexer *l) {
+        if (l->at[l->cursor_idx] == '-'
+        && l->at[l->cursor_idx + 1] == '-'
+        && l->SIZE == 2) {
+                l->cursor_idx += 2;
                 return true;
         }
         return false;
@@ -64,56 +75,63 @@ static bool start_n_number(Arq_Token *t, Lexer *l) {
 
 static Arq_Token next_token(Lexer *l, bool const bundling) {
         Arq_Token t = {0};
+        t.at = &l->at[l->cursor_idx];
 
         if (bundling && is_short_identifier(l->at[l->cursor_idx])) {
                 t.id = ARQ_CMD_SHORT_OPTION; 
-                t.at = &l->at[l->cursor_idx];
                 l->cursor_idx++;
                 t.size = 1;
                 return t;
         }
 
-        if (start_p_number(&t, l)) {
+        if (start_p_number(l)) {
+                t.id = ARQ_P_DEZ; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx == l->SIZE) {
+                        return t;
+                }
+        }
+
+        if (start_n_number(l)) {
+                t.id = ARQ_N_DEZ; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx == l->SIZE) {
+                        return t;
+                }
+        }
+
+        if (start_short_identifier(l)) {
+                t.id = ARQ_CMD_SHORT_OPTION; 
+                t.size = &l->at[l->cursor_idx] - t.at;
                 return t;
         }
 
-        if (l->at[l->cursor_idx] == '-') {
-                t.at = &l->at[l->cursor_idx];
-                l->cursor_idx++;
-                t.size = 1;
-                if (start_n_number(&t, l)) {
+        if (start_long_identifier(l)) {
+                t.id = ARQ_CMD_LONG_OPTION;
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && is_long_identifier(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx == l->SIZE) {
                         return t;
                 }
-
-                if (is_short_identifier(l->at[l->cursor_idx])) {
-                        t.id = ARQ_CMD_SHORT_OPTION; 
-                        t.at = &l->at[l->cursor_idx];
-                        l->cursor_idx++;
-                        t.size = 1;
-                        return t;
-                }
-
-                if (l->at[l->cursor_idx] == '-') {
-                        t.id = ARQ_CMD_LONG_OPTION; 
-                        l->cursor_idx++;
-                        t.at = &l->at[l->cursor_idx];
-                        t.size = 0;
-                        while (l->cursor_idx < l->SIZE && is_long_identifier(l->at[l->cursor_idx])) {
-                                l->cursor_idx++;
-                                t.size++;
-                        }
-                        if (t.size == 0) {
-                                t.at = t.at - 2;
-                                t.size = 2;
-                                t.id = ARQ_CMD_DASHDASH; 
-                        }
-                        return t; 
-                }
-                set_token_RAW_STR(&t ,l);
-                return t; 
         }
 
-        t.at = &l->at[l->cursor_idx]; 
+        if (start_dash_dash(l)) {
+                t.id = ARQ_CMD_DASHDASH; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                return t;
+        }
+
         set_token_RAW_STR(&t ,l);
         return t;
 }

@@ -49,11 +49,12 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_Vector *
         for (i = 0; i <= cmd->idx; i++) {
                 /* render argv to calculate argv_len */
                 if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
-                        arq_msg_append_chr(m, '-');
+                        uint32_t const x = cmd->at[i].at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
                         arq_msg_append_chr(m, cmd->at[i].at[0]);
+                        arq_msg_append_nchr(m, cmd->at[i].at[1], x);
                         arq_msg_append_chr(m, '_');
                 } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
-                        arq_msg_append_nchr(m, '-', 2);
+                        /* arq_msg_append_nchr(m, '-', 2); */
                         arq_msg_append_cstr(m, cmd->at[i].at);
                         arq_msg_append_chr(m, '_');
                 } else if (cmd->at[i].id == ARQ_CMD_END_OF_LINE) {
@@ -77,11 +78,12 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_Vector *
         for (i = 0; i <= cmd->idx; i++) {
                 /* render argv once more for moving argv */
                 if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
-                        arq_msg_append_chr(m, '-');
+                        uint32_t const x = cmd->at[i].at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
                         arq_msg_append_chr(m, cmd->at[i].at[0]);
+                        arq_msg_append_nchr(m, cmd->at[i].at[1], x);
                         arq_msg_append_chr(m, ' ');
                 } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
-                        arq_msg_append_nchr(m, '-', 2);
+                        /* arq_msg_append_nchr(m, '-', 2); */
                         arq_msg_append_cstr(m, cmd->at[i].at);
                         arq_msg_append_chr(m, ' ');
                 } else if (cmd->at[i].id == ARQ_CMD_END_OF_LINE) {

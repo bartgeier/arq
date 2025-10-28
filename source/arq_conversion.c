@@ -5,13 +5,14 @@
 #include <stdio.h>
 #include <arq_inttypes.h>
 
-bool string_eq(Arq_Token const *token, char const *cstr) {
+bool token_long_option_eq(Arq_Token const *token, char const *cstr) {
         uint32_t i;
-        if (strlen(cstr) != token->size) {
+        if (strlen(cstr) != token->size - 2) {
                 return false;
+
         }
-        for (i = 0; i < token->size; i++) {
-                if (cstr[i] != token->at[i]) {
+        for (i = 2; i < token->size; i++) {
+                if (cstr[i - 2] != token->at[i]) {
                         return false;
                 }
         }

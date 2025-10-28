@@ -259,7 +259,7 @@ Arq_OptVector *arq_imm_get_long(
         uint32_t i;
         for (i = 0; i < option_list->num_of_Vec; i++) {
                 char const * opt_name = options[i].name;
-                if (string_eq(token, opt_name)) {
+                if (token_long_option_eq(token, opt_name)) {
                         Arq_OptVector *opt = option_list->at[i];
                         option_list->row = i;
                         opt->idx = 0;
@@ -268,7 +268,7 @@ Arq_OptVector *arq_imm_get_long(
                 }
         }
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
-        arq_msg_append_cstr(error_msg, "'--");
+        /* arq_msg_append_cstr(error_msg, "'--"); */
         arq_msg_append_str(error_msg, token->at, token->size);
         arq_msg_append_cstr(error_msg, "' unknown long option ");
         arq_msg_append_lf(error_msg);
@@ -282,10 +282,11 @@ Arq_OptVector *arq_imm_get_short(
         Arq_msg *error_msg
 ) {
         Arq_Token const token = cmd->at[cmd->idx];
+        uint32_t const IDX = (token. at[0] == '-') ? 1 : 0; /* : 0 because of bundled short options */
         uint32_t i;
         for (i = 0; i < option_list->num_of_Vec; i++) {
                 char opt_short_name = options[i].chr;
-                if (token.at[0] == opt_short_name) {
+                if (token.at[IDX] == opt_short_name) {
                         Arq_OptVector *opt = option_list->at[i];
                         option_list->row = i;
                         opt->idx = 0;
@@ -294,7 +295,7 @@ Arq_OptVector *arq_imm_get_short(
                 }
         }
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
-        arq_msg_append_cstr(error_msg, "'-");
+        /* arq_msg_append_cstr(error_msg, "'-"); */
         arq_msg_append_str(error_msg, token.at, token.size);
         arq_msg_append_cstr(error_msg, "' unknown short option ");
         arq_msg_append_lf(error_msg);
@@ -422,13 +423,6 @@ char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         } 
 
         /* Even it looks like a short or long option but it is not it expects an argument */
-        if (token->id == ARQ_CMD_SHORT_OPTION) {
-                token->at -= 1;    /* -foo */
-                token->size += 1;
-        } else if (cmd->at[cmd->idx].id == ARQ_CMD_LONG_OPTION) {
-                token->at -= 2;   /* --foo */
-                token->size += 2;
-        }
         result = token->at;
         next_bundle_idx(cmd);
         return result;
