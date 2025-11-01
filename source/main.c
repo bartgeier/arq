@@ -33,7 +33,7 @@ void fn_nstring(Arq_Queue *queue) {
 
 void fn_uint32(Arq_Queue *queue) {
         uint32_t number = arq_uint32_t(queue);
-        printf("fn_uint32 number = %d\n", number);
+        printf("fn_uint32 number = %u\n", number);
 }
 
 void fn_int32(Arq_Queue *queue) {
@@ -71,7 +71,7 @@ void fn_array(Arq_Queue *queue) {
 void fn_test(Arq_Queue *queue) {
         uint32_t num_0 = arq_uint32_t(queue);
         uint32_t num_1 = arq_uint32_t(queue);
-        printf("fn_test %d %d\n", num_0, num_1);
+        printf("fn_test %u %u\n", num_0, num_1);
 }
 
 
@@ -81,7 +81,8 @@ int main(int argc, char **argv) {
                 {'s', "string",  fn_string,  "(cstr_t str)"},
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
                 {'u', "uint32",  fn_uint32,  "(uint32_t number)"},
-                {'i', "int32",   fn_int32,   "(int32_t number = 0xFFFFFFFF)"}, 
+                {'i', "int32",   fn_int32,   "(int32_t number)"}, 
+                {'i', "int32",   fn_int32,   "(int32_t number = -56)"}, 
 
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},
                 {'a', "array",   fn_array,   "(int32_t numbers[], cstr_t list[])"},

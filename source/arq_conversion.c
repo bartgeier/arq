@@ -22,7 +22,7 @@ bool token_long_option_eq(Arq_Token const *token, char const *cstr) {
 uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint32_to result = {0};
         uint32_t i;
-        assert(token->id == ARQ_P_DEZ);
+        assert(token->id == ARQ_P_DEC);
         if (token->at[0] == '+') {
                 i = 1;
         } else {
@@ -51,11 +51,11 @@ uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, c
         return result;
 }
 
-int32_to arq_tok_nDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         int32_to result = {0};
         int32_t SIGN;
         uint32_t i;
-        assert(token->id == ARQ_P_DEZ || token->id == ARQ_N_DEZ);
+        assert(token->id == ARQ_P_DEC || token->id == ARQ_N_DEC);
 
         if (token->at[0] == '-') {
                 SIGN = -1;
@@ -152,14 +152,11 @@ uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, ch
                         result.error = true;
                         if (error_msg != NULL) {
                                 Arq_Token tok = *token;
-                                char buffer[12];
-                                sprintf(buffer, "%x", INT32_MAX);
                                 arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
                                 arq_msg_append_cstr(error_msg, "Token '");
                                 arq_msg_append_str(error_msg, tok.at, tok.size);
-                                arq_msg_append_cstr(error_msg, "' more than 8 bytes");
-                                arq_msg_append_cstr(error_msg, buffer);
+                                arq_msg_append_cstr(error_msg, "' more than 8 hex digits");
                                 arq_msg_append_lf(error_msg);
                         }
                         return result;

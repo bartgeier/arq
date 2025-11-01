@@ -27,17 +27,37 @@ static void set_token_RAW_STR(Arq_Token *t, Lexer *l) {
         l->cursor_idx = l->SIZE;
 }
 
-static bool start_p_number(Lexer *l) {
-        if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
-                l->cursor_idx++;
+static bool hex_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if ((idx + 2 < l->SIZE)
+        && (l->at[idx + 0] == '0') 
+        && (l->at[idx + 1] == 'x' || l->at[idx + 1] == 'X') 
+        && isxdigit(l->at[idx + 2])) {
+                l->cursor_idx += 3;
                 return true;
         }
         return false;
 }
 
-static bool start_n_number(Lexer *l) {
-        if (l->at[l->cursor_idx] == '-'
-        && isdigit(l->at[l->cursor_idx + 1])) {
+static bool p_dec_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if (isdigit(l->at[idx])) {
+                l->cursor_idx += 1;
+                return true;
+        } else if (idx + 1 < l->SIZE 
+        && l->at[idx] == '+' 
+        && isdigit(l->at[idx + 1])) {
+                l->cursor_idx += 2;
+                return true;
+        }
+        return false;
+}
+
+static bool n_dec_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if (idx + 1 < l->SIZE 
+        && l->at[idx] == '-'
+        && isdigit(l->at[idx + 1])) {
                 l->cursor_idx += 2;
                 return true;
         }
@@ -84,8 +104,21 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                 return t;
         }
 
-        if (start_p_number(l)) {
-                t.id = ARQ_P_DEZ; 
+        if (hex_start(l)) {
+                t.id = ARQ_HEX; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx == l->SIZE) {
+                        return t;
+                }
+
+        }
+
+        if (p_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
                 t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
@@ -96,8 +129,8 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                 }
         }
 
-        if (start_n_number(l)) {
-                t.id = ARQ_N_DEZ; 
+        if (n_dec_start(l)) {
+                t.id = ARQ_N_DEC; 
                 t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;

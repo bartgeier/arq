@@ -38,10 +38,6 @@ static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord con
         return true;
 }
 
-static bool is_identifier_start(char chr) {
-        return isalpha(chr) || chr == '_';
-}
-
 static bool is_identifier(char chr) {
         return isalnum(chr) || chr == '_';
 }
@@ -52,12 +48,57 @@ typedef struct {
         char const *at;
 } Lexer;
 
-static bool is_hex_start(Lexer *l) {
-        uint32_t idx = l->cursor_idx;
+static bool identifier_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if (isalpha(l->at[idx]) || l->at[idx] == '_') {
+                l->cursor_idx += 1;
+                return true;
+        }
+        return false;
+}
+
+static bool array_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if ((idx + 1 < l->SIZE)
+        && (l->at[idx] == '[') 
+        && (l->at[idx + 1] == ']')) {
+                l->cursor_idx += 2;
+                return true; 
+        }
+        return false;
+}
+
+static bool hex_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
         if ((idx + 2 < l->SIZE)
         && (l->at[idx + 0] == '0') 
         && (l->at[idx + 1] == 'x' || l->at[idx + 1] == 'X') 
         && isxdigit(l->at[idx + 2])) {
+                l->cursor_idx += 3;
+                return true;
+        }
+        return false;
+}
+
+static bool p_dec_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if (isdigit(l->at[idx])) {
+                l->cursor_idx += 1;
+                return true;
+        } else if (idx + 1 < l->SIZE 
+        && l->at[idx] == '+' 
+        && isdigit(l->at[idx + 1])) {
+                l->cursor_idx += 2;
+                return true;
+        }
+        return false;
+}
+
+static bool n_dec_start(Lexer *l) {
+        uint32_t const idx = l->cursor_idx;
+        if (idx + 1 < l->SIZE 
+        && l->at[idx] == '-'
+        && isdigit(l->at[idx + 1])) {
                 l->cursor_idx += 2;
                 return true;
         }
@@ -95,15 +136,6 @@ static Arq_Token next_token(Lexer *l) {
                 return t; 
         }
 
-        if ((l->at[l->cursor_idx] == '[') 
-        && (l->cursor_idx + 1 < l->SIZE) 
-        && (l->at[l->cursor_idx + 1] == ']')) {
-                t.id = ARQ_OPT_ARRAY; 
-                l->cursor_idx += 2;
-                t.size = 2;
-                return t; 
-        }
-
         if (l->at[l->cursor_idx] == '(') {
                 t.id = ARQ_OPT_L_PARENTHESIS; 
                 l->cursor_idx++;
@@ -125,21 +157,11 @@ static Arq_Token next_token(Lexer *l) {
                 return t; 
         }
 
-        if (is_hex_start(l)) {
-                t.id = ARQ_HEX;
-                t.size = &l->at[l->cursor_idx] - t.at;
-                while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
-                        l->cursor_idx++;
-                        t.size++;
-                }
-                return t;
-        }
 
-        if (is_identifier_start(l->at[l->cursor_idx])) {
+        if (identifier_start(l)) {
                 uint32_t i;
                 t.id = ARQ_OPT_IDENTFIER; 
-                l->cursor_idx++;
-                t.size = 1;
+                t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
@@ -152,10 +174,25 @@ static Arq_Token next_token(Lexer *l) {
                 return t;
         }
 
-        if (isdigit(l->at[l->cursor_idx]) || (l->at[l->cursor_idx] == '+')) {
-                t.id = ARQ_P_DEZ; 
-                l->cursor_idx++;
-                t.size = 1;
+        if (array_start(l)) {
+                t.id = ARQ_OPT_ARRAY; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                return t; 
+        }
+
+        if (hex_start(l)) {
+                t.id = ARQ_HEX;
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                return t;
+        }
+
+        if (p_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
@@ -163,10 +200,9 @@ static Arq_Token next_token(Lexer *l) {
                 return t;
         }
 
-        if (l->at[l->cursor_idx] == '-') {
-                t.id = ARQ_N_DEZ; 
-                l->cursor_idx++;
-                t.size = 1;
+        if (n_dec_start(l)) {
+                t.id = ARQ_N_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
