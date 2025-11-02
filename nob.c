@@ -46,10 +46,20 @@ bool arq_build(bool const clean) {
         nob_cmd_append(&c_ompiler, "-mshstk");
 #endif
 #if 1
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wparentheses"); 
+        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+                // "-Os", "-s", 
+                // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
+                "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
+        ); 
 #endif
 #if 0
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", "-O3", "-Wall", "-Wextra", "-pedantic-errors", "-Wparentheses"); 
+        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", "-Os", "-Wall", "-Wextra", "-pedantic", "-fPIC",
+                "-Os", "-s", "-Wl,--gc-sections",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-fomit-frame-pointer",
+                "-shared", "-o", "build/libarq.so"
+        );
+
 #endif
         Nob_Cmd cmd = {0};
         nob_cmd_append_cmd(&cmd, &c_ompiler);
