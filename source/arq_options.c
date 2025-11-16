@@ -9,7 +9,7 @@
 
 typedef struct {
     uint32_t id;
-    char *at;
+    char const *at;
 } KeyWord;
 
 static KeyWord const key_words[] = {
@@ -235,7 +235,7 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
 }
 
 uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
-        char *error_str = "' missing open parenthesis '('\n";
+        char const *error_str = "' missing open parenthesis '('\n";
         tokens->idx = 0;
         if (arq_imm_L_parenthesis(tokens)) {
                 while (tokens->idx < tokens->num_of_token) {

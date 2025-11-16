@@ -10,7 +10,7 @@ typedef struct {
 } Arq_msg;
 
 #ifdef __cplusplus
-exter "C" {
+extern "C" {
 #endif
 
 void arq_msg_clear(Arq_msg *m);

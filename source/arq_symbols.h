@@ -49,6 +49,6 @@ typedef enum {
 } Arq_SymbolID;
 #undef X
 
-extern char *symbol_names[];
+extern char const *symbol_names[];
 
 #endif

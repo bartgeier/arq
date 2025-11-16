@@ -3,9 +3,11 @@
 
 #include "arq_int.h"
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+    /* C++, >= C99 */
     #include <inttypes.h>
 #else
+    /* C89 */
     #define PRId32 "d"
     #define PRIu8  "u"
     #define PRIu32 "u"

@@ -152,6 +152,43 @@ bool download_build_googleTest(bool const clean) {
         return ok;
 }
 
+#if 1
+bool unittests_build(bool const clean) {
+        if (clean) {
+                return true;
+        }
+        bool ok = true;
+        nob_log(NOB_INFO, "BUILD: otest ----> unit tests");
+        Nob_Cmd cmd = {0};
+        nob_cmd_append(
+                &cmd, 
+                "g++", "-ggdb", "-O0", "-std=c++20",
+                "-Wall", "-Wextra", "-pedantic",
+                "-Wno-parentheses", "-Wno-missing-field-initializers"
+        );
+        nob_cmd_append(&cmd, "-I", "googletest/include/"); 
+        nob_cmd_append(&cmd, "-I", "source/"); 
+        nob_cmd_append(&cmd, "-L", "googletest/build/lib/");
+        nob_cmd_append(&cmd, "-o", "build/test");
+        nob_cmd_append(&cmd, "./source/arq.c");
+        nob_cmd_append(&cmd, "./source/arq_symbols.c");
+        nob_cmd_append(&cmd, "./source/arq_queue.c");
+        nob_cmd_append(&cmd, "./source/arq_options.c");
+        nob_cmd_append(&cmd, "./source/arq_cmd.c");
+        nob_cmd_append(&cmd, "./source/arq_conversion.c");
+        nob_cmd_append(&cmd, "./source/arq_msg.c");
+        nob_cmd_append(&cmd, "./source/arq_arena.c");
+        nob_cmd_append(&cmd, "./source/arq_immediate.c");
+        nob_cmd_append(&cmd, "unittests/tst_arq_arena.c");
+        nob_cmd_append(&cmd, "unittests/tst_arq_queue.c");
+        nob_cmd_append(&cmd, "unittests/tst_arq.c");
+        nob_cmd_append(&cmd, "-lgtest", "-lgtest_main");
+        ok &= nob_cmd_run_sync(cmd);
+        cmd.count = 0;
+        nob_cmd_free(cmd);
+        return ok;
+}
+#else
 bool unittests_build(bool const clean) {
         if (clean) {
                 return true;
@@ -173,12 +210,15 @@ bool unittests_build(bool const clean) {
         nob_cmd_append(&cmd, "source/arq_queue.c");
         nob_cmd_append(&cmd, "unittests/tst_arq_arena.c");
         nob_cmd_append(&cmd, "unittests/tst_arq_queue.c");
+        nob_cmd_append(&cmd, "unittests/tst_arq.c");
         nob_cmd_append(&cmd, "-lgtest", "-lgtest_main");
         ok &= nob_cmd_run_sync(cmd);
         cmd.count = 0;
         nob_cmd_free(cmd);
         return ok;
 }
+
+#endif
 
 int main(int argc, char **argv) {
         uint64_t t_start = nob_millis();
@@ -205,8 +245,8 @@ int main(int argc, char **argv) {
 
         create_source_paths();
         create_include_paths();
-        ok &= arq_build(flag.clean);
-        //ok &= unittests_build(flag.clean);
+        // ok &= arq_build(flag.clean);
+        ok &= unittests_build(flag.clean);
 
         if (!ok) {
                 nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n", nob_millis() - t_start);

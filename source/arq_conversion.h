@@ -23,7 +23,7 @@ typedef struct {
 } int32_to;
 
 #ifdef __cplusplus
-exter "C" {
+extern "C" {
 #endif
 
 bool token_long_option_eq(Arq_Token const *token, char const *cstr);

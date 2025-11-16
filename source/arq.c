@@ -178,7 +178,7 @@ uint32_t arq_fn(
                 uint32_t SIZE_OF_ERROR_MSG;
                 Arq_msg e_msg;
                 uint32_t const shrink = arena->size;
-                char *chr = arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
+                char *chr = (char *)arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
                 arena->size = shrink;
                 e_msg.SIZE = SIZE_OF_ERROR_MSG;
                 e_msg.size = 0;
@@ -189,12 +189,12 @@ uint32_t arq_fn(
         for (i = 0; i < num_of_options; i++) {
                 uint32_t NUM_OF_TOKEN;
                 uint32_t const shrink = arena->size;
-                Arq_OptVector *v = arq_arena_malloc_rest(arena, offsetof(Arq_OptVector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+                Arq_OptVector *v = (Arq_OptVector *)arq_arena_malloc_rest(arena, offsetof(Arq_OptVector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
                 arena->size = shrink;
 
                 arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
                 {
-                        Arq_OptVector *vb = arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
+                        Arq_OptVector *vb = (Arq_OptVector *)arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
                         assert(v == vb);
                         log_memory(("      Option vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
                                 (int)offsetof(Arq_Token, at),
@@ -228,7 +228,7 @@ uint32_t arq_fn(
         {
                 uint32_t NUM_OF_TOKEN;
                 uint32_t const shrink = arena->size;
-                cmd = arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
+                cmd = (Arq_Vector *)arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
                 arena->size = shrink;
                 arq_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
                 assert(cmd == arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + cmd->num_of_token * sizeof(Arq_Token)));
