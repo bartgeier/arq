@@ -245,7 +245,7 @@ int main(int argc, char **argv) {
 
         create_source_paths();
         create_include_paths();
-        // ok &= arq_build(flag.clean);
+        ok &= arq_build(flag.clean);
         ok &= unittests_build(flag.clean);
 
         if (!ok) {

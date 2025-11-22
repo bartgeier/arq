@@ -137,6 +137,43 @@ int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, cha
         return result;
 }
 
+int8_to arq_tok_sDec_to_int8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        int8_to result;
+        int32_to num = arq_tok_sDec_to_int32_t(token, error_msg, cstr);
+        if (num.i32 > INT8_MAX || (num.i32 > 0 && num.error)) {
+                num.error = true;
+                if (error_msg != NULL) {
+                        Arq_Token tok = *token;
+                        char buffer[12];
+                        sprintf(buffer, "%" PRId8, INT8_MAX);
+                        arq_msg_clear(error_msg);
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' positive number > INT8_MAX ");
+                        arq_msg_append_cstr(error_msg, buffer);
+                        arq_msg_append_lf(error_msg);
+                }
+        } else if (num.i32 < INT8_MIN || (num.i32 < 0 && num.error)) {
+                num.error = true;
+                if (error_msg != NULL) {
+                        Arq_Token tok = *token;
+                        char buffer[12];
+                        sprintf(buffer, "%" PRId8, INT8_MIN);
+                        arq_msg_clear(error_msg);
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' negative number < INT8_MIN ");
+                        arq_msg_append_cstr(error_msg, buffer);
+                        arq_msg_append_lf(error_msg);
+                }
+        }
+        result.i8 = (uint8_t) num.i32;
+        result.error = num.error;
+        return result;
+}
+
 uint8_to arq_tok_hex_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint8_to result;
         uint32_to num = arq_tok_hex_to_uint32_t(token, error_msg, cstr);

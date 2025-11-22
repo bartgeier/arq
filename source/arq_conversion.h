@@ -19,6 +19,11 @@ typedef struct {
 
 typedef struct {
         bool error;
+        uint8_t i8;
+} int8_to;
+
+typedef struct {
+        bool error;
         int32_t i32;
 } int32_to;
 
@@ -30,6 +35,7 @@ bool token_long_option_eq(Arq_Token const *token, char const *cstr);
 uint8_to arq_tok_pDec_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
+int8_to arq_tok_sDec_to_int8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
 uint8_to arq_tok_hex_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);

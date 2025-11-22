@@ -8,6 +8,7 @@
     #include <inttypes.h>
 #else
     /* C89 */
+    #define PRId8  "d"
     #define PRId32 "d"
     #define PRIu8  "u"
     #define PRIu32 "u"

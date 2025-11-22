@@ -105,6 +105,94 @@ TEST(arq, no_parameter) {
         }
 }
 
+void fn_number8(Arq_Queue *queue) {
+        uint8_t x = arq_uint8_t(queue);
+        sprintf(result, "fn_number8 %u", x);
+}
+void fn_number8_array(Arq_Queue *queue) {
+        uint32_t const array_size = arq_array_size(queue);
+        uint32_t i;
+        int pos = sprintf(result, "fn_number8_array %u ", array_size);
+        for (i = 0; i < array_size; i++) {
+                pos += sprintf(result + pos, "%u ", arq_uint8_t(queue));
+        }
+
+}
+TEST(arq, uint8_t) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'a', "numberA",  fn_number8,  "(uint8_t number)"},
+                {'b', "numberB",  fn_number8,  "(uint8_t number = 124)"},
+                {'c', "numberC",  fn_number8_array,  "(uint8_t number[])"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "--numberA", "sdf");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer, 
+                                        "CMD line failure:\n"
+                                        "    --numberA sdf \n"
+                                        "    Token 'sdf' is not a positiv number\n"
+                                        "    -a --numberA (uint8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        EXPECT_FALSE(true);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "256");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 256 \n"
+                                        "    Token '256' positive number > UINT8_MAX 255\n"
+                                        "    -a --numberA (uint8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "123");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number8 123"));
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xAa");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number8 170"));
+        }
+        {
+                set(&cmd, "arq", "--numberB");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number8 124"));
+        }
+        {
+                set(&cmd, "arq", "--numberB", "0xFF");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number8 255"));
+        }
+        {
+                set(&cmd, "arq", "--numberC", "0xF", "242", "1", "42");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number8_array 4 15 242 1 42 "));
+        }
+}
+
 void fn_number32(Arq_Queue *queue) {
         uint32_t x = arq_uint32_t(queue);
         sprintf(result, "fn_number32 %u", x);
@@ -190,6 +278,108 @@ TEST(arq, uint32_t) {
                         ASSERT_TRUE(false);
                 }
                 EXPECT_TRUE(0 == strcmp(result,"fn_number32_array 4 15 40004 1 42 "));
+        }
+}
+
+void fn_numberi8(Arq_Queue *queue) {
+        int8_t x = arq_int8_t(queue);
+        sprintf(result, "fn_numberi8 %d", x);
+}
+void fn_numberi8_array(Arq_Queue *queue) {
+        int32_t const array_size = arq_array_size(queue);
+        int32_t i;
+        int pos = sprintf(result, "fn_numberi8_array %d ", array_size);
+        for (i = 0; i < array_size; i++) {
+                pos += sprintf(result + pos, "%d ", arq_int8_t(queue));
+        }
+}
+TEST(arq, int8_t) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'a', "numberA",  fn_numberi8,  "(int8_t number)"},
+                {'b', "numberB",  fn_numberi8,  "(int8_t number = -84)"},
+                {'c', "numberC",  fn_numberi8_array,  "(int8_t number[])"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "--numberA", "sdf");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer, 
+                                        "CMD line failure:\n"
+                                        "    --numberA sdf \n"
+                                        "    Token 'sdf' is not a signed number\n"
+                                        "    -a --numberA (int8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        EXPECT_FALSE(true);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "128");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 128 \n"
+                                        "    Token '128' positive number > INT8_MAX 127\n"
+                                        "    -a --numberA (int8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "-129");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA -129 \n"
+                                        "    Token '-129' negative number < INT8_MIN -128\n"
+                                        "    -a --numberA (int8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "-123");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi8 -123"));
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xAa");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi8 -86"));
+        }
+        {
+                set(&cmd, "arq", "--numberB");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi8 -84"));
+        }
+        {
+                set(&cmd, "arq", "--numberB", "0xFF");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi8 -1"));
+        }
+        {
+                set(&cmd, "arq", "--numberC", "0xF", "-44", "42", "0x80");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi8_array 4 15 -44 42 -128 "));
         }
 }
 
