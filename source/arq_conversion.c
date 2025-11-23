@@ -19,6 +19,52 @@ bool token_long_option_eq(Arq_Token const *token, char const *cstr) {
         return true;
 }
 
+uint8_to arq_tok_pDec_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        uint8_to result;
+        uint32_to num = arq_tok_pDec_to_uint32_t(token, error_msg, cstr);
+        if (num.u32 > UINT8_MAX || num.error) {
+                num.error = true;
+                if (error_msg != NULL) {
+                        Arq_Token tok = *token;
+                        char buffer[12];
+                        sprintf(buffer, "%" PRIu8, UINT8_MAX);
+                        arq_msg_clear(error_msg);
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' positive number > UINT8_MAX ");
+                        arq_msg_append_cstr(error_msg, buffer);
+                        arq_msg_append_lf(error_msg);
+                }
+        }
+        result.u8 = (uint8_t) num.u32;
+        result.error = num.error;
+        return result;
+}
+
+uint16_to arq_tok_pDec_to_uint16_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        uint16_to result;
+        uint32_to num = arq_tok_pDec_to_uint32_t(token, error_msg, cstr);
+        if (num.u32 > UINT16_MAX || num.error) {
+                num.error = true;
+                if (error_msg != NULL) {
+                        Arq_Token tok = *token;
+                        char buffer[12];
+                        sprintf(buffer, "%" PRIu16, UINT16_MAX);
+                        arq_msg_clear(error_msg);
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' positive number > UINT16_MAX ");
+                        arq_msg_append_cstr(error_msg, buffer);
+                        arq_msg_append_lf(error_msg);
+                }
+        }
+        result.u16 = (uint16_t) num.u32;
+        result.error = num.error;
+        return result;
+}
+
 uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint32_to result = {0};
         uint32_t i;
@@ -48,29 +94,6 @@ uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, c
                 }
                 result.u32 = result.u32 * 10 + digit;
         } 
-        return result;
-}
-
-uint8_to arq_tok_pDec_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
-        uint8_to result;
-        uint32_to num = arq_tok_pDec_to_uint32_t(token, error_msg, cstr);
-        if (num.u32 > UINT8_MAX || num.error) {
-                num.error = true;
-                if (error_msg != NULL) {
-                        Arq_Token tok = *token;
-                        char buffer[12];
-                        sprintf(buffer, "%" PRIu8, UINT8_MAX);
-                        arq_msg_clear(error_msg);
-                        arq_msg_append_cstr(error_msg, cstr);
-                        arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, tok.at, tok.size);
-                        arq_msg_append_cstr(error_msg, "' positive number > UINT8_MAX ");
-                        arq_msg_append_cstr(error_msg, buffer);
-                        arq_msg_append_lf(error_msg);
-                }
-        }
-        result.u8 = (uint8_t) num.u32;
-        result.error = num.error;
         return result;
 }
 
@@ -190,6 +213,26 @@ uint8_to arq_tok_hex_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char
                 }
         }
         result.u8 = (uint8_t) num.u32;
+        result.error = num.error;
+        return result;
+}
+
+uint16_to arq_tok_hex_to_uint16_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        uint16_to result;
+        uint32_to num = arq_tok_hex_to_uint32_t(token, error_msg, cstr);
+        if (num.u32 > UINT16_MAX || num.error) {
+                num.error = true;
+                if (error_msg != NULL) {
+                        Arq_Token tok = *token;
+                        arq_msg_clear(error_msg);
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' more than 4 hex digits");
+                        arq_msg_append_lf(error_msg);
+                }
+        }
+        result.u16 = (uint16_t) num.u32;
         result.error = num.error;
         return result;
 }

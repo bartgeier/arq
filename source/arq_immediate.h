@@ -25,11 +25,13 @@ bool arq_imm_not_identifier(Arq_OptVector *opt);
 
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt); 
 bool arq_imm_is_a_uint8_t(Arq_OptVector *opt); 
+bool arq_imm_is_a_uint16_t(Arq_OptVector *opt);
 bool arq_imm_is_a_int32_t(Arq_OptVector *opt);
 bool arq_imm_is_a_int8_t(Arq_OptVector *opt);
 
 uint8_to arq_imm_default_uint8_t(Arq_OptVector *opt);
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt);
+uint16_to arq_imm_default_uint16_t(Arq_OptVector *opt);
 int8_to arq_imm_default_int8_t(Arq_OptVector *opt);
 int32_to arq_imm_default_int32_t(Arq_OptVector *opt);
 
@@ -66,6 +68,7 @@ bool arq_imm_is_n_dec(Arq_Vector *cmd);
 bool arq_imm_is_hex(Arq_Vector *cmd);
 
 bool arq_imm_optional_argument_uint8_t(Arq_Vector *cmd, uint8_to *num, Arq_msg *error_msg);
+bool arq_imm_optional_argument_uint16_t(Arq_Vector *cmd, uint16_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_int8_t(Arq_Vector *cmd, int8_to *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_int32_t(Arq_Vector *cmd, int32_to *num, Arq_msg *error_msg);
@@ -73,6 +76,7 @@ bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr);
 bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr);
 
 uint8_to arq_imm_argument_uint8_t(Arq_Vector *cmd, Arq_msg *error_msg);
+uint16_to arq_imm_argument_uint16_t(Arq_Vector *cmd, Arq_msg *error_msg);
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg);
 int8_to arq_imm_argument_int8_t(Arq_Vector *cmd, Arq_msg *error_msg);
 int32_to arq_imm_argument_int32_t(Arq_Vector *cmd, Arq_msg *error_msg);

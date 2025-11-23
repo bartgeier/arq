@@ -11,6 +11,7 @@
     #define PRId8  "d"
     #define PRId32 "d"
     #define PRIu8  "u"
+    #define PRIu16 "u"
     #define PRIu32 "u"
     #define PRId64 "ld"
     #define PRIu64 "lu"

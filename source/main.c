@@ -32,17 +32,21 @@ void fn_nstring(Arq_Queue *queue) {
 }
 
 void fn_uint8(Arq_Queue *queue) {
-#if 0
-        uint32_t number = arq_uint8_t(queue);
-        printf("fn_uint8 number = %u\n", number);
-#else
         uint32_t const array_size = arq_array_size(queue);
         uint32_t i;
         printf("    numbers array_size: %d\n", array_size);
         for (i = 0; i < array_size; i++) {
                 printf("        argument[%d]: %d\n", i, arq_uint8_t(queue));
         }
-#endif
+}
+
+void fn_uint16(Arq_Queue *queue) {
+        uint32_t const array_size = arq_array_size(queue);
+        uint32_t i;
+        printf("    numbers array_size: %d\n", array_size);
+        for (i = 0; i < array_size; i++) {
+                printf("        argument[%d]: %d\n", i, arq_uint16_t(queue));
+        }
 }
 
 void fn_uint32(Arq_Queue *queue) {
@@ -105,6 +109,7 @@ int main(int argc, char **argv) {
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
 
                 {'u', "uint8",   fn_uint8,   "(uint8_t number[])"},
+                {'u', "uint16",  fn_uint16,  "(uint16_t number[])"},
                 {'u', "uint32",  fn_uint32,  "(uint32_t number = 324)"},
 
                 {'u', "int8",    fn_int8,    "(int8_t number[])"},

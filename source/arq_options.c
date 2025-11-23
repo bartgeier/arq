@@ -266,6 +266,30 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_UINT16_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_uint16_t(tokens)) {
+                                                error_str = "' is not a uint16_t\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
                                 error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {

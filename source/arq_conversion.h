@@ -14,6 +14,11 @@ typedef struct {
 
 typedef struct {
         bool error;
+        uint16_t u16;
+} uint16_to;
+
+typedef struct {
+        bool error;
         uint32_t u32;
 } uint32_to;
 
@@ -33,12 +38,14 @@ extern "C" {
 
 bool token_long_option_eq(Arq_Token const *token, char const *cstr);
 uint8_to arq_tok_pDec_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+uint16_to arq_tok_pDec_to_uint16_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
 int8_to arq_tok_sDec_to_int8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
 uint8_to arq_tok_hex_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+uint16_to arq_tok_hex_to_uint16_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 
 #ifdef __cplusplus

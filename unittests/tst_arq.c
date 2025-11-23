@@ -157,6 +157,21 @@ TEST(arq, uint8_t) {
                 }
         }
         {
+                set(&cmd, "arq", "--numberA", "0xFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFF0 \n"
+                                        "    Token '0xFF0' more than 2 hex digits\n"
+                                        "    -a --numberA (uint8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
                 set(&cmd, "arq", "--numberA", "123");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         ASSERT_TRUE(false);
@@ -190,6 +205,109 @@ TEST(arq, uint8_t) {
                         ASSERT_TRUE(false);
                 }
                 EXPECT_TRUE(0 == strcmp(result,"fn_number8_array 4 15 242 1 42 "));
+        }
+}
+
+void fn_number16(Arq_Queue *queue) {
+        uint16_t x = arq_uint16_t(queue);
+        sprintf(result, "fn_number16 %u", x);
+}
+void fn_number16_array(Arq_Queue *queue) {
+        uint32_t const array_size = arq_array_size(queue);
+        uint32_t i;
+        int pos = sprintf(result, "fn_number16_array %u ", array_size);
+        for (i = 0; i < array_size; i++) {
+                pos += sprintf(result + pos, "%u ", arq_uint16_t(queue));
+        }
+
+}
+TEST(arq, uint16_t) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'a', "numberA",  fn_number16,  "(uint16_t number)"},
+                {'b', "numberB",  fn_number16,  "(uint16_t number = 0xffff)"},
+                {'c', "numberC",  fn_number16_array,  "(uint16_t number[])"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "--numberA", "sdf");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer, 
+                                        "CMD line failure:\n"
+                                        "    --numberA sdf \n"
+                                        "    Token 'sdf' is not a positiv number\n"
+                                        "    -a --numberA (uint16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        EXPECT_FALSE(true);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "65536");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 65536 \n"
+                                        "    Token '65536' positive number > UINT16_MAX 65535\n"
+                                        "    -a --numberA (uint16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xFFFFFFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFFFFFFF0 \n"
+                                        "    Token '0xFFFFFFF0' more than 4 hex digits\n"
+                                        "    -a --numberA (uint16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "42069");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number16 42069"));
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xAaAa");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number16 43690"));
+        }
+        {
+                set(&cmd, "arq", "--numberB");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number16 65535"));
+        }
+        {
+                set(&cmd, "arq", "--numberB", "0xFF00");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number16 65280"));
+        }
+        {
+                set(&cmd, "arq", "--numberC", "0x8000", "1242", "69", "42");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_number16_array 4 32768 1242 69 42 "));
         }
 }
 
@@ -237,6 +355,21 @@ TEST(arq, uint32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 42949672950 \n"
                                         "    Token '42949672950' positive number > UINT32_MAX 4294967295\n"
+                                        "    -a --numberA (uint32_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xFFFFFFFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFFFFFFFF0 \n"
+                                        "    Token '0xFFFFFFFF0' more than 8 hex digits\n"
                                         "    -a --numberA (uint32_t number)\n"
                                 ), 0
                         );
@@ -324,6 +457,21 @@ TEST(arq, int8_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 128 \n"
                                         "    Token '128' positive number > INT8_MAX 127\n"
+                                        "    -a --numberA (int8_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFF0 \n"
+                                        "    Token '0xFF0' more than 2 hex digits\n"
                                         "    -a --numberA (int8_t number)\n"
                                 ), 0
                         );
@@ -427,6 +575,21 @@ TEST(arq, int32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 42949672950 \n"
                                         "    Token '42949672950' positive number > INT32_MAX 2147483647\n"
+                                        "    -a --numberA (int32_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xFFFFFFFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFFFFFFFF0 \n"
+                                        "    Token '0xFFFFFFFF0' more than 8 hex digits\n"
                                         "    -a --numberA (int32_t number)\n"
                                 ), 0
                         );
