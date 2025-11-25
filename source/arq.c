@@ -468,6 +468,51 @@ uint32_t arq_fn(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+                        if (arq_imm_type(opt, ARQ_OPT_INT16_T)) {
+                                log_int_token_indent(ARQ_OPT_INT16_T);
+                                (void)arq_imm_not_identifier(opt);
+                                if (arq_imm_equal(opt)) {
+                                        int16_to num = arq_imm_default_int16_t(opt);
+                                        if (arq_imm_optional_argument_int16_t(cmd, &num, &error_msg)) {
+                                                /* overflow */
+                                                error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
+                                        }
+                                        arq_push_int16_t(queue, num.i16);
+                                        log_inta(("i16 %d", num.i16));
+                                } else if (arq_imm_array(opt)) {
+                                        uint32_t *array_size = arq_push_array_size(queue, 0);
+                                        log_inta(("u32 %u // init array_size", *array_size));
+                                        while (arq_imm_is_p_dec(cmd) || arq_imm_is_n_dec(cmd) || arq_imm_is_hex(cmd)) {
+                                                int16_to num = {0};
+                                                if (arq_imm_optional_argument_int16_t(cmd, &num, &error_msg)) {
+                                                        /* overflow */
+                                                        error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                        output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                        return error_msg.size;
+                                                }
+                                                *array_size += 1;
+                                                arq_push_int16_t(queue, num.i16);
+                                                log_inta(("i16 %d", num.i16));
+                                        }
+                                } else {
+                                        int16_to const num = arq_imm_argument_int16_t(cmd, &error_msg);
+                                        if (num.error) { 
+                                                /* wasn't an int8_t number or overflow */
+                                                error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
+                                        }
+                                        arq_push_int16_t(queue, num.i16);
+                                        log_inta(("i16 %d", num.i16));
+                                }
+                                if (arq_imm_comma(opt)) continue;
+                                goto terminator;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         if (arq_imm_type(opt, ARQ_OPT_INT32_T)) {
                                 log_int_token_indent(ARQ_OPT_INT32_T);
                                 (void)arq_imm_not_identifier(opt);

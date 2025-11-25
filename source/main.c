@@ -59,7 +59,16 @@ void fn_int8(Arq_Queue *queue) {
         uint32_t i;
         printf("    numbers array_size: %u\n", array_size);
         for (i = 0; i < array_size; i++) {
-                printf("        argument[%u]: %u\n", i, arq_int8_t(queue));
+                printf("        argument[%d]: %d\n", i, arq_int8_t(queue));
+        }
+}
+
+void fn_int16(Arq_Queue *queue) {
+        uint32_t const array_size = arq_array_size(queue);
+        uint32_t i;
+        printf("    numbers array_size: %u\n", array_size);
+        for (i = 0; i < array_size; i++) {
+                printf("        argument[%d]: %d\n", i, arq_int16_t(queue));
         }
 }
 
@@ -113,7 +122,7 @@ int main(int argc, char **argv) {
                 {'u', "uint32",  fn_uint32,  "(uint32_t number = 324)"},
 
                 {'u', "int8",    fn_int8,    "(int8_t number[])"},
-                {'i', "int32",   fn_int32,   "(int32_t number)"}, 
+                {'i', "int16",   fn_int16,   "(int16_t number[])"}, 
                 {'i', "int32",   fn_int32,   "(int32_t number = -56)"}, 
 
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},

@@ -531,6 +531,123 @@ TEST(arq, int8_t) {
         }
 }
 
+void fn_numberi16(Arq_Queue *queue) {
+        int16_t x = arq_int16_t(queue);
+        sprintf(result, "fn_numberi16 %d", x);
+}
+void fn_numberi16_array(Arq_Queue *queue) {
+        int32_t const array_size = arq_array_size(queue);
+        int32_t i;
+        int pos = sprintf(result, "fn_numberi16_array %d ", array_size);
+        for (i = 0; i < array_size; i++) {
+                pos += sprintf(result + pos, "%d ", arq_int16_t(queue));
+        }
+}
+TEST(arq, int16_t) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'a', "numberA",  fn_numberi16,        "(int16_t number)"},
+                {'b', "numberB",  fn_numberi16,        "(int16_t number = -21846)"},
+                {'c', "numberC",  fn_numberi16_array,  "(int16_t number[])"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "--numberA", "sdf");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer, 
+                                        "CMD line failure:\n"
+                                        "    --numberA sdf \n"
+                                        "    Token 'sdf' is not a signed number\n"
+                                        "    -a --numberA (int16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        EXPECT_FALSE(true);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "32768");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 32768 \n"
+                                        "    Token '32768' positive number > INT16_MAX 32767\n"
+                                        "    -a --numberA (int16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0xFFFF0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA 0xFFFF0 \n"
+                                        "    Token '0xFFFF0' more than 4 hex digits\n"
+                                        "    -a --numberA (int16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "-32769");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --numberA -32769 \n"
+                                        "    Token '-32769' negative number < INT16_MIN -32768\n"
+                                        "    -a --numberA (int16_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--numberA", "-32767");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi16 -32767"));
+        }
+        {
+                set(&cmd, "arq", "--numberA", "0XAaaA");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi16 -21846"));
+        }
+        {
+                set(&cmd, "arq", "--numberB");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi16 -21846"));
+        }
+        {
+                set(&cmd, "arq", "--numberB", "0xFFFF");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi16 -1"));
+        }
+        {
+                set(&cmd, "arq", "--numberC", "0xFFFE", "-44", "42", "0x8000");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_numberi16_array 4 -2 -44 42 -32768 "));
+        }
+}
+
 void fn_numberi32(Arq_Queue *queue) {
         int32_t x = arq_int32_t(queue);
         sprintf(result, "fn_numberi32 %d", x);
