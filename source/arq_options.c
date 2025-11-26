@@ -347,7 +347,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_int16_t(tokens)) {
-                                                error_str = "' is not a int8_t\n";
+                                                error_str = "' is not a int16_t\n";
                                                 break; /* error */
                                         }
                                         error_str = "' but expected ',' or ')'\n";
