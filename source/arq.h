@@ -32,6 +32,7 @@ uint32_t arq_array_size(Arq_Queue *queue);
 int8_t arq_int8_t(Arq_Queue *queue);
 int16_t arq_int16_t(Arq_Queue *queue);
 int32_t arq_int32_t(Arq_Queue *queue);
+double arq_float(Arq_Queue *queue);
 char const *arq_cstr_t(Arq_Queue *queue);
 
 #ifdef __cplusplus

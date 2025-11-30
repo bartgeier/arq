@@ -13,8 +13,8 @@ typedef struct {
 } KeyWord;
 
 static KeyWord const key_words[] = {
-        {  ARQ_OPT_NULL,  "NULL" },
-        {  ARQ_OPT_CSTR_T,  "cstr_t" },
+        {  ARQ_OPT_NULL,     "NULL" },
+        {  ARQ_OPT_CSTR_T,   "cstr_t" },
         {  ARQ_OPT_UINT8_T,  "uint8_t" },
         {  ARQ_OPT_UINT16_T, "uint16_t" },
         {  ARQ_OPT_UINT32_T, "uint32_t" },
@@ -23,6 +23,7 @@ static KeyWord const key_words[] = {
         {  ARQ_OPT_INT16_T,  "int16_t" },
         {  ARQ_OPT_INT32_T,  "int32_t" },
         {  ARQ_OPT_INT64_T,  "int64_t" },
+        {  ARQ_OPT_FLOAT,    "float" },
 };
 
 static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
@@ -38,7 +39,7 @@ static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord con
         return true;
 }
 
-static bool is_identifier(char chr) {
+static bool is_identifier(char const chr) {
         return isalnum(chr) || chr == '_';
 }
 
@@ -78,6 +79,10 @@ static bool hex_start(Lexer *l) {
                 return true;
         }
         return false;
+}
+
+static bool has_hex_exponent(char const s) {
+    return (s == 'p') || (s == 'P');
 }
 
 static bool p_dec_start(Lexer *l) {
@@ -187,7 +192,43 @@ static Arq_Token next_token(Lexer *l) {
                         l->cursor_idx++;
                         t.size++;
                 }
-                return t;
+                if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
+                        t.id = ARQ_OPT_NO_TOKEN;
+                        l->cursor_idx++;
+                        t.size++;
+                        while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                        }
+                        if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                                if (p_dec_start(l) || n_dec_start(l)) {
+                                        t.id = ARQ_HEX_FLOAT; 
+                                        t.size = &l->at[l->cursor_idx] - t.at;
+                                        while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                                l->cursor_idx++;
+                                                t.size++;
+                                        }
+                                        return t;
+                                }
+                        } 
+                } else if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                        t.id = ARQ_OPT_NO_TOKEN;
+                        l->cursor_idx++;
+                        t.size++;
+                        if (p_dec_start(l) || n_dec_start(l)) {
+                                t.id = ARQ_HEX_FLOAT; 
+                                t.size = &l->at[l->cursor_idx] - t.at;
+                                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                        l->cursor_idx++;
+                                        t.size++;
+                                }
+                                return t;
+                        }
+                } else { 
+                        return t;
+                }
         }
 
         if (p_dec_start(l)) {
@@ -371,6 +412,30 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_int32_t(tokens)) {
+                                                error_str = "' is not a int32_t\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_FLOAT)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_float(tokens)) {
                                                 error_str = "' is not a int32_t\n";
                                                 break; /* error */
                                         }

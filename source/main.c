@@ -104,6 +104,11 @@ void fn_array(Arq_Queue *queue) {
         printf("}\n");
 }
 
+void fn_float(Arq_Queue *queue) {
+        double number = arq_float(queue);
+        printf("fn_float number = %f\n", number);
+}
+
 void fn_test(Arq_Queue *queue) {
         uint32_t num_0 = arq_uint32_t(queue);
         uint32_t num_1 = arq_uint32_t(queue);
@@ -127,6 +132,8 @@ int main(int argc, char **argv) {
 
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},
                 {'a', "array",   fn_array,   "(int32_t numbers[], cstr_t list[])"},
+
+                {'f', "float",   fn_float,   "(float number)"}, 
         };
 
         /* testen mit */

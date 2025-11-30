@@ -11,6 +11,7 @@
         X(ARQ_P_DEC)                             \
         X(ARQ_N_DEC)                             \
         X(ARQ_HEX)                               \
+        X(ARQ_HEX_FLOAT)                         \
         X(ARQ_CMD_RAW_STR)                       \
                                                  \
         /* option operators */                   \
@@ -35,6 +36,7 @@
         X(ARQ_OPT_INT16_T)                       \
         X(ARQ_OPT_INT32_T)                       \
         X(ARQ_OPT_INT64_T)                       \
+        X(ARQ_OPT_FLOAT)                         \
                                                  \
         /* command line tokens */                \
         X(ARQ_CMD_SHORT_OPTION)                  \

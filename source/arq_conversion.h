@@ -37,6 +37,11 @@ typedef struct {
         int32_t i32;
 } int32_to;
 
+typedef struct {
+        bool error;
+        double f;
+} float_to;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +58,8 @@ int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, cha
 uint8_to arq_tok_hex_to_uint8_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint16_to arq_tok_hex_to_uint16_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+
+float_to arq_tok_hexFloat_to_float(Arq_Token const *token);
 
 #ifdef __cplusplus
 }

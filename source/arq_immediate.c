@@ -210,6 +210,31 @@ bool arq_imm_is_a_int32_t(Arq_OptVector *opt) {
         return !num.error; /* return true if successful */
 }
 
+bool arq_imm_is_a_float(Arq_OptVector *opt) {
+        (void) opt;
+        return true;
+        hier geht weiter => arq_tok_hexFloat_to_float
+#if 0
+        Arq_Token const *token = &opt->at[opt->idx];
+        float_to num;
+        switch (token->id) {
+        case ARQ_DEC_FLOAT:
+                num = arq_tok_sDec_to_int32_t(token, NULL, "");
+                break;
+        case ARQ_HEX_FLOAT:
+                num = arq_tok_hex_to_uint32_t(token, NULL, "");
+                break;
+        default:
+                return false;
+        }
+        if (!num.error) {
+                /* success */
+                arq_imm_opt_next(opt);
+        }
+        return !num.error; /* return true if successful */
+#endif
+}
+
 uint8_to arq_imm_default_uint8_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         uint8_to num = {0};

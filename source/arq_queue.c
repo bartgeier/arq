@@ -97,6 +97,12 @@ int32_t arq_int32_t(Arq_Queue *queue) {
         return t.value.i32;
 }
 
+double arq_float(Arq_Queue *queue) {
+        Arq_Argument t = pop(queue);
+        assert(t.type_id == ARQ_OPT_FLOAT);
+        return t.value.f;
+}
+
 char const *arq_cstr_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_CSTR_T);

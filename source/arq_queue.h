@@ -17,6 +17,7 @@ typedef struct {
                 int16_t i16;
                 int32_t i32;
                 /* int64_t i64; */
+                double f;
                 char const *cstr;
         } value;
 } Arq_Argument;

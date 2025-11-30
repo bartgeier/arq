@@ -29,6 +29,7 @@ bool arq_imm_is_a_uint32_t(Arq_OptVector *opt);
 bool arq_imm_is_a_int8_t(Arq_OptVector *opt);
 bool arq_imm_is_a_int16_t(Arq_OptVector *opt);
 bool arq_imm_is_a_int32_t(Arq_OptVector *opt);
+bool arq_imm_is_a_float(Arq_OptVector *opt);
 
 uint8_to arq_imm_default_uint8_t(Arq_OptVector *opt);
 uint16_to arq_imm_default_uint16_t(Arq_OptVector *opt);
