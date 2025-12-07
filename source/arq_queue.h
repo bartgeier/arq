@@ -46,6 +46,7 @@ void arq_push_int8_t(Arq_Queue *queue, int8_t n);
 void arq_push_int16_t(Arq_Queue *queue, int16_t n);
 void arq_push_int32_t(Arq_Queue *queue, int32_t n);
 /* void arq_push_int64_t(Arq_Queue *queue, int64_t n); */
+void arq_push_float(Arq_Queue *queue, double f);
 void arq_push_cstr_t(Arq_Queue *queue, char const *cstr);
 
 #ifdef __cplusplus

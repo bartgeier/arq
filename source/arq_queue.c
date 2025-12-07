@@ -168,6 +168,13 @@ void arq_push_int32_t(Arq_Queue *queue, int32_t n) {
         push(queue, &a);
 }
 
+void arq_push_float(Arq_Queue *queue, double f) {
+        Arq_Argument a;
+        a.type_id = ARQ_OPT_FLOAT;
+        a.value.f = n;
+        push(queue, &a);
+}
+
 void arq_push_cstr_t(Arq_Queue *queue, char const * cstr) {
         Arq_Argument a;
         a.type_id = ARQ_OPT_CSTR_T;

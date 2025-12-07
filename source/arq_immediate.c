@@ -211,18 +211,16 @@ bool arq_imm_is_a_int32_t(Arq_OptVector *opt) {
 }
 
 bool arq_imm_is_a_float(Arq_OptVector *opt) {
-        (void) opt;
-        return true;
-        hier geht weiter => arq_tok_hexFloat_to_float
-#if 0
         Arq_Token const *token = &opt->at[opt->idx];
         float_to num;
         switch (token->id) {
+#if 0
         case ARQ_DEC_FLOAT:
                 num = arq_tok_sDec_to_int32_t(token, NULL, "");
                 break;
+#endif
         case ARQ_HEX_FLOAT:
-                num = arq_tok_hex_to_uint32_t(token, NULL, "");
+                num = arq_tok_hexFloat_to_float(token);
                 break;
         default:
                 return false;
@@ -232,7 +230,6 @@ bool arq_imm_is_a_float(Arq_OptVector *opt) {
                 arq_imm_opt_next(opt);
         }
         return !num.error; /* return true if successful */
-#endif
 }
 
 uint8_to arq_imm_default_uint8_t(Arq_OptVector *opt) {
@@ -355,6 +352,27 @@ int32_to arq_imm_default_int32_t(Arq_OptVector *opt) {
         return num;
 }
 
+float_to arq_imm_default_float(Arq_OptVector *opt) {
+        Arq_Token const *token = &opt->at[opt->idx];
+        float_to num = {0};
+        switch (token->id) {
+#if 0
+        case ARQ_DEC_FLOAT:
+                num = arq_tok_sDec_to_int32_t(token, NULL, "");
+                break;
+#endif
+        case ARQ_HEX_FLOAT:
+                num = arq_tok_hexFloat_to_float(token);
+                break;
+        default:
+                assert(false);
+                break;
+        }
+        assert(num.error == false);
+        arq_imm_opt_next(opt);
+        return num;
+}
+
 bool arq_imm_is_a_NULL(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         if (token->id != ARQ_OPT_NULL) {
@@ -436,6 +454,12 @@ bool arq_imm_is_n_dec(Arq_Vector *cmd) {
 bool arq_imm_is_hex(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         const bool b = (token->id == ARQ_HEX);
+        return b;
+}
+
+bool arq_imm_is_hexFloat(Arq_Vector *cmd) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        const bool b = (token->id == ARQ_HEX_FLOAT);
         return b;
 }
 
@@ -630,6 +654,28 @@ bool arq_imm_optional_argument_int32_t(Arq_Vector *cmd, int32_to *num, Arq_msg *
         return false;
 }
 
+bool arq_imm_optional_argument_float(Arq_Vector *cmd, float_to *num, Arq_msg *error_msg) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        (void)error_msg;
+        switch (token->id) {
+#if 0 
+        case ARQ_DEC_FLOAT:
+                *num = arq_tok_sDec_to_int32_t(token, error_msg, CMD_LINE_FAILURE);
+                break;
+#endif
+        case ARQ_HEX_FLOAT:
+                *num = arq_tok_hexFloat_to_float(token);
+                break;
+        default:
+                return false;
+        }
+        if (num->error) {
+                return true;
+        }
+        arq_imm_cmd_next(cmd);
+        return false;
+}
+
 bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         if (token->id != ARQ_CMD_LONG_OPTION 
@@ -815,6 +861,35 @@ int32_to arq_imm_argument_int32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
                         arq_msg_append_cstr(error_msg, "Token '");
                         arq_msg_append_str(error_msg, tok.at, tok.size);
                         arq_msg_append_cstr(error_msg, "' is not a signed number");
+                        arq_msg_append_lf(error_msg);
+                }
+                result.error = true;
+                return result;
+        }
+        arq_imm_cmd_next(cmd);
+        return result;
+}
+
+float_to arq_imm_argument_float(Arq_Vector *cmd, Arq_msg *error_msg) {
+        Arq_Token const *token = &cmd->at[cmd->idx];
+        float_to result = {0};
+        char const *cstr = CMD_LINE_FAILURE;
+        switch (token->id) {
+        case ARQ_HEX_FLOAT:
+                result = arq_tok_hexFloat_to_float(token);
+                break;
+#if 0
+        case ARQ_DEC_FLOAT:
+                result = arq_tok_sDec_to_int32_t(token, error_msg, cstr);
+                break;
+#endif
+        default:
+                if (error_msg != NULL) {
+                        Arq_Token const tok = *token;
+                        arq_msg_append_cstr(error_msg, cstr);
+                        arq_msg_append_cstr(error_msg, "Token '");
+                        arq_msg_append_str(error_msg, tok.at, tok.size);
+                        arq_msg_append_cstr(error_msg, "' is not a float number");
                         arq_msg_append_lf(error_msg);
                 }
                 result.error = true;

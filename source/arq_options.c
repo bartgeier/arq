@@ -436,7 +436,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 }
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_float(tokens)) {
-                                                error_str = "' is not a int32_t\n";
+                                                error_str = "' is not a float\n";
                                                 break; /* error */
                                         }
                                         error_str = "' but expected ',' or ')'\n";

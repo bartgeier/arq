@@ -766,6 +766,98 @@ TEST(arq, int32_t) {
         }
 }
 
+void fn_float(Arq_Queue *queue) {
+        double x = arq_float(queue);
+        sprintf(result, "fn_float = %.20f\n", x);
+}
+void fn_float_array(Arq_Queue *queue) {
+        int32_t const array_size = arq_array_size(queue);
+        int32_t i;
+        int pos = sprintf(result, "fn_float_array %d ", array_size);
+        for (i = 0; i < array_size; i++) {
+                pos += sprintf(result + pos, "%.20f ", arq_float(queue));
+        }
+
+}
+TEST(arq, float) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'a', "floatA",  fn_float,       "(float number)"},
+                {'b', "floatB",  fn_float,       "(float number = 0x23.23p1)"},
+                {'c', "floatC",  fn_float_array, "(float number[])"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "--floatA", "0xFF");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer, 
+                                        "CMD line failure:\n"
+                                        "    --floatA 0xFF \n"
+                                        "    Token '0xFF' is not a float number\n"
+                                        "    -a --floatA (float number)\n"
+                                ), 0
+                        );
+                } else {
+                        EXPECT_FALSE(true);
+                }
+        }
+        {
+                set(&cmd, "arq", "--floatA", "0xFFFFFFFFFF.AAp0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                } else {
+                        EXPECT_EQ(
+                                strcmp(result,
+                                        "fn_float = 1099511627775.66406250000000000000\n"
+                                ), 0
+                        );
+                }
+        }
+        {
+                set(&cmd, "arq", "--floatA", "-0x23.23p1");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(buffer,
+                                        "CMD line failure:\n"
+                                        "    --floatA -0x23.23p1 \n"
+                                        "    Token '-0x23.23p1' is not a float number\n"
+                                        "    -a --floatA (float number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "--floatB");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_float = 70.27343750000000000000\n"));
+        }
+        {
+                set(&cmd, "arq", "--floatB", "0x24.23p1");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_float = 72.27343750000000000000\n"));
+        }
+        {
+                set(&cmd, "arq", "--floatC", "0x1.1p0",  "0x2.1p0",  "0xFF.1p5", "0x1.0p0");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(
+                        result,
+                        "fn_float_array 4 "
+                        "1.06250000000000000000 "
+                        "2.06250000000000000000 "
+                        "8162.00000000000000000000 "
+                        "1.00000000000000000000 "
+               ));
+        }
+}
 #if 0
 
                 {'s', "string",  NULL,  "(cstr_t str)"},

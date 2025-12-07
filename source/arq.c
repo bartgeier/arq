@@ -558,6 +558,51 @@ uint32_t arq_fn(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+                        if (arq_imm_type(opt, ARQ_OPT_FLOAT)) {
+                                log_int_token_indent(ARQ_OPT_FLOAT);
+                                (void)arq_imm_not_identifier(opt);
+                                if (arq_imm_equal(opt)) {
+                                        float_to num = arq_imm_default_float(opt);
+                                        if (arq_imm_optional_argument_float(cmd, &num, &error_msg)) {
+                                                /* in the moment there is no error */
+                                                error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
+                                        }
+                                        arq_push_float(queue, num.f);
+                                        log_inta(("float %f", num.f));
+                                } else if (arq_imm_array(opt)) {
+                                        uint32_t *array_size = arq_push_array_size(queue, 0);
+                                        log_inta(("u32 %u // init array_size", *array_size));
+                                        while (arq_imm_is_hexFloat(cmd)) {
+                                                float_to num = {0};
+                                                if (arq_imm_optional_argument_float(cmd, &num, &error_msg)) {
+                                                        /* in the moment there is no error */
+                                                        error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                        output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                        return error_msg.size;
+                                                }
+                                                *array_size += 1;
+                                                arq_push_float(queue, num.f);
+                                                log_inta(("float %f", num.f));
+                                        }
+                                } else {
+                                        float_to const num = arq_imm_argument_float(cmd, &error_msg);
+                                        if (num.error) { 
+                                                /* wasn't an float number */
+                                                error_msg_insert_cmd_line(&error_msg, 1, cmd);
+                                                output_cmd_line_conversion_failure(&error_msg, &options[option_list->row], arena_buffer); 
+                                                return error_msg.size;
+                                        }
+                                        arq_push_float(queue, num.f);
+                                        log_inta(("float %f", num.f));
+                                }
+                                if (arq_imm_comma(opt)) continue;
+                                goto terminator;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         if (arq_imm_type(opt, ARQ_OPT_CSTR_T)) {
                                 char const *cstr; 
                                 log_int_token_indent(ARQ_OPT_CSTR_T);

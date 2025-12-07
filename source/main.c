@@ -106,7 +106,7 @@ void fn_array(Arq_Queue *queue) {
 
 void fn_float(Arq_Queue *queue) {
         double number = arq_float(queue);
-        printf("fn_float number = %f\n", number);
+        printf("fn_float number = %.10f\n", number);
 }
 
 void fn_test(Arq_Queue *queue) {

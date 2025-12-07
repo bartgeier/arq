@@ -39,6 +39,10 @@ static bool hex_start(Lexer *l) {
         return false;
 }
 
+static bool has_hex_exponent(char const s) {
+    return (s == 'p') || (s == 'P');
+}
+
 static bool p_dec_start(Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if (isdigit(l->at[idx])) {
@@ -105,16 +109,49 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
         }
 
         if (hex_start(l)) {
-                t.id = ARQ_HEX; 
+                t.id = ARQ_HEX;
                 t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
                 }
-                if (l->cursor_idx == l->SIZE) {
-                        return t;
+                if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
+                        t.id = ARQ_CMD_RAW_STR;
+                        l->cursor_idx++;
+                        t.size++;
+                        while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                        }
+                        if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                                if (p_dec_start(l) || n_dec_start(l)) {
+                                        t.id = ARQ_HEX_FLOAT; 
+                                        t.size = &l->at[l->cursor_idx] - t.at;
+                                        while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                                l->cursor_idx++;
+                                                t.size++;
+                                        }
+                                        if (l->cursor_idx == l->SIZE) { return t; }
+                                }
+                        } 
+                } else if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                        t.id = ARQ_CMD_RAW_STR;
+                        l->cursor_idx++;
+                        t.size++;
+                        if (p_dec_start(l) || n_dec_start(l)) {
+                                t.id = ARQ_HEX_FLOAT; 
+                                t.size = &l->at[l->cursor_idx] - t.at;
+                                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                        l->cursor_idx++;
+                                        t.size++;
+                                }
+                                if (l->cursor_idx == l->SIZE) { return t; }
+                        }
+                } else { 
+                        if (l->cursor_idx == l->SIZE) { return t; }
                 }
-
         }
 
         if (p_dec_start(l)) {
