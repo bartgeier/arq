@@ -153,7 +153,7 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                         if (l->cursor_idx == l->SIZE) { return t; }
                 }
         }
-
+hier gehts weiter dec float 
         if (p_dec_start(l)) {
                 t.id = ARQ_P_DEC; 
                 t.size = &l->at[l->cursor_idx] - t.at;

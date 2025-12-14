@@ -171,7 +171,7 @@ void arq_push_int32_t(Arq_Queue *queue, int32_t n) {
 void arq_push_float(Arq_Queue *queue, double f) {
         Arq_Argument a;
         a.type_id = ARQ_OPT_FLOAT;
-        a.value.f = n;
+        a.value.f = f;
         push(queue, &a);
 }
 

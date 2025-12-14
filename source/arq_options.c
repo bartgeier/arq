@@ -110,6 +110,44 @@ static bool n_dec_start(Lexer *l) {
         return false;
 }
 
+static bool has_dec_exponent(Lexer *l) {
+        if (l->cursor_idx + 1 < l->SIZE) { 
+                uint32_t const idx = l->cursor_idx;
+                char const chr = l->at[l->cursor_idx];
+                bool isExp = (chr == 'e') || (chr == 'E');
+                l->cursor_idx++;
+                isExp &= p_dec_start(l) || n_dec_start(l);
+                if (isExp) {
+                        return true;
+                }
+                l->cursor_idx = idx;
+        }
+        return false;
+}
+
+static void dec_float(Lexer *l, Arq_Token *t) {
+        if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
+                /* fractional part */
+                t->id = ARQ_DEC_FLOAT;
+                l->cursor_idx++;
+                t->size++;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t->size++;
+                }
+        }
+        if (has_dec_exponent(l)) {
+                t->id = ARQ_DEC_FLOAT;
+                t->size = &l->at[l->cursor_idx] - t->at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t->size++;
+                }
+                return;
+        }
+        return;
+}
+
 static void skip_space(Lexer *l) {
     while (l->cursor_idx < l->SIZE && (l->at[l->cursor_idx] == 0 || isspace(l->at[l->cursor_idx]))) {
             l->cursor_idx++;
@@ -238,7 +276,12 @@ static Arq_Token next_token(Lexer *l) {
                         l->cursor_idx++;
                         t.size++;
                 }
-                return t;
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_P_DEC: return t;
+                default: break;
+                }; 
         }
 
         if (n_dec_start(l)) {
@@ -248,7 +291,12 @@ static Arq_Token next_token(Lexer *l) {
                         l->cursor_idx++;
                         t.size++;
                 }
-                return t;
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_N_DEC: return t;
+                default: break;
+                }; 
         }
 
         if (l->cursor_idx < l->SIZE) {

@@ -308,7 +308,118 @@ uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, ch
         return result;
 }
 
-#if 1
+static double arq_pow(double base, int exp) {
+        double result = 1.0;
+        int negative = 0;
+
+        if (exp < 0) {
+                negative = 1;
+                exp = -exp;
+        }
+
+        while (exp > 0) {
+                if (exp % 2 == 1) {
+                        result *= base;
+                }
+                base *= base;
+                exp /= 2;
+        }
+
+        if (negative) {
+                return 1.0 / result;
+        }
+        return result;
+}
+
+float_to arq_tok_decFloat_to_float(Arq_Token const *token) {
+        float_to result;
+        double value = 0.0;
+        int mantissa_sign = 1;
+        int exp10 = 0;
+        int exp_sign = 1;
+
+        uint32_t i = 0;
+
+        assert(token->id == ARQ_DEC_FLOAT);
+
+        if (i < token->size) {
+                switch (token->at[i]) {
+                case '+': 
+                        mantissa_sign = 1;
+                        i++;
+                        break;
+                case '-': 
+                        mantissa_sign = -1;
+                        i++;
+                        break;
+                }
+        }
+
+        /* integer part */
+        while (i < token->size) {
+                int v = token->at[i] - '0';
+                if (v < 0) {
+                        break;
+                }
+                value = value * 10.0 + (double)v;
+                i++;
+        }
+
+        /* fractional part */
+        if (i < token->size && '.' == token->at[i]) {
+                double place = 1.0 / 10.0;
+                i++;
+                while (i < token->size) {
+                        int v = token->at[i] - '0';
+                        if (v < 0) {
+                                break;
+                        }
+                        value += (double)v * place;
+                        place /= 10.0;
+                        i++;
+                }
+        }
+        value = mantissa_sign * value;
+
+        /* exponent part (binary exponent) */
+        if (i < token->size + 1 && ('e' == token->at[i] || 'E' == token->at[i])) {
+                i++;
+                switch (token->at[i]) {
+                case '+': 
+                        exp_sign = 1;
+                        i++;
+                        break;
+                case '-': 
+                        exp_sign = -1;
+                        i++;
+                        break;
+                }
+                while (i < token->size) {
+                        if (exp10 < 2000) {
+                                exp10 = exp10 * 10 + (token->at[i] - '0');
+                        }
+                        i++;
+                }
+                if (exp_sign > 0 && exp10 > 1200) {
+                        result.f = HUGE_VAL; /* INFINITY */
+                        result.error = false;
+                        return result;
+                }
+                if (exp_sign < 0 && exp10 > 1200) {
+                        result.f = 0.0;
+                        result.error = false;
+                        return result;
+                }
+        }
+
+        /* scale by value * 10^exp10 */
+        {
+                result.f = value * arq_pow(10.0, (double)(exp_sign * exp10));
+                result.error = false;
+                return result;
+        }
+}
+
 float_to arq_tok_hexFloat_to_float(Arq_Token const *token) {
         float_to result;
         double value = 0.0;
@@ -384,194 +495,3 @@ float_to arq_tok_hexFloat_to_float(Arq_Token const *token) {
                 return result;
         }
 }
-#endif
-#if 0
-float_to arq_tok_hexFloat_to_float(const Arq_Token *token) {
-        float_to result;
-        double value;
-        int exp10;
-        int exp_sign;
-        uint32_t i;
-        double place;
-        /* int v; */
-
-        /* initialize result */
-        result.f = 0.0;
-        result.error = 0;
-
-        assert(token->id == ARQ_HEX_FLOAT);
-        if (!token || token->size < 3) {
-                return result; /* must at least contain 0x1 */
-        }
-
-        /* initialize parsing variables */
-        value = 0.0;
-        exp10 = 0;
-        exp_sign = 1;
-        i = 2; /* skip 0x prefix */
-
-        /* --- Integer part --- */
-        while (i < token->size) {
-                const int v = hexval(token->at[i]);
-                if (v < 0) {
-                        break;
-                }
-                value = value * 16.0 + (double)v;
-                i++;
-        }
-
-        /* --- Fractional part --- */
-        if (i < token->size && token->at[i] == '.') {
-                i++;
-                place = 1.0 / 16.0;
-                while (i < token->size) {
-                        const int v = hexval(token->at[i]);
-                        if (v < 0) {
-                                break;
-                        }
-                        value += (double)v * place;
-                        place /= 16.0;
-                        i++;
-                }
-        }
-
-        /* --- Exponent part --- */
-        if (i < token->size + 1 && (token->at[i] == 'p' || token->at[i] == 'P')) {
-                i++;
-                switch (token->at[i]) {
-                case '+': 
-                        exp_sign = 1;
-                        i++;
-                        break;
-                case '-': 
-                        exp_sign = -1;
-                        i++;
-                        break;
-                }
-                while (i < token->size) {
-                        if (exp10 < 2000) {
-                                exp10 = exp10 * 10 + (token->at[i] - '0');
-                        }
-                        i++;
-                }
-                if (exp_sign > 0 && exp10 > 1200) {
-                        result.f = HUGE_VAL;  /* infinity */
-                        result.error = 1;
-                        return result;
-                }
-                if (exp_sign < 0 && exp10 > 1200) {
-                        result.f = 0.0;
-                        result.error = 1;
-                        return result;
-                }
-        }
-
-        /* --- Final scaling --- */
-        {
-                int final_exp = exp_sign * exp10;
-                result.f = ldexp(value, final_exp);
-                result.error = 0;
-                return result;
-        }
-}
-#endif
-#if 0
-/* Main parser: 64-bit mantissa for perfect rounding */
-float_to arq_tok_hexFloat_to_float(const Arq_Token *token) {
-    float_to result;
-    uint64_t mantissa;
-    int mantissa_bits;
-    int exp10, exp_sign, final_exp;
-    uint32_t i;
-    int v;
-    char c;
-    int fraction_digits;
-
-    /* initialize result */
-    result.f = 0.0;
-    result.error = 0;
-
-    assert(token->id == ARQ_HEX_FLOAT);
-    if (!token || token->size < 3) return result; /* must at least contain 0x1 */
-
-    /* --- Variables --- */
-    mantissa = 0ULL;
-    mantissa_bits = 0;   /* number of significant bits in mantissa */
-    fraction_digits = 0;
-    exp10 = 0;
-    exp_sign = 1;
-    i = 2; /* skip 0x prefix */
-
-    /* --- Integer part --- */
-    while (i < token->size) {
-        v = hexval(token->at[i]);
-        if (v < 0) break;
-
-        if (mantissa_bits < 53) {  /* accumulate only up to 53 bits for double precision */
-            mantissa = (mantissa << 4) | (uint64_t)v;
-            mantissa_bits += 4;
-        } else {
-            /* ignore extra digits, they affect rounding minimally */
-        }
-        i++;
-    }
-
-    /* --- Fractional part --- */
-    if (i < token->size && token->at[i] == '.') {
-        i++;
-        while (i < token->size) {
-            v = hexval(token->at[i]);
-            if (v < 0) break;
-
-            if (mantissa_bits < 53) {
-                mantissa = (mantissa << 4) | (uint64_t)v;
-                mantissa_bits += 4;
-            }
-            fraction_digits++;
-            i++;
-        }
-    }
-
-    /* adjust exponent for fractional shift */
-    final_exp = -4 * fraction_digits;
-
-    /* --- Exponent part --- */
-    if (i < token->size && (token->at[i] == 'p' || token->at[i] == 'P')) {
-        i++;
-        if (i < token->size) {
-            if (token->at[i] == '+') { exp_sign = 1; i++; }
-            else if (token->at[i] == '-') { exp_sign = -1; i++; }
-        }
-
-        while (i < token->size) {
-            c = token->at[i];
-            if (c < '0' || c > '9') break;
-            /* clamp to prevent integer overflow */
-            if (exp10 < 2000) {
-                exp10 = exp10 * 10 + (c - '0');
-            }
-            i++;
-        }
-
-        /* combine exponent */
-        final_exp += exp_sign * exp10;
-
-        /* handle extreme exponent cases */
-        if (final_exp > 1023) {
-            result.f = HUGE_VAL;  /* overflow */
-            result.error = 1;
-            return result;
-        }
-        if (final_exp < -1074) {
-            result.f = 0.0;       /* underflow */
-            result.error = 1;
-            return result;
-        }
-    }
-
-    /* --- Construct final double --- */
-    result.f = ldexp((double)mantissa, final_exp - (mantissa_bits - 1));
-    result.error = 0;
-    return result;
-}
-#endif

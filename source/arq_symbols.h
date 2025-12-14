@@ -10,6 +10,7 @@
         /* literals */                           \
         X(ARQ_P_DEC)                             \
         X(ARQ_N_DEC)                             \
+        X(ARQ_DEC_FLOAT)                         \
         X(ARQ_HEX)                               \
         X(ARQ_HEX_FLOAT)                         \
         X(ARQ_CMD_RAW_STR)                       \

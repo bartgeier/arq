@@ -214,11 +214,9 @@ bool arq_imm_is_a_float(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         float_to num;
         switch (token->id) {
-#if 0
         case ARQ_DEC_FLOAT:
-                num = arq_tok_sDec_to_int32_t(token, NULL, "");
+                num = arq_tok_decFloat_to_float(token);
                 break;
-#endif
         case ARQ_HEX_FLOAT:
                 num = arq_tok_hexFloat_to_float(token);
                 break;

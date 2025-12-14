@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},
                 {'a', "array",   fn_array,   "(int32_t numbers[], cstr_t list[])"},
 
-                {'f', "float",   fn_float,   "(float number)"}, 
+                {'f', "float",   fn_float,   "(float number = 0.1e0)"}, 
         };
 
         /* testen mit */
