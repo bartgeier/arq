@@ -281,6 +281,10 @@ static int hexval(char c) {
     if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
     return -1;
 }
+static int decval(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    return -1;
+}
 
 uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint32_to result = {0};
@@ -357,7 +361,7 @@ float_to arq_tok_decFloat_to_float(Arq_Token const *token) {
 
         /* integer part */
         while (i < token->size) {
-                int v = token->at[i] - '0';
+                int v = decval(token->at[i]);
                 if (v < 0) {
                         break;
                 }
@@ -370,7 +374,7 @@ float_to arq_tok_decFloat_to_float(Arq_Token const *token) {
                 double place = 1.0 / 10.0;
                 i++;
                 while (i < token->size) {
-                        int v = token->at[i] - '0';
+                        int v = decval(token->at[i]);
                         if (v < 0) {
                                 break;
                         }

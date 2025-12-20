@@ -68,6 +68,44 @@ static bool n_dec_start(Lexer *l) {
         return false;
 }
 
+static bool has_dec_exponent(Lexer *l) {
+        if (l->cursor_idx + 1 < l->SIZE) { 
+                uint32_t const idx = l->cursor_idx;
+                char const chr = l->at[l->cursor_idx];
+                bool isExp = (chr == 'e') || (chr == 'E');
+                l->cursor_idx++;
+                isExp &= p_dec_start(l) || n_dec_start(l);
+                if (isExp) {
+                        return true;
+                }
+                l->cursor_idx = idx;
+        }
+        return false;
+}
+
+static void dec_float(Lexer *l, Arq_Token *t) {
+        if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
+                /* fractional part */
+                t->id = ARQ_DEC_FLOAT;
+                l->cursor_idx++;
+                t->size++;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t->size++;
+                }
+        }
+        if (has_dec_exponent(l)) {
+                t->id = ARQ_DEC_FLOAT;
+                t->size = &l->at[l->cursor_idx] - t->at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t->size++;
+                }
+                return;
+        }
+        return;
+}
+
 static bool start_short_identifier(Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && is_short_identifier(l->at[l->cursor_idx + 1])) {
@@ -153,7 +191,8 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
                         if (l->cursor_idx == l->SIZE) { return t; }
                 }
         }
-hier gehts weiter dec float 
+
+#if 0
         if (p_dec_start(l)) {
                 t.id = ARQ_P_DEC; 
                 t.size = &l->at[l->cursor_idx] - t.at;
@@ -176,6 +215,54 @@ hier gehts weiter dec float
                 if (l->cursor_idx == l->SIZE) {
                         return t;
                 }
+        }
+#endif
+        if (l->at[l->cursor_idx] ==  '.') {
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
+        }
+
+
+        if (p_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_P_DEC: 
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
+        }
+
+        if (n_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_P_DEC: 
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
         }
 
         if (start_short_identifier(l)) {

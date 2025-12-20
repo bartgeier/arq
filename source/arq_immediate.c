@@ -354,11 +354,9 @@ float_to arq_imm_default_float(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         float_to num = {0};
         switch (token->id) {
-#if 0
         case ARQ_DEC_FLOAT:
-                num = arq_tok_sDec_to_int32_t(token, NULL, "");
+                num = arq_tok_decFloat_to_float(token);
                 break;
-#endif
         case ARQ_HEX_FLOAT:
                 num = arq_tok_hexFloat_to_float(token);
                 break;
@@ -457,7 +455,7 @@ bool arq_imm_is_hex(Arq_Vector *cmd) {
 
 bool arq_imm_is_hexFloat(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
-        const bool b = (token->id == ARQ_HEX_FLOAT);
+        const bool b = (token->id == ARQ_DEC_FLOAT) || (token->id == ARQ_HEX_FLOAT);
         return b;
 }
 
@@ -656,11 +654,9 @@ bool arq_imm_optional_argument_float(Arq_Vector *cmd, float_to *num, Arq_msg *er
         Arq_Token const *token = &cmd->at[cmd->idx];
         (void)error_msg;
         switch (token->id) {
-#if 0 
         case ARQ_DEC_FLOAT:
-                *num = arq_tok_sDec_to_int32_t(token, error_msg, CMD_LINE_FAILURE);
+                *num = arq_tok_decFloat_to_float(token);
                 break;
-#endif
         case ARQ_HEX_FLOAT:
                 *num = arq_tok_hexFloat_to_float(token);
                 break;
@@ -876,11 +872,9 @@ float_to arq_imm_argument_float(Arq_Vector *cmd, Arq_msg *error_msg) {
         case ARQ_HEX_FLOAT:
                 result = arq_tok_hexFloat_to_float(token);
                 break;
-#if 0
         case ARQ_DEC_FLOAT:
-                result = arq_tok_sDec_to_int32_t(token, error_msg, cstr);
+                result = arq_tok_decFloat_to_float(token);
                 break;
-#endif
         default:
                 if (error_msg != NULL) {
                         Arq_Token const tok = *token;

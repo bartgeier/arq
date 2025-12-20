@@ -269,6 +269,14 @@ static Arq_Token next_token(Lexer *l) {
                 }
         }
 
+        if (l->at[l->cursor_idx] ==  '.') {
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT: return t;
+                default: break;
+                }; 
+        }
+
         if (p_dec_start(l)) {
                 t.id = ARQ_P_DEC; 
                 t.size = &l->at[l->cursor_idx] - t.at;
