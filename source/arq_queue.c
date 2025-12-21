@@ -15,8 +15,8 @@ Arq_Queue *arq_queue_malloc(Arq_Arena *arena) {
         queue->write_idx = 0; 
         {
                 Arq_Argument a;
-                a.type_id = ARQ_OPT_UINT16_T;
-                a.value.u16 = 0;
+                a.type_id = ARQ_OPT_UINT32_T;
+                a.value.u32 = 0;
                 queue->at[0] = a;
         }
         return queue;
@@ -47,18 +47,6 @@ void arq_unused(Arq_Queue *queue) {
         (void)pop(queue);
 }
 
-uint8_t arq_uint8_t(Arq_Queue *queue) {
-        Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_UINT8_T);
-        return t.value.u8;
-}
-
-uint16_t arq_uint16_t(Arq_Queue *queue) {
-        Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_UINT16_T);
-        return t.value.u16;
-}
-
 uint32_t arq_uint32_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_UINT32_T);
@@ -79,18 +67,6 @@ uint64_t arq_uint64_t(Arq_Queue *queue) {
 }
 #endif
 
-int8_t arq_int8_t(Arq_Queue *queue) {
-        Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_INT8_T);
-        return t.value.i8;
-}
-
-int16_t arq_int16_t(Arq_Queue *queue) {
-        Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_INT16_T);
-        return t.value.i16;
-}
-
 int32_t arq_int32_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_INT32_T);
@@ -107,20 +83,6 @@ char const *arq_cstr_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_OPT_CSTR_T);
         return t.value.cstr;
-}
-
-void arq_push_uint8_t(Arq_Queue *queue, uint8_t n) {
-        Arq_Argument a;
-        a.type_id = ARQ_OPT_UINT8_T;
-        a.value.u8 = n;
-        push(queue, &a);
-}
-
-void arq_push_uint16_t(Arq_Queue *queue, uint16_t n) {
-        Arq_Argument a;
-        a.type_id = ARQ_OPT_UINT16_T;
-        a.value.u16 = n;
-        push(queue, &a);
 }
 
 void arq_push_uint32_t(Arq_Queue *queue, uint32_t n) {
@@ -146,20 +108,6 @@ void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {
         push(queue, &a);
 }
 #endif
-
-void arq_push_int8_t(Arq_Queue *queue, int8_t n) {
-        Arq_Argument a;
-        a.type_id = ARQ_OPT_INT8_T;
-        a.value.i8 = n;
-        push(queue, &a);
-}
-
-void arq_push_int16_t(Arq_Queue *queue, int16_t n) {
-        Arq_Argument a;
-        a.type_id = ARQ_OPT_INT16_T;
-        a.value.i16 = n;
-        push(queue, &a);
-}
 
 void arq_push_int32_t(Arq_Queue *queue, int32_t n) {
         Arq_Argument a;

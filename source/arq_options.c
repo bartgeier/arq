@@ -15,12 +15,8 @@ typedef struct {
 static KeyWord const key_words[] = {
         {  ARQ_OPT_NULL,     "NULL" },
         {  ARQ_OPT_CSTR_T,   "cstr_t" },
-        {  ARQ_OPT_UINT8_T,  "uint8_t" },
-        {  ARQ_OPT_UINT16_T, "uint16_t" },
         {  ARQ_OPT_UINT32_T, "uint32_t" },
         {  ARQ_OPT_UINT64_T, "uint64_t" },
-        {  ARQ_OPT_INT8_T,   "int8_t" },
-        {  ARQ_OPT_INT16_T,  "int16_t" },
         {  ARQ_OPT_INT32_T,  "int32_t" },
         {  ARQ_OPT_INT64_T,  "int64_t" },
         {  ARQ_OPT_FLOAT,    "float" },
@@ -339,54 +335,6 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                        if (arq_imm_type(tokens, ARQ_OPT_UINT8_T)) {
-                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                if (arq_imm_not_identifier(tokens)) {
-                                        error_str = "' is not a parameter name\n";
-                                        break; /* error */
-
-                                }
-                                if (arq_imm_equal(tokens)) {
-                                        if (false == arq_imm_is_a_uint8_t(tokens)) {
-                                                error_str = "' is not a uint8_t\n";
-                                                break; /* error */
-                                        }
-                                        error_str = "' but expected ',' or ')'\n";
-                                } else if (arq_imm_array(tokens)) {
-                                        error_str = "' but expected ',' or ')'\n";
-                                }
-                                if (arq_imm_comma(tokens)) {
-                                        continue;
-                                }
-                                goto next_argument;
-                        }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                        if (arq_imm_type(tokens, ARQ_OPT_UINT16_T)) {
-                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                if (arq_imm_not_identifier(tokens)) {
-                                        error_str = "' is not a parameter name\n";
-                                        break; /* error */
-
-                                }
-                                if (arq_imm_equal(tokens)) {
-                                        if (false == arq_imm_is_a_uint16_t(tokens)) {
-                                                error_str = "' is not a uint16_t\n";
-                                                break; /* error */
-                                        }
-                                        error_str = "' but expected ',' or ')'\n";
-                                } else if (arq_imm_array(tokens)) {
-                                        error_str = "' but expected ',' or ')'\n";
-                                }
-                                if (arq_imm_comma(tokens)) {
-                                        continue;
-                                }
-                                goto next_argument;
-                        }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
                         if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
                                 error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                 if (arq_imm_not_identifier(tokens)) {
@@ -397,54 +345,6 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                                 if (arq_imm_equal(tokens)) {
                                         if (false == arq_imm_is_a_uint32_t(tokens)) {
                                                 error_str = "' is not a uint32_t\n";
-                                                break; /* error */
-                                        }
-                                        error_str = "' but expected ',' or ')'\n";
-                                } else if (arq_imm_array(tokens)) {
-                                        error_str = "' but expected ',' or ')'\n";
-                                }
-                                if (arq_imm_comma(tokens)) {
-                                        continue;
-                                }
-                                goto next_argument;
-                        }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                        if (arq_imm_type(tokens, ARQ_OPT_INT8_T)) {
-                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                if (arq_imm_not_identifier(tokens)) {
-                                        error_str = "' is not a parameter name\n";
-                                        break; /* error */
-
-                                }
-                                if (arq_imm_equal(tokens)) {
-                                        if (false == arq_imm_is_a_int8_t(tokens)) {
-                                                error_str = "' is not a int8_t\n";
-                                                break; /* error */
-                                        }
-                                        error_str = "' but expected ',' or ')'\n";
-                                } else if (arq_imm_array(tokens)) {
-                                        error_str = "' but expected ',' or ')'\n";
-                                }
-                                if (arq_imm_comma(tokens)) {
-                                        continue;
-                                }
-                                goto next_argument;
-                        }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                        if (arq_imm_type(tokens, ARQ_OPT_INT16_T)) {
-                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                if (arq_imm_not_identifier(tokens)) {
-                                        error_str = "' is not a parameter name\n";
-                                        break; /* error */
-
-                                }
-                                if (arq_imm_equal(tokens)) {
-                                        if (false == arq_imm_is_a_int16_t(tokens)) {
-                                                error_str = "' is not a int16_t\n";
                                                 break; /* error */
                                         }
                                         error_str = "' but expected ',' or ')'\n";

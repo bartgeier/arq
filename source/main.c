@@ -31,45 +31,9 @@ void fn_nstring(Arq_Queue *queue) {
         }
 }
 
-void fn_uint8(Arq_Queue *queue) {
-        uint32_t const array_size = arq_array_size(queue);
-        uint32_t i;
-        printf("    numbers array_size: %d\n", array_size);
-        for (i = 0; i < array_size; i++) {
-                printf("        argument[%d]: %d\n", i, arq_uint8_t(queue));
-        }
-}
-
-void fn_uint16(Arq_Queue *queue) {
-        uint32_t const array_size = arq_array_size(queue);
-        uint32_t i;
-        printf("    numbers array_size: %d\n", array_size);
-        for (i = 0; i < array_size; i++) {
-                printf("        argument[%d]: %d\n", i, arq_uint16_t(queue));
-        }
-}
-
 void fn_uint32(Arq_Queue *queue) {
         uint32_t number = arq_uint32_t(queue);
         printf("fn_uint32 number = %u\n", number);
-}
-
-void fn_int8(Arq_Queue *queue) {
-        uint32_t const array_size = arq_array_size(queue);
-        uint32_t i;
-        printf("    numbers array_size: %u\n", array_size);
-        for (i = 0; i < array_size; i++) {
-                printf("        argument[%d]: %d\n", i, arq_int8_t(queue));
-        }
-}
-
-void fn_int16(Arq_Queue *queue) {
-        uint32_t const array_size = arq_array_size(queue);
-        uint32_t i;
-        printf("    numbers array_size: %u\n", array_size);
-        for (i = 0; i < array_size; i++) {
-                printf("        argument[%d]: %d\n", i, arq_int16_t(queue));
-        }
 }
 
 void fn_int32(Arq_Queue *queue) {
@@ -122,12 +86,7 @@ int main(int argc, char **argv) {
                 {'s', "string",  fn_string,  "(cstr_t str)"},
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
 
-                {'u', "uint8",   fn_uint8,   "(uint8_t number[])"},
-                {'u', "uint16",  fn_uint16,  "(uint16_t number[])"},
                 {'u', "uint32",  fn_uint32,  "(uint32_t number = 324)"},
-
-                {'u', "int8",    fn_int8,    "(int8_t number[])"},
-                {'i', "int16",   fn_int16,   "(int16_t number[])"}, 
                 {'i', "int32",   fn_int32,   "(int32_t number = -56)"}, 
 
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},

@@ -33,14 +33,14 @@ TEST(arq_queue, push_and_pop) {
         Arq_Queue *queue = arq_queue_malloc(arena);
         EXPECT_EQ(queue->read_idx, (uint32_t)0);
         EXPECT_EQ(queue->read_idx, queue->write_idx);
-        arq_push_uint8_t(queue, (uint8_t)69);
-        EXPECT_EQ(arq_uint8_t(queue), 69);
+        arq_push_uint32_t(queue, (uint32_t)69);
+        EXPECT_EQ(arq_uint32_t(queue), (uint32_t)69);
 
-        arq_push_uint8_t(queue, (uint8_t)1);
-        arq_push_uint8_t(queue, (uint8_t)2);
-        EXPECT_EQ(arq_uint8_t(queue), 1);
-        arq_push_uint8_t(queue, (uint8_t)3);
-        EXPECT_EQ(arq_uint8_t(queue), 2);
-        EXPECT_EQ(arq_uint8_t(queue), 3);
+        arq_push_uint32_t(queue, (uint32_t)1);
+        arq_push_uint32_t(queue, (uint32_t)2);
+        EXPECT_EQ(arq_uint32_t(queue), (uint32_t)1);
+        arq_push_uint32_t(queue, (uint32_t)3);
+        EXPECT_EQ(arq_uint32_t(queue), (uint32_t)2);
+        EXPECT_EQ(arq_uint32_t(queue), (uint32_t)3);
         EXPECT_EQ(queue->read_idx, queue->write_idx);
 }

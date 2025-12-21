@@ -28,13 +28,9 @@
         X(ARQ_OPT_NULL)                          \
         /* option types */                       \
         X(ARQ_OPT_CSTR_T)                        \
-        X(ARQ_OPT_UINT8_T)                       \
-        X(ARQ_OPT_UINT16_T)                      \
         X(ARQ_OPT_UINT32_T)                      \
         X(ARQ_OPT_ARRAY_SIZE_T)                  \
         X(ARQ_OPT_UINT64_T)                      \
-        X(ARQ_OPT_INT8_T)                        \
-        X(ARQ_OPT_INT16_T)                       \
         X(ARQ_OPT_INT32_T)                       \
         X(ARQ_OPT_INT64_T)                       \
         X(ARQ_OPT_FLOAT)                         \
