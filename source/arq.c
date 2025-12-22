@@ -139,6 +139,19 @@ static void call_back_function(Arq_Option const *options, Arq_List const *option
         arq_queue_clear(queue);
 }
 
+static uint32_t arq_option_parameter_idx(Arq_Option const *option) {
+        uint32_t STRLEN;
+        uint32_t result = 0;
+        if (option->chr != 0) {
+                result += 3;
+        }
+        STRLEN = strlen(option->name);
+        if (STRLEN > 0) {
+                result += STRLEN + 3;
+        }
+        return result;
+}
+
 static uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         char const *error_str = "' missing open parenthesis '('\n";
         tokens->idx = 0;
