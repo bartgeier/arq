@@ -3,7 +3,7 @@
 
 #include "arq.h"
 #include "arq_arena.h"
-#include "arq_symbols.h"
+#include "arq_token.h"
 #include "arq_int.h"
 
 typedef struct {

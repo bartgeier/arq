@@ -16,9 +16,7 @@ static KeyWord const key_words[] = {
         {  ARQ_OPT_NULL,     "NULL" },
         {  ARQ_OPT_CSTR_T,   "cstr_t" },
         {  ARQ_OPT_UINT32_T, "uint32_t" },
-        {  ARQ_OPT_UINT64_T, "uint64_t" },
         {  ARQ_OPT_INT32_T,  "int32_t" },
-        {  ARQ_OPT_INT64_T,  "int64_t" },
         {  ARQ_OPT_FLOAT,    "float" },
 };
 
@@ -327,6 +325,7 @@ uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         return result;
 }
 
+#if 0
 uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
         char const *error_str = "' missing open parenthesis '('\n";
         tokens->idx = 0;
@@ -460,7 +459,7 @@ uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
                 return idx;
         }
 }
-
+#endif
 
 void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t const NUM_OF_TOKEN) {
         Lexer l;

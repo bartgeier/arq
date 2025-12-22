@@ -1,5 +1,4 @@
 #include "arq_msg.h"
-#include "arq_symbols.h"
 #include <assert.h>
 #include <string.h>
 

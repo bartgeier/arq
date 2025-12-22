@@ -2,8 +2,6 @@
 #define ARQ_IMMEDIATE_H
 
 #include "arq.h"
-#include "arq_symbols.h"
-#include "arq_token.h"
 #include "arq_conversion.h"
 #include "arq_bool.h"
 

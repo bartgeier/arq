@@ -1,4 +1,4 @@
-#include "arq_symbols.h"
+#include "arq_token.h"
 
 
 #define X(name) #name,

@@ -1,9 +1,6 @@
-#include "arq_symbols.h"
 #include "arq_options.h"
 #include "arq_queue.h"
 #include "arq_cmd.h"
-#include "arq_token.h"
-#include "arq_conversion.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
 #include "arq_bool.h"
@@ -140,6 +137,140 @@ static void call_back_function(Arq_Option const *options, Arq_List const *option
         option->fn(queue);
         assert(queue->read_idx == queue->write_idx && "Queue is not empty, there are still arguments in the queue!");
         arq_queue_clear(queue);
+}
+
+static uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {
+        char const *error_str = "' missing open parenthesis '('\n";
+        tokens->idx = 0;
+        if (arq_imm_L_parenthesis(tokens)) {
+                while (tokens->idx < tokens->num_of_token) {
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_UINT32_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_uint32_t(tokens)) {
+                                                error_str = "' is not a uint32_t\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_INT32_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_int32_t(tokens)) {
+                                                error_str = "' is not a int32_t\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_FLOAT)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_float(tokens)) {
+                                                error_str = "' is not a float\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        }
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        if (arq_imm_type(tokens, ARQ_OPT_CSTR_T)) {
+                                error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                if (arq_imm_not_identifier(tokens)) {
+                                        error_str = "' is not a parameter name\n";
+                                        break; /* error */
+
+                                }
+                                if (arq_imm_equal(tokens)) {
+                                        if (false == arq_imm_is_a_NULL(tokens)) {
+                                                error_str =  "' must be NULL\n";
+                                                break; /* error */
+                                        }
+                                        error_str = "' but expected ',' or ')'\n";
+                                } else if (arq_imm_array(tokens)) {
+                                        error_str = "' but expected ',' or ')'\n";
+                                }
+                                if (arq_imm_comma(tokens)) {
+                                        continue;
+                                }
+                                goto next_argument;
+                        } 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                        error_str = "' is not a type\n";
+        next_argument:
+                        if (arq_imm_R_parenthesis(tokens)) {
+                                error_str = "' after ')' no tokens allowed!\n";
+                                if (arq_imm_terminator(tokens)) {
+                                        uint32_to idx;
+                                        idx.error = false;
+                                        idx.u32 = 0;
+                                        return idx;
+                                } 
+                        }
+                        break; /* error */
+                } /* while */
+        }
+
+        {
+                /* error */
+                Arq_Token token = tokens->at[tokens->idx];
+                uint32_to idx; 
+                idx.error = true; 
+                idx.u32 = tokens->at[tokens->idx].at - tokens->at[0].at;
+                arq_msg_clear(error_msg);
+                arq_msg_append_cstr(error_msg, "Option failure:\n");
+                arq_msg_append_cstr(error_msg, "token '");
+                arq_msg_append_str(error_msg, token.at, token.size);
+                arq_msg_append_cstr(error_msg, error_str);
+                return idx;
+        }
 }
 
 uint32_t arq_fn(

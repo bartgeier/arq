@@ -1,6 +1,7 @@
 #ifndef ARQ_SYMBOLS_H
 #define ARQ_SYMBOLS_H
 
+#if 0
 #define ARQ_LIST_OF_IDS                          \
                                                  \
         /* helper to control option tokenizer */ \
@@ -30,9 +31,7 @@
         X(ARQ_OPT_CSTR_T)                        \
         X(ARQ_OPT_UINT32_T)                      \
         X(ARQ_OPT_ARRAY_SIZE_T)                  \
-        X(ARQ_OPT_UINT64_T)                      \
         X(ARQ_OPT_INT32_T)                       \
-        X(ARQ_OPT_INT64_T)                       \
         X(ARQ_OPT_FLOAT)                         \
                                                  \
         /* command line tokens */                \
@@ -49,5 +48,6 @@ typedef enum {
 #undef X
 
 extern char const *symbol_names[];
+#endif
 
 #endif
