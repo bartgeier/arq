@@ -106,6 +106,87 @@ TEST(arq, no_parameter) {
         }
 }
 
+int pos;
+void fn_bundeling_first(Arq_Queue *queue) {
+        (void) queue;
+        pos = 0;
+        pos += sprintf(result + pos, "version ");
+}
+void fn_bundeling(Arq_Queue *queue) {
+        (void) queue;
+        pos += sprintf(result + pos, "recursion ");
+}
+void fn_bundeling_number(Arq_Queue *queue) {
+        (void) queue;
+        pos += sprintf(result + pos, "number %u\n", arq_uint32_t(queue));
+}
+void fn_bundeling_string(Arq_Queue *queue) {
+        (void) queue;
+        pos += sprintf(result + pos, "string %s\n", arq_cstr_t(queue));
+}
+TEST(arq, short_option_bundeling) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'v', "version",   fn_bundeling_first, "()"},
+                {'r', "recursion", fn_bundeling, "()"},
+                {'n', "number",    fn_bundeling_number, "(uint32_t number)"},
+                {'s', "string",    fn_bundeling_string, "(cstr_t string)"},
+                {'o', "optional",  fn_bundeling_number, "(uint32_t number = 42)"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                set(&cmd, "arq", "-vovnr");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                       "CMD line failure:\n"
+                                       "    -v o v n r \n"
+                                       "    Token 'r' is not a positiv number\n"
+                                       "    -n --number (uint32_t number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                set(&cmd, "arq", "-vorn", "69");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version number 42\nrecursion number 69\n"));
+        }
+        {
+                set(&cmd, "arq", "-vrn", "69");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version recursion number 69\n"));
+        }
+        {
+                set(&cmd, "arq", "-vrn8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version recursion number 8\n"));
+        }
+        {
+                set(&cmd, "arq", "-vrs", "hello!");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version recursion string hello!\n"));
+        }
+        {
+                set(&cmd, "arq", "-vrshello!");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version recursion string hello!\n"));
+        }
+}
+
 void fn_number32(Arq_Queue *queue) {
         uint32_t x = arq_uint32_t(queue);
         sprintf(result, "fn_number32 %u", x);

@@ -135,6 +135,7 @@ static bool start_dash_dash(Lexer *l) {
         return false;
 }
 
+#if 0
 static Arq_Token next_token(Lexer *l, bool const bundling) {
         Arq_Token t = {0};
         t.at = &l->at[l->cursor_idx];
@@ -292,7 +293,135 @@ static Arq_Token next_token(Lexer *l, bool const bundling) {
         set_token_RAW_STR(&t ,l);
         return t;
 }
+#else
+static Arq_Token next_token(Lexer *l) {
+        Arq_Token t = {0};
+        t.at = &l->at[l->cursor_idx];
 
+        if (hex_start(l)) {
+                t.id = ARQ_HEX;
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
+                        t.id = ARQ_CMD_RAW_STR;
+                        l->cursor_idx++;
+                        t.size++;
+                        while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                        }
+                        if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
+                                if (p_dec_start(l) || n_dec_start(l)) {
+                                        t.id = ARQ_HEX_FLOAT; 
+                                        t.size = &l->at[l->cursor_idx] - t.at;
+                                        while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                                l->cursor_idx++;
+                                                t.size++;
+                                        }
+                                        if (l->cursor_idx == l->SIZE) { return t; }
+                                }
+                        } 
+                } else if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
+                        t.id = ARQ_CMD_RAW_STR;
+                        l->cursor_idx++;
+                        t.size++;
+                        if (p_dec_start(l) || n_dec_start(l)) {
+                                t.id = ARQ_HEX_FLOAT; 
+                                t.size = &l->at[l->cursor_idx] - t.at;
+                                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                                        l->cursor_idx++;
+                                        t.size++;
+                                }
+                                if (l->cursor_idx == l->SIZE) { return t; }
+                        }
+                } else { 
+                        if (l->cursor_idx == l->SIZE) { return t; }
+                }
+        }
+
+        if (l->at[l->cursor_idx] ==  '.') {
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
+        }
+
+
+        if (p_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_P_DEC: 
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
+        }
+
+        if (n_dec_start(l)) {
+                t.id = ARQ_P_DEC; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && isdigit(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                dec_float(l, &t);
+                switch (t.id) {
+                case ARQ_DEC_FLOAT:
+                case ARQ_P_DEC: 
+                        if (l->cursor_idx == l->SIZE) {
+                                return t;
+                        }
+                default: break;
+                }; 
+        }
+
+        if (start_short_identifier(l)) {
+                t.id = ARQ_CMD_SHORT_OPTION; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                return t;
+        }
+
+        if (start_long_identifier(l)) {
+                t.id = ARQ_CMD_LONG_OPTION;
+                t.size = &l->at[l->cursor_idx] - t.at;
+                while (l->cursor_idx < l->SIZE && is_long_identifier(l->at[l->cursor_idx])) {
+                        l->cursor_idx++;
+                        t.size++;
+                }
+                if (l->cursor_idx == l->SIZE) {
+                        return t;
+                }
+        }
+
+        if (start_dash_dash(l)) {
+                t.id = ARQ_CMD_DASHDASH; 
+                t.size = &l->at[l->cursor_idx] - t.at;
+                return t;
+        }
+
+        set_token_RAW_STR(&t ,l);
+        return t;
+}
+#endif
+
+#if 0
 void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
         bool bundling = false;
         int i;
@@ -332,4 +461,48 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
                 v->at[v->num_of_token++] = t;
         }
 }
+#else
+void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
+        int i;
+        assert(argc >= 1);
+        argv += 1;
+        argc -= 1;
+        v->num_of_token = 0;
+        v->idx = 0;
+        for (i = 0; i < argc; i++) {
+                Lexer lexer;
+                lexer.SIZE = strlen(argv[i]);
+                lexer.cursor_idx = 0;
+                lexer.at = argv[i];
+                assert( v->num_of_token < num_of_token);
+                v->at[v->num_of_token++] = next_token(&lexer);
+                while (lexer.cursor_idx < lexer.SIZE) { 
+                        /* bundled optons, Option clustering */
+                        lexer.SIZE -= lexer.cursor_idx;
+                        lexer.at = &lexer.at[lexer.cursor_idx];
+                        lexer.cursor_idx = 0;
+                        if (is_short_identifier(lexer.at[lexer.cursor_idx])) {
+                                Arq_Token t = {0};
+                                t.at = &lexer.at[lexer.cursor_idx];
+                                t.id = ARQ_CMD_SHORT_OPTION; 
+                                t.size = 1;
+                                lexer.cursor_idx++;
+                                assert(v->num_of_token < num_of_token);
+                                v->at[v->num_of_token++] = t;
+                        } else {
+                                assert( v->num_of_token < num_of_token);
+                                v->at[v->num_of_token++] = next_token(&lexer);
+                        }
+                }
+        }
+        {
+                Arq_Token t;
+                t.id = ARQ_CMD_END_OF_LINE;
+                t.size = 0;
+                t.at = NULL;
+                assert(v->num_of_token < num_of_token);
+                v->at[v->num_of_token++] = t;
+        }
+}
+#endif
 
