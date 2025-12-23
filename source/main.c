@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
 
                 {'u', "uint32",  fn_uint32,  "(uint32_t number = 324)"},
+                {'U', "UU",      fn_uint32,  "(uint32_t number)"}, 
                 {'i', "int32",   fn_int32,   "(int32_t number = -56)"}, 
 
                 {'p', "print",   fn_print,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},

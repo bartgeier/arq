@@ -1,6 +1,5 @@
 #include "arq_options.h"
 #include "arq_queue.h"
-#include "arq_cmd.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
 #include "arq_bool.h"
