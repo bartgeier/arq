@@ -3,6 +3,7 @@
 #include "arq_immediate.h"
 #include "arq_log.h"
 #include "arq_bool.h"
+#include "arq_token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -149,6 +150,109 @@ static uint32_t arq_option_parameter_idx(Arq_Option const *option) {
                 result += STRLEN + 3;
         }
         return result;
+}
+
+uint32_t arq_verify(
+        char *arena_buffer, uint32_t const buffer_size,
+        Arq_Option const *options, uint32_t const num_of_options
+) {
+#if 1
+        Arq_msg error_msg;
+        char const *error_str = "' missing open parenthesis '('\n";
+        uint32_t i;
+        Arq_Arena *arena;
+        (void) buffer_size;
+
+        log_memory(("Buffer capacity %d byte", buffer_size));
+        arena = arq_arena_init(arena_buffer, buffer_size);
+        log_memory(("Arena head %d byte, capacity %d byte,                arena.size = %4d byte", 
+                (int)offsetof(Arq_Arena,at),
+                arena->SIZE, 
+                arena->size
+        ));
+
+        {
+                uint32_t SIZE_OF_ERROR_MSG;
+                uint32_t const shrink = arena->size;
+                char *chr = (char *)arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
+                arena->size = shrink;
+                error_msg.SIZE = SIZE_OF_ERROR_MSG;
+                error_msg.size = 0;
+                error_msg.at = chr;
+        }
+
+        for (i = 0; i < num_of_options; i++) {
+                Arq_Token t;
+                Lexer l = {0};
+                l.at = options[i].arguments;
+                l.SIZE = strlen(options[i].arguments);
+                l.cursor_idx = 0;
+                t = arq_next_opt_token(&l);
+                if (arq_imm_L_parenthesis_t(&l, &t)) {
+                        do {
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                                if (arq_imm_type_t(&l, &t, ARQ_OPT_UINT32_T)) {
+                                        error_str = "' but expected '=' or '[]' or ',' or ')'\n";
+                                        if (arq_imm_not_identifier_t(&l, &t)) {
+                                                error_str = "' is not a parameter name\n";
+                                                break; /* error */
+
+                                        }
+                                        if (arq_imm_equal_t(&l, &t)) {
+                                                if (false == arq_imm_is_a_uint32_t_t(&l, &t)) {
+                                                        error_str = "' is not a uint32_t\n";
+                                                        break; /* error */
+                                                }
+                                                error_str = "' but expected ',' or ')'\n";
+                                        } else if (arq_imm_array_t(&l, &t)) {
+                                                error_str = "' but expected ',' or ')'\n";
+                                        }
+                                        if (arq_imm_comma_t(&l, &t)) {
+                                                continue;
+                                        }
+                                        goto next_argument;
+                                }
+                                hier gehts weiter
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+                                error_str = "' is not a type\n";
+                        next_argument:
+                                if (arq_imm_R_parenthesis_t(&l, &t)) {
+                                        error_str = "' after ')' no tokens allowed!\n";
+                                        if (arq_imm_noToken(&t)) {
+                                                return 0;
+                                        } 
+                                }
+                                break; /* error */
+                        } while (t.id != ARQ_OPT_NO_TOKEN);
+                }
+                {
+                        /* error */
+                        uint32_t n;
+                        uint32_to ups; 
+                        ups.error = true; 
+                        ups.u32 = l.cursor_idx - t.size;
+                        arq_msg_clear(&error_msg);
+                        arq_msg_append_cstr(&error_msg, "Option failure:\n");
+                        arq_msg_append_cstr(&error_msg, "token '");
+                        arq_msg_append_str(&error_msg, t.at, t.size);
+                        arq_msg_append_cstr(&error_msg, error_str);
+
+                        n = arq_option_parameter_idx(&options[i]) + ups.u32;
+                        error_msg_append_option(&error_msg, &options[i]);
+                        arq_msg_append_nchr(&error_msg, ' ', n);
+                        arq_msg_append_cstr(&error_msg, "^\n");
+                        output_option_verify_failure(&error_msg, arena_buffer);
+                        return error_msg.size;
+                }
+
+        } /* for loop */
+        assert(false);
+        return 0;
+#endif
 }
 
 static uint32_to arq_option_verify_vector(Arq_OptVector *tokens, Arq_msg *error_msg) {

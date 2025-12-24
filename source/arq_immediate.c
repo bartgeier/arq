@@ -1,4 +1,6 @@
 #include "arq_immediate.h"
+#include "arq_options.h"
+#include "arq_token.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <assert.h>
@@ -21,11 +23,26 @@ bool arq_imm_type(Arq_OptVector *opt, Arq_SymbolID const id) {
         return b;
 }
 
+bool arq_imm_type_t(Lexer *lexer, Arq_Token *token, Arq_SymbolID const id) {
+        const bool b = (token->id == id);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
+        }
+        return b;
+}
+
 bool arq_imm_equal(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_EQ);
         if (b) {
                 arq_imm_opt_next(opt);
+        }
+        return b;
+}
+bool arq_imm_equal_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_EQ);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
         }
         return b;
 }
@@ -38,12 +55,26 @@ bool arq_imm_array(Arq_OptVector *opt) {
         }
         return b;
 }
+bool arq_imm_array_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_ARRAY);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
+        }
+        return b;
+}
 
 bool arq_imm_comma(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_COMMA);
         if (b) {
                 arq_imm_opt_next(opt);
+        }
+        return b;
+}
+bool arq_imm_comma_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_COMMA);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
         }
         return b;
 }
@@ -56,6 +87,13 @@ bool arq_imm_L_parenthesis(Arq_OptVector *opt) {
         }
         return b;
 }
+bool arq_imm_L_parenthesis_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_L_PARENTHESIS);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
+        }
+        return b;
+}
 
 bool arq_imm_R_parenthesis(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
@@ -65,10 +103,21 @@ bool arq_imm_R_parenthesis(Arq_OptVector *opt) {
         }
         return b;
 }
+bool arq_imm_R_parenthesis_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_R_PARENTHESIS);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
+        }
+        return b;
+}
 
 bool arq_imm_terminator(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         const bool b = (token->id == ARQ_OPT_TERMINATOR);
+        return b;
+}
+bool arq_imm_noToken(Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_NO_TOKEN);
         return b;
 }
 
@@ -80,45 +129,12 @@ bool arq_imm_not_identifier(Arq_OptVector *opt) {
         }
         return !b;
 }
-
-bool arq_imm_is_a_uint8_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        uint8_to num;
-        switch (token->id) {
-        case ARQ_P_DEC:
-                num = arq_tok_pDec_to_uint8_t(token, NULL, "");
-                break;
-        case ARQ_HEX:
-                num = arq_tok_hex_to_uint8_t(token, NULL, "");
-                break;
-        default:
-                return false;
+bool arq_imm_not_identifier_t(Lexer *lexer, Arq_Token *token) {
+        const bool b = (token->id == ARQ_OPT_IDENTFIER);
+        if (b) {
+                *token = arq_next_opt_token(lexer);
         }
-        if (!num.error) {
-                /* success */
-                arq_imm_opt_next(opt);
-        }
-        return !num.error; /* return true if successful */
-}
-
-bool arq_imm_is_a_uint16_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        uint16_to num;
-        switch (token->id) {
-        case ARQ_P_DEC:
-                num = arq_tok_pDec_to_uint16_t(token, NULL, "");
-                break;
-        case ARQ_HEX:
-                num = arq_tok_hex_to_uint16_t(token, NULL, "");
-                break;
-        default:
-                return false;
-        }
-        if (!num.error) {
-                /* success */
-                arq_imm_opt_next(opt);
-        }
-        return !num.error; /* return true if successful */
+        return !b;
 }
 
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt) {
@@ -140,47 +156,21 @@ bool arq_imm_is_a_uint32_t(Arq_OptVector *opt) {
         }
         return !num.error; /* return true if successful */
 }
-
-bool arq_imm_is_a_int8_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        int8_to num;
+bool arq_imm_is_a_uint32_t_t(Lexer *lexer, Arq_Token *token) {
+        uint32_to num;
         switch (token->id) {
-        case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int8_t(token, NULL, "");
+        case ARQ_P_DEC:
+                num = arq_tok_pDec_to_uint32_t(token, NULL, "");
                 break;
-        case ARQ_HEX: {
-                uint8_to const n = arq_tok_hex_to_uint8_t(token, NULL, "");
-                num.i8 = (int8_t)n.u8;
-                num.error = n.error;
-                } break;
+        case ARQ_HEX:
+                num = arq_tok_hex_to_uint32_t(token, NULL, "");
+                break;
         default:
                 return false;
         }
         if (!num.error) {
                 /* success */
-                arq_imm_opt_next(opt);
-        }
-        return !num.error; /* return true if successful */
-}
-
-bool arq_imm_is_a_int16_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        int16_to num;
-        switch (token->id) {
-        case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int16_t(token, NULL, "");
-                break;
-        case ARQ_HEX: {
-                uint16_to const n = arq_tok_hex_to_uint16_t(token, NULL, "");
-                num.i16 = (int16_t)n.u16;
-                num.error = n.error;
-                } break;
-        default:
-                return false;
-        }
-        if (!num.error) {
-                /* success */
-                arq_imm_opt_next(opt);
+                *token = arq_next_opt_token(lexer);
         }
         return !num.error; /* return true if successful */
 }
@@ -227,44 +217,6 @@ bool arq_imm_is_a_float(Arq_OptVector *opt) {
         return !num.error; /* return true if successful */
 }
 
-uint8_to arq_imm_default_uint8_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        uint8_to num = {0};
-        switch (token->id) {
-        case ARQ_P_DEC: 
-                num = arq_tok_pDec_to_uint8_t(token, NULL, "");
-                break;
-        case ARQ_HEX:
-                num = arq_tok_hex_to_uint8_t(token, NULL, "");
-                break;
-        default:
-                assert(false);
-                break;
-        }
-        assert(num.error == false);
-        arq_imm_opt_next(opt);
-        return num;
-}
-
-uint16_to arq_imm_default_uint16_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        uint16_to num = {0};
-        switch (token->id) {
-        case ARQ_P_DEC: 
-                num = arq_tok_pDec_to_uint16_t(token, NULL, "");
-                break;
-        case ARQ_HEX:
-                num = arq_tok_hex_to_uint16_t(token, NULL, "");
-                break;
-        default:
-                assert(false);
-                break;
-        }
-        assert(num.error == false);
-        arq_imm_opt_next(opt);
-        return num;
-}
-
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
         uint32_to num = {0};
@@ -275,48 +227,6 @@ uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
         case ARQ_HEX:
                 num = arq_tok_hex_to_uint32_t(token, NULL, "");
                 break;
-        default:
-                assert(false);
-                break;
-        }
-        assert(num.error == false);
-        arq_imm_opt_next(opt);
-        return num;
-}
-
-int8_to arq_imm_default_int8_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        int8_to num = {0};
-        switch (token->id) {
-        case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int8_t(token, NULL, "");
-                break;
-        case ARQ_HEX: {
-                uint8_to const x = arq_tok_hex_to_uint8_t(token, NULL, "");
-                num.i8 = (int8_t)x.u8;
-                num.error = x.error;
-                } break;
-        default:
-                assert(false);
-                break;
-        }
-        assert(num.error == false);
-        arq_imm_opt_next(opt);
-        return num;
-}
-
-int16_to arq_imm_default_int16_t(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        int16_to num = {0};
-        switch (token->id) {
-        case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int16_t(token, NULL, "");
-                break;
-        case ARQ_HEX: {
-                uint16_to const x = arq_tok_hex_to_uint16_t(token, NULL, "");
-                num.i16 = (int16_t)x.u16;
-                num.error = x.error;
-                } break;
         default:
                 assert(false);
                 break;
@@ -524,44 +434,6 @@ bool arq_imm_end_of_line(Arq_Vector *cmd) {
         return b;
 }
 
-bool arq_imm_optional_argument_uint8_t(Arq_Vector *cmd, uint8_to *num, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        switch (token->id) {
-        case ARQ_P_DEC:
-                *num = arq_tok_pDec_to_uint8_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        case ARQ_HEX:
-                *num = arq_tok_hex_to_uint8_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        default:
-                return false;
-        }
-        if (num->error) {
-                return true; /* overflow */
-        } 
-        arq_imm_cmd_next(cmd);
-        return false;
-}
-
-bool arq_imm_optional_argument_uint16_t(Arq_Vector *cmd, uint16_to *num, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        switch (token->id) {
-        case ARQ_P_DEC:
-                *num = arq_tok_pDec_to_uint16_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        case ARQ_HEX:
-                *num = arq_tok_hex_to_uint16_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        default:
-                return false;
-        }
-        if (num->error) {
-                return true; /* overflow */
-        } 
-        arq_imm_cmd_next(cmd);
-        return false;
-}
-
 bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         switch (token->id) {
@@ -571,50 +443,6 @@ bool arq_imm_optional_argument_uint32_t(Arq_Vector *cmd, uint32_to *num, Arq_msg
         case ARQ_HEX:
                 *num = arq_tok_hex_to_uint32_t(token, error_msg, CMD_LINE_FAILURE);
                 break;
-        default:
-                return false;
-        }
-        if (num->error) {
-                return true; /* overflow */
-        } 
-        arq_imm_cmd_next(cmd);
-        return false;
-}
-
-bool arq_imm_optional_argument_int8_t(Arq_Vector *cmd, int8_to *num, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        switch (token->id) {
-        case ARQ_P_DEC:
-        case ARQ_N_DEC:
-                *num = arq_tok_sDec_to_int8_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        case ARQ_HEX: {
-                uint8_to n = arq_tok_hex_to_uint8_t(token, error_msg, CMD_LINE_FAILURE);
-                num->i8 = (int8_t)n.u8;
-                num->error = n.error;
-                } break;
-        default:
-                return false;
-        }
-        if (num->error) {
-                return true; /* overflow */
-        } 
-        arq_imm_cmd_next(cmd);
-        return false;
-}
-
-bool arq_imm_optional_argument_int16_t(Arq_Vector *cmd, int16_to *num, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        switch (token->id) {
-        case ARQ_P_DEC:
-        case ARQ_N_DEC:
-                *num = arq_tok_sDec_to_int16_t(token, error_msg, CMD_LINE_FAILURE);
-                break;
-        case ARQ_HEX: {
-                uint16_to n = arq_tok_hex_to_uint16_t(token, error_msg, CMD_LINE_FAILURE);
-                num->i16 = (int16_t)n.u16;
-                num->error = n.error;
-                } break;
         default:
                 return false;
         }
@@ -690,60 +518,6 @@ bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr) {
         return false;
 }
 
-uint8_to arq_imm_argument_uint8_t(Arq_Vector *cmd, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        uint8_to result = {0};
-        char const *cstr = CMD_LINE_FAILURE;
-        switch (token->id) {
-        case ARQ_P_DEC:
-                result = arq_tok_pDec_to_uint8_t(token, error_msg, cstr);
-                break;
-        case ARQ_HEX:
-                result = arq_tok_hex_to_uint8_t(token, error_msg, cstr);
-                break;
-        default:
-                if (error_msg != NULL) {
-                        Arq_Token const tok = *token;
-                        arq_msg_append_cstr(error_msg, cstr);
-                        arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, tok.at, tok.size);
-                        arq_msg_append_cstr(error_msg, "' is not a positiv number");
-                        arq_msg_append_lf(error_msg);
-                }
-                result.error = true;
-                return result;
-        }
-        arq_imm_cmd_next(cmd);
-        return result;
-}
-
-uint16_to arq_imm_argument_uint16_t(Arq_Vector *cmd, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        uint16_to result = {0};
-        char const *cstr = CMD_LINE_FAILURE;
-        switch (token->id) {
-        case ARQ_P_DEC:
-                result = arq_tok_pDec_to_uint16_t(token, error_msg, cstr);
-                break;
-        case ARQ_HEX:
-                result = arq_tok_hex_to_uint16_t(token, error_msg, cstr);
-                break;
-        default:
-                if (error_msg != NULL) {
-                        Arq_Token const tok = *token;
-                        arq_msg_append_cstr(error_msg, cstr);
-                        arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, tok.at, tok.size);
-                        arq_msg_append_cstr(error_msg, "' is not a positiv number");
-                        arq_msg_append_lf(error_msg);
-                }
-                result.error = true;
-                return result;
-        }
-        arq_imm_cmd_next(cmd);
-        return result;
-}
-
 uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->at[cmd->idx];
         uint32_to result = {0};
@@ -762,66 +536,6 @@ uint32_to arq_imm_argument_uint32_t(Arq_Vector *cmd, Arq_msg *error_msg) {
                         arq_msg_append_cstr(error_msg, "Token '");
                         arq_msg_append_str(error_msg, tok.at, tok.size);
                         arq_msg_append_cstr(error_msg, "' is not a positiv number");
-                        arq_msg_append_lf(error_msg);
-                }
-                result.error = true;
-                return result;
-        }
-        arq_imm_cmd_next(cmd);
-        return result;
-}
-
-int8_to arq_imm_argument_int8_t(Arq_Vector *cmd, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        int8_to result = {0};
-        char const *cstr = CMD_LINE_FAILURE;
-        switch (token->id) {
-        case ARQ_HEX: {
-                uint8_to const r = arq_tok_hex_to_uint8_t(token, error_msg, cstr);
-                result.i8 = (int8_t) r.u8;
-                result.error = r.error;
-                } break;
-        case ARQ_P_DEC:
-        case ARQ_N_DEC:
-                result = arq_tok_sDec_to_int8_t(token, error_msg, cstr);
-                break;
-        default:
-                if (error_msg != NULL) {
-                        Arq_Token const tok = *token;
-                        arq_msg_append_cstr(error_msg, cstr);
-                        arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, tok.at, tok.size);
-                        arq_msg_append_cstr(error_msg, "' is not a signed number");
-                        arq_msg_append_lf(error_msg);
-                }
-                result.error = true;
-                return result;
-        }
-        arq_imm_cmd_next(cmd);
-        return result;
-}
-
-int16_to arq_imm_argument_int16_t(Arq_Vector *cmd, Arq_msg *error_msg) {
-        Arq_Token const *token = &cmd->at[cmd->idx];
-        int16_to result = {0};
-        char const *cstr = CMD_LINE_FAILURE;
-        switch (token->id) {
-        case ARQ_HEX: {
-                uint16_to const r = arq_tok_hex_to_uint16_t(token, error_msg, cstr);
-                result.i16 = (int16_t) r.u16;
-                result.error = r.error;
-                } break;
-        case ARQ_P_DEC:
-        case ARQ_N_DEC:
-                result = arq_tok_sDec_to_int16_t(token, error_msg, cstr);
-                break;
-        default:
-                if (error_msg != NULL) {
-                        Arq_Token const tok = *token;
-                        arq_msg_append_cstr(error_msg, cstr);
-                        arq_msg_append_cstr(error_msg, "Token '");
-                        arq_msg_append_str(error_msg, tok.at, tok.size);
-                        arq_msg_append_cstr(error_msg, "' is not a signed number");
                         arq_msg_append_lf(error_msg);
                 }
                 result.error = true;

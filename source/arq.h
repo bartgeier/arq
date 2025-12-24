@@ -17,6 +17,11 @@ typedef struct {
 extern "C" {
 #endif
 
+uint32_t arq_verify(
+        char *arena_buffer, uint32_t const buffer_size,
+        Arq_Option const *options, uint32_t const num_of_options
+);
+
 uint32_t arq_fn(
         int argc, char **argv, 
         char *arena_buffer, uint32_t const buffer_size,

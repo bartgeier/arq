@@ -35,12 +35,6 @@ static bool is_identifier(char const chr) {
         return isalnum(chr) || chr == '_';
 }
 
-typedef struct {
-        uint32_t cursor_idx;
-        uint32_t SIZE;
-        char const *at;
-} Lexer;
-
 static bool identifier_start(Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if (isalpha(l->at[idx]) || l->at[idx] == '_') {
@@ -399,6 +393,11 @@ void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t co
                 assert(v->num_of_token < NUM_OF_TOKEN);
                 v->at[v->num_of_token++] = t;
         }
+}
+
+Arq_Token arq_next_opt_token(Lexer *l) {
+        Arq_Token t = next_token(l);
+        return t;
 }
 
 /******************************************************************************/

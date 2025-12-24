@@ -82,7 +82,7 @@ void fn_test(Arq_Queue *queue) {
 
 int main(int argc, char **argv) {
         Arq_Option options[] = {
-                {'v', "version", fn_version, "()"},
+                {'v', "version", fn_version, "(sdf)"},
                 {'s', "string",  fn_string,  "(cstr_t str)"},
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
 
@@ -101,6 +101,15 @@ int main(int argc, char **argv) {
         char buffer[10000];
 
         printf("size of size_t %ld\n", sizeof(size_t));
+        if (0 < arq_verify(
+                buffer, sizeof(buffer),
+                options, sizeof(options)/sizeof(Arq_Option))
+        ) {
+                /* arq_verify returns strlen of error msg */
+                /* print error msg */
+                printf("%s\n", (char *)buffer);
+        }
+#if 1
         if (0 < arq_fn(
                 argc, argv, 
                 buffer, sizeof(buffer),
@@ -110,6 +119,6 @@ int main(int argc, char **argv) {
                 /* print error msg */
                 printf("%s\n", (char *)buffer);
         }
-
+#endif
         return 0;
 }
