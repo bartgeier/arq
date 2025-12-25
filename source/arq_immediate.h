@@ -34,13 +34,16 @@ bool arq_imm_not_identifier_t(Lexer *lexer, Arq_Token *token);
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt); 
 bool arq_imm_is_a_uint32_t_t(Lexer *lexer, Arq_Token *token);
 bool arq_imm_is_a_int32_t(Arq_OptVector *opt);
+bool arq_imm_is_a_int32_t_t(Lexer *lexer, Arq_Token *token);
 bool arq_imm_is_a_float(Arq_OptVector *opt);
+bool arq_imm_is_a_float_t(Lexer *lexer, Arq_Token *token);
 
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt);
 int32_to arq_imm_default_int32_t(Arq_OptVector *opt);
 float_to arq_imm_default_float(Arq_OptVector *opt);
 
 bool arq_imm_is_a_NULL(Arq_OptVector *opt);
+bool arq_imm_is_a_NULL_t(Lexer *lexer, Arq_Token *token);
 char const *arq_imm_default_cstr_t(Arq_OptVector *opt);
 
 /*///////////////////////////////////////////////////////////////////////////*/

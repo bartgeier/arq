@@ -101,6 +101,8 @@ int main(int argc, char **argv) {
         char buffer[10000];
 
         printf("size of size_t %ld\n", sizeof(size_t));
+
+#if 0
         if (0 < arq_verify(
                 buffer, sizeof(buffer),
                 options, sizeof(options)/sizeof(Arq_Option))
@@ -109,6 +111,8 @@ int main(int argc, char **argv) {
                 /* print error msg */
                 printf("%s\n", (char *)buffer);
         }
+#endif
+
 #if 1
         if (0 < arq_fn(
                 argc, argv, 

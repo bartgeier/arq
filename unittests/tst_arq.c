@@ -5,15 +5,46 @@
 
 int strcmp_verbose(const char* s1, const char* s2) {
         int i = 0;
-        printf("%s", s1);
+        putchar('"');
+        for (size_t idx = 0; idx < strlen(s1); idx++) {
+                if (s1[idx] == '\n') {
+                        putchar('\\');
+                        putchar('n');
+                        putchar('"');
+                        putchar('\n');
+                        if (idx + 1 < strlen(s1)) {
+                                putchar('"');
+                        }
+                        continue;
+                }
+                putchar(s1[idx]);
+        }
         // Compare character by character
         while (s1[i] != '\0' && s2[i] != '\0') {
                 if (s1[i] != s2[i]) {
                         printf("--------------\n");
-                        printf("Strings differ at position %d: '%c' vs '%c'\n", i, s1[i], s2[i]);
-                        printf("-------------\n");
-                        for (int idx = 0; idx < i; idx++) {
-                                putchar(s1[idx]);
+                        //printf("Strings differ at position %d: '%c' vs '%c'\n", i, s1[i], s2[i]);
+                        printf("Strings differ at position %d: ", i);
+                        if (s1[i] == '\n') {
+                                putchar('\\');
+                                putchar('n');
+                        } else {
+                                putchar(s1[i]);
+                        }
+                        printf(" vs ");
+                        if (s2[i] == '\n') {
+                                putchar('\\');
+                                putchar('n');
+                        } else {
+                                putchar(s2[i]);
+                        }
+                        printf("\n-------------\n");
+                        for (int idx = 0; idx <= i; idx++) {
+                                if (s2[idx] == '\n') {
+                                        putchar('\\');
+                                        putchar('n');
+                                }
+                                putchar(s2[idx]);
                         }
                         printf("\n-------------\n");
                         return (unsigned char)s1[i] - (unsigned char)s2[i];
@@ -24,10 +55,23 @@ int strcmp_verbose(const char* s1, const char* s2) {
         // If one string is longer
         if (s1[i] != s2[i]) {
                 printf("--------------\n");
-                printf("Strings differ at position %d: '%c' vs '%c'\n", i, s1[i], s2[i]);
-                printf("--------------\n");
+                printf("Strings differ at position %d: ", i);
+                if (s1[i] == '\n') {
+                        putchar('\\');
+                        putchar('n');
+                }
+                printf(" vs ");
+                if (s2[i] == '\n') {
+                        putchar('\\');
+                        putchar('n');
+                }
+                printf("\n--------------\n");
                 for (int idx = 0; idx < i; idx++) {
-                        putchar(s1[idx]);
+                        if (s2[idx] == '\n') {
+                                putchar('\\');
+                                putchar('n');
+                        }
+                        putchar(s2[idx]);
                 }
                 printf("\n--------------\n");
                 return (unsigned char)s1[i] - (unsigned char)s2[i];
@@ -39,6 +83,34 @@ int strcmp_verbose(const char* s1, const char* s2) {
 
 char buffer[10000];
 uint32_t const b_size = sizeof(buffer);
+
+void fn_failure(Arq_Queue *queue) {
+        (void)queue;
+}
+TEST(arq, verify) {
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, ")"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp_verbose(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    token ')' missing open parenthesis '('\n"
+                                        "    -v --version )\n"
+                                        "                 ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+}
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 typedef struct {
         char *argv[50];
@@ -61,12 +133,10 @@ void set_argv_argc(CommandLine *cmd, char const *first, ...) {
 
 char result[10000] = {0};
 
-
 void fn_no_parameter(Arq_Queue *queue) {
         (void) queue;
         sprintf(result, "fn_version");
 }
-
 TEST(arq, no_parameter) {
         result[0] = 0;
         Arq_Option options[] = {

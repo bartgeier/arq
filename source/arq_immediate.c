@@ -196,6 +196,26 @@ bool arq_imm_is_a_int32_t(Arq_OptVector *opt) {
         }
         return !num.error; /* return true if successful */
 }
+bool arq_imm_is_a_int32_t_t(Lexer *lexer, Arq_Token *token) {
+        int32_to num;
+        switch (token->id) {
+        case ARQ_P_DEC: case ARQ_N_DEC:
+                num = arq_tok_sDec_to_int32_t(token, NULL, "");
+                break;
+        case ARQ_HEX: {
+                uint32_to const n = arq_tok_hex_to_uint32_t(token, NULL, "");
+                num.i32 = (int32_t)n.u32;
+                num.error = n.error;
+                } break;
+        default:
+                return false;
+        }
+        if (!num.error) {
+                /* success */
+                *token = arq_next_opt_token(lexer);
+        }
+        return !num.error; /* return true if successful */
+}
 
 bool arq_imm_is_a_float(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
@@ -213,6 +233,24 @@ bool arq_imm_is_a_float(Arq_OptVector *opt) {
         if (!num.error) {
                 /* success */
                 arq_imm_opt_next(opt);
+        }
+        return !num.error; /* return true if successful */
+}
+bool arq_imm_is_a_float_t(Lexer *lexer, Arq_Token *token) {
+        float_to num;
+        switch (token->id) {
+        case ARQ_DEC_FLOAT:
+                num = arq_tok_decFloat_to_float(token);
+                break;
+        case ARQ_HEX_FLOAT:
+                num = arq_tok_hexFloat_to_float(token);
+                break;
+        default:
+                return false;
+        }
+        if (!num.error) {
+                /* success */
+                arq_next_opt_token(lexer);
         }
         return !num.error; /* return true if successful */
 }
@@ -282,6 +320,13 @@ bool arq_imm_is_a_NULL(Arq_OptVector *opt) {
                 return false;
         }
         arq_imm_opt_next(opt);
+        return true;
+}
+bool arq_imm_is_a_NULL_t(Lexer *lexer, Arq_Token *token) {
+        if (token->id != ARQ_OPT_NULL) {
+                return false;
+        }
+        arq_next_opt_token(lexer);
         return true;
 }
 
