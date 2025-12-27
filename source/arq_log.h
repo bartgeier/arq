@@ -16,6 +16,8 @@
         #include "arq_token.h"
         #include "arq_symbols.h"
         #include "arq_int.h"
+        #include "arq_options.h"
+        #include <string.h>
         #include <stdio.h>
         static void log_tokenizer(Arq_Token *t, uint32_t toknr) {
                 uint32_t i;
@@ -27,13 +29,22 @@
                 printf("\n");
         }
 
-        static void log_tokenizer_option(Arq_OptVector *v, uint32_t number) {
-                uint32_t i;
-                printf("Option token %d:\n", number);
-                for (i = 0; i < v->num_of_token; i++) {
-                        log_tokenizer(&v->at[i], i);
+        static void log_tokenizer_option_t(Arq_Option const *options, uint32_t const num_of_options) {
+                uint32_t n;
+                for (n = 0; n < num_of_options; n++) {
+                        uint32_t i = 0;
+                        Arq_Token t;
+                        Lexer l = {0};
+                        l.at = options[n].arguments;
+                        l.SIZE = strlen(options[n].arguments);
+                        l.cursor_idx = 0;
+                        printf("Option[%d] -%c --%s %s\n", n, options[n].chr, options[n].name, options[n].arguments);
+                        do {
+                                t = arq_next_opt_token(&l);
+                                log_tokenizer(&t, i++);
+                        } while (t.id != ARQ_OPT_NO_TOKEN);
+                        printf("\n");
                 }
-                printf("\n");
         }
 
         static void log_tokenizer_cmd_line(Arq_Vector *v)  {
@@ -47,6 +58,7 @@
 #else
         #define log_tokenizer(t) ((void)0)
         #define log_tokenizer_option(v, number) ((void)0)
+        #define log_tokenizer_option_t(o, n) ((void)0)
         #define log_tokenizer_cmd_line(v) ((void)0)
 #endif
 

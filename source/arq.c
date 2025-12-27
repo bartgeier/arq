@@ -422,11 +422,17 @@ uint32_t arq_fn(
                                 arena->size
                         ));
                 }
+#if 0
                 log_tokenizer_option(v, i);
+                log_tokenizer_option_t(options[i].arguments);
+                log_tokenizer_option_t(options].arguments);
+#else
 
+#endif
                 assert(option_list->num_of_Vec < num_of_options);
                 option_list->at[option_list->num_of_Vec++] = v;
         }
+        log_tokenizer_option_t(options, num_of_options);
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
