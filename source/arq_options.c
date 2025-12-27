@@ -18,6 +18,17 @@ static KeyWord const key_words[] = {
         {  ARQ_OPT_FLOAT,    "float" },
 };
 
+Lexer arq_lexer_create(void) {
+        Lexer lexer;
+        lexer.cursor_idx = 0;
+        lexer.SIZE = 0;
+        lexer.at = NULL;
+        lexer.token.at = NULL;
+        lexer.token.id = 0;
+        lexer.token.size = 0;
+        return lexer;
+}
+
 static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
         uint32_t i;
         if (str_size != strlen(cstr->at)) {
@@ -395,9 +406,8 @@ void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t co
         }
 }
 
-Arq_Token arq_next_opt_token(Lexer *l) {
-        Arq_Token t = next_token(l);
-        return t;
+void arq_next_opt_token(Lexer *l) {
+        l->token = next_token(l);
 }
 
 /******************************************************************************/

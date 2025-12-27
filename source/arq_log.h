@@ -33,16 +33,15 @@
                 uint32_t n;
                 for (n = 0; n < num_of_options; n++) {
                         uint32_t i = 0;
-                        Arq_Token t;
-                        Lexer l = {0};
+                        Lexer l = arq_lexer_create();
                         l.at = options[n].arguments;
                         l.SIZE = strlen(options[n].arguments);
                         l.cursor_idx = 0;
                         printf("Option[%d] -%c --%s %s\n", n, options[n].chr, options[n].name, options[n].arguments);
                         do {
-                                t = arq_next_opt_token(&l);
-                                log_tokenizer(&t, i++);
-                        } while (t.id != ARQ_OPT_NO_TOKEN);
+                                arq_next_opt_token(&l);
+                                log_tokenizer(&l.token, i++);
+                        } while (l.token.id != ARQ_OPT_NO_TOKEN);
                         printf("\n");
                 }
         }

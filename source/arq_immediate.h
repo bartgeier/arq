@@ -13,37 +13,37 @@
 
 void arq_imm_opt_next(Arq_OptVector *opt);
 bool arq_imm_type(Arq_OptVector *opt, Arq_SymbolID const id);
-bool arq_imm_type_t(Lexer *lexer, Arq_Token *token, Arq_SymbolID const id);
+bool arq_imm_type_t(Lexer *lexer, Arq_SymbolID const id);
 
 bool arq_imm_equal(Arq_OptVector *opt);
-bool arq_imm_equal_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_equal_t(Lexer *lexer);
 bool arq_imm_array(Arq_OptVector *opt);
-bool arq_imm_array_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_array_t(Lexer *lexer);
 bool arq_imm_comma(Arq_OptVector *opt);
-bool arq_imm_comma_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_comma_t(Lexer *lexer);
 bool arq_imm_L_parenthesis(Arq_OptVector *opt);
-bool arq_imm_L_parenthesis_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_L_parenthesis_t(Lexer *lexer);
 bool arq_imm_R_parenthesis(Arq_OptVector *opt);
-bool arq_imm_R_parenthesis_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_R_parenthesis_t(Lexer *lexer);
 bool arq_imm_terminator(Arq_OptVector *opt);
 bool arq_imm_noToken(Arq_Token *token);
 
 bool arq_imm_not_identifier(Arq_OptVector *opt);
-bool arq_imm_not_identifier_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_not_identifier_t(Lexer *lexer);
 
 bool arq_imm_is_a_uint32_t(Arq_OptVector *opt); 
-bool arq_imm_is_a_uint32_t_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_is_a_uint32_t_t(Lexer *lexer);
 bool arq_imm_is_a_int32_t(Arq_OptVector *opt);
-bool arq_imm_is_a_int32_t_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_is_a_int32_t_t(Lexer *lexer);
 bool arq_imm_is_a_float(Arq_OptVector *opt);
-bool arq_imm_is_a_float_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_is_a_float_t(Lexer *lexer);
 
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt);
 int32_to arq_imm_default_int32_t(Arq_OptVector *opt);
 float_to arq_imm_default_float(Arq_OptVector *opt);
 
 bool arq_imm_is_a_NULL(Arq_OptVector *opt);
-bool arq_imm_is_a_NULL_t(Lexer *lexer, Arq_Token *token);
+bool arq_imm_is_a_NULL_t(Lexer *lexer);
 char const *arq_imm_default_cstr_t(Arq_OptVector *opt);
 
 /*///////////////////////////////////////////////////////////////////////////*/
@@ -60,7 +60,19 @@ Arq_OptVector *arq_imm_get_long(
         Arq_Vector *cmd,
         Arq_msg *error_msg
 );
+Lexer arq_imm_get_long_t(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector *cmd ,
+        Arq_msg *error_msg
+);
 Arq_OptVector *arq_imm_get_short(
+        Arq_List *option_list,
+        Arq_Option const *options,
+        Arq_Vector *cmd,
+        Arq_msg *error_msg
+);
+Lexer arq_imm_get_short_t(
         Arq_List *option_list,
         Arq_Option const *options,
         Arq_Vector *cmd,
