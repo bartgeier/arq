@@ -273,6 +273,23 @@ uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt) {
         arq_imm_opt_next(opt);
         return num;
 }
+uint32_to arq_imm_default_uint32_t_t(Lexer *lexer) {
+        uint32_to num = {0};
+        switch (lexer->token.id) {
+        case ARQ_P_DEC: 
+                num = arq_tok_pDec_to_uint32_t(&lexer->token, NULL, "");
+                break;
+        case ARQ_HEX:
+                num = arq_tok_hex_to_uint32_t(&lexer->token, NULL, "");
+                break;
+        default:
+                assert(false);
+                break;
+        }
+        assert(num.error == false);
+        arq_next_opt_token(lexer);
+        return num;
+}
 
 int32_to arq_imm_default_int32_t(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
@@ -294,6 +311,25 @@ int32_to arq_imm_default_int32_t(Arq_OptVector *opt) {
         arq_imm_opt_next(opt);
         return num;
 }
+int32_to arq_imm_default_int32_t_t(Lexer *lexer) {
+        int32_to num = {0};
+        switch (lexer->token.id) {
+        case ARQ_P_DEC: case ARQ_N_DEC:
+                num = arq_tok_sDec_to_int32_t(&lexer->token, NULL, "");
+                break;
+        case ARQ_HEX: {
+                uint32_to const x = arq_tok_hex_to_uint32_t(&lexer->token, NULL, "");
+                num.i32 = (int32_t)x.u32;
+                num.error = x.error;
+                } break;
+        default:
+                assert(false);
+                break;
+        }
+        assert(num.error == false);
+        arq_next_opt_token(lexer);
+        return num;
+}
 
 float_to arq_imm_default_float(Arq_OptVector *opt) {
         Arq_Token const *token = &opt->at[opt->idx];
@@ -311,6 +347,23 @@ float_to arq_imm_default_float(Arq_OptVector *opt) {
         }
         assert(num.error == false);
         arq_imm_opt_next(opt);
+        return num;
+}
+float_to arq_imm_default_float_t(Lexer *opt) {
+        float_to num = {0};
+        switch (opt->token.id) {
+        case ARQ_DEC_FLOAT:
+                num = arq_tok_decFloat_to_float(&opt->token);
+                break;
+        case ARQ_HEX_FLOAT:
+                num = arq_tok_hexFloat_to_float(&opt->token);
+                break;
+        default:
+                assert(false);
+                break;
+        }
+        assert(num.error == false);
+        arq_next_opt_token(opt);
         return num;
 }
 
@@ -332,6 +385,11 @@ bool arq_imm_is_a_NULL_t(Lexer *lexer) {
 
 char const *arq_imm_default_cstr_t(Arq_OptVector *opt) {
         arq_imm_opt_next(opt);
+        return NULL;
+}
+
+char const *arq_imm_default_cstr_t_t(Lexer *opt) {
+        arq_next_opt_token(opt);
         return NULL;
 }
 
@@ -451,6 +509,7 @@ Lexer arq_imm_get_long_t(
                         opt.at = options[i].arguments;
                         opt.SIZE = strlen(options[i].arguments);
                         opt.cursor_idx = 0;
+                        option_list->row = i;
                         arq_imm_cmd_next(cmd);
                         return opt;
                 }
@@ -505,6 +564,7 @@ Lexer arq_imm_get_short_t(
                         opt.at = options[i].arguments;
                         opt.SIZE = strlen(options[i].arguments);
                         opt.cursor_idx = 0;
+                        option_list->row = i;
                         arq_imm_cmd_next(cmd);
                         return opt;
                 }

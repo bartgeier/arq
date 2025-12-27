@@ -39,12 +39,16 @@ bool arq_imm_is_a_float(Arq_OptVector *opt);
 bool arq_imm_is_a_float_t(Lexer *lexer);
 
 uint32_to arq_imm_default_uint32_t(Arq_OptVector *opt);
+uint32_to arq_imm_default_uint32_t_t(Lexer *lexer);
 int32_to arq_imm_default_int32_t(Arq_OptVector *opt);
+int32_to arq_imm_default_int32_t_t(Lexer *lexer);
 float_to arq_imm_default_float(Arq_OptVector *opt);
+float_to arq_imm_default_float_t(Lexer *opt);
 
 bool arq_imm_is_a_NULL(Arq_OptVector *opt);
 bool arq_imm_is_a_NULL_t(Lexer *lexer);
 char const *arq_imm_default_cstr_t(Arq_OptVector *opt);
+char const *arq_imm_default_cstr_t_t(Lexer *opt);
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
