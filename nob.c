@@ -24,7 +24,7 @@ void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/arq.c");
         nob_cmd_append(&source_paths, "./source/arq_symbols.c");
         nob_cmd_append(&source_paths, "./source/arq_queue.c");
-        nob_cmd_append(&source_paths, "./source/arq_options.c");
+        nob_cmd_append(&source_paths, "./source/arq_lexer.c");
         nob_cmd_append(&source_paths, "./source/arq_conversion.c");
         nob_cmd_append(&source_paths, "./source/arq_msg.c");
         nob_cmd_append(&source_paths, "./source/arq_arena.c");
@@ -172,7 +172,7 @@ bool unittests_build(bool const clean) {
         nob_cmd_append(&cmd, "./source/arq.c");
         nob_cmd_append(&cmd, "./source/arq_symbols.c");
         nob_cmd_append(&cmd, "./source/arq_queue.c");
-        nob_cmd_append(&cmd, "./source/arq_options.c");
+        nob_cmd_append(&cmd, "./source/arq_lexer.c");
         nob_cmd_append(&cmd, "./source/arq_conversion.c");
         nob_cmd_append(&cmd, "./source/arq_msg.c");
         nob_cmd_append(&cmd, "./source/arq_arena.c");

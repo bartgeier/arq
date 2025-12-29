@@ -1,9 +1,7 @@
-#include "arq_options.h"
 #include "arq_queue.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
 #include "arq_bool.h"
-#include "arq_token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,14 +179,14 @@ uint32_t arq_verify(
         }
 
         for (i = 0; i < num_of_options; i++) {
-                Lexer l = arq_lexer_create();
+                Arq_Lexer l = arq_lexer_create();
                 l.at = options[i].arguments;
                 l.SIZE = strlen(options[i].arguments);
                 l.cursor_idx = 0;
-                arq_next_opt_token(&l);
+                arq_lexer_next_opt_token(&l);
                 error_str = "' missing open parenthesis '('\n";
-                if (arq_imm_L_parenthesis_t(&l)) {
-                        if (arq_imm_R_parenthesis_t(&l)) {
+                if (arq_imm_L_parenthesis(&l)) {
+                        if (arq_imm_R_parenthesis(&l)) {
                                 error_str = "' after ')' no tokens allowed!\n";
                                 if (arq_imm_noToken(&l.token)) {
                                         return 0;
@@ -199,26 +197,26 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                                if (arq_imm_type_t(&l, ARQ_OPT_UINT32_T)) {
+                                if (arq_imm_type(&l, ARQ_OPT_UINT32_T)) {
                                         error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                        if (arq_imm_not_identifier_t(&l)) {
+                                        if (arq_imm_not_identifier(&l)) {
                                                 error_str = "' is not a parameter name\n";
                                                 goto error;
 
                                         }
-                                        if (arq_imm_equal_t(&l)) {
-                                                if (false == arq_imm_is_a_uint32_t_t(&l)) {
+                                        if (arq_imm_equal(&l)) {
+                                                if (false == arq_imm_is_a_uint32_t(&l)) {
                                                         error_str = "' is not a uint32_t literal\n";
                                                         goto error;
                                                 }
                                                 error_str = "' but expected ',' or ')'\n";
-                                        } else if (arq_imm_array_t(&l)) {
+                                        } else if (arq_imm_array(&l)) {
                                                 error_str = "' but expected ',' or ')'\n";
                                         }
-                                        if (arq_imm_comma_t(&l)) {
+                                        if (arq_imm_comma(&l)) {
                                                 continue;
                                         }
-                                        if (arq_imm_R_parenthesis_t(&l)) {
+                                        if (arq_imm_R_parenthesis(&l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
                                                         return 0;
@@ -229,26 +227,26 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                                if (arq_imm_type_t(&l, ARQ_OPT_INT32_T)) {
+                                if (arq_imm_type(&l, ARQ_OPT_INT32_T)) {
                                         error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                        if (arq_imm_not_identifier_t(&l)) {
+                                        if (arq_imm_not_identifier(&l)) {
                                                 error_str = "' is not a parameter name\n";
                                                 goto error;
 
                                         }
-                                        if (arq_imm_equal_t(&l)) {
-                                                if (false == arq_imm_is_a_int32_t_t(&l)) {
+                                        if (arq_imm_equal(&l)) {
+                                                if (false == arq_imm_is_a_int32_t(&l)) {
                                                         error_str = "' is not a int32_t literal\n";
                                                         goto error;
                                                 }
                                                 error_str = "' but expected ',' or ')'\n";
-                                        } else if (arq_imm_array_t(&l)) {
+                                        } else if (arq_imm_array(&l)) {
                                                 error_str = "' but expected ',' or ')'\n";
                                         }
-                                        if (arq_imm_comma_t(&l)) {
+                                        if (arq_imm_comma(&l)) {
                                                 continue;
                                         }
-                                        if (arq_imm_R_parenthesis_t(&l)) {
+                                        if (arq_imm_R_parenthesis(&l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
                                                         return 0;
@@ -259,26 +257,26 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                                if (arq_imm_type_t(&l, ARQ_OPT_FLOAT)) {
+                                if (arq_imm_type(&l, ARQ_OPT_FLOAT)) {
                                         error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                        if (arq_imm_not_identifier_t(&l)) {
+                                        if (arq_imm_not_identifier(&l)) {
                                                 error_str = "' is not a parameter name\n";
                                                 goto error;
 
                                         }
-                                        if (arq_imm_equal_t(&l)) {
-                                                if (false == arq_imm_is_a_float_t(&l)) {
+                                        if (arq_imm_equal(&l)) {
+                                                if (false == arq_imm_is_a_float(&l)) {
                                                         error_str = "' is not a float literal\n";
                                                         goto error;
                                                 }
                                                 error_str = "' but expected ',' or ')'\n";
-                                        } else if (arq_imm_array_t(&l)) {
+                                        } else if (arq_imm_array(&l)) {
                                                 error_str = "' but expected ',' or ')'\n";
                                         }
-                                        if (arq_imm_comma_t(&l)) {
+                                        if (arq_imm_comma(&l)) {
                                                 continue;
                                         }
-                                        if (arq_imm_R_parenthesis_t(&l)) {
+                                        if (arq_imm_R_parenthesis(&l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
                                                         return 0;
@@ -289,26 +287,26 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                                if (arq_imm_type_t(&l, ARQ_OPT_CSTR_T)) {
+                                if (arq_imm_type(&l, ARQ_OPT_CSTR_T)) {
                                         error_str = "' but expected '=' or '[]' or ',' or ')'\n";
-                                        if (arq_imm_not_identifier_t(&l)) {
+                                        if (arq_imm_not_identifier(&l)) {
                                                 error_str = "' is not a parameter name\n";
                                                 goto error;
 
                                         }
-                                        if (arq_imm_equal_t(&l)) {
-                                                if (false == arq_imm_is_a_NULL_t(&l)) {
+                                        if (arq_imm_equal(&l)) {
+                                                if (false == arq_imm_is_a_NULL(&l)) {
                                                         error_str =  "' must be NULL\n";
                                                         goto error;
                                                 }
                                                 error_str = "' but expected ',' or ')'\n";
-                                        } else if (arq_imm_array_t(&l)) {
+                                        } else if (arq_imm_array(&l)) {
                                                 error_str = "' but expected ',' or ')'\n";
                                         }
-                                        if (arq_imm_comma_t(&l)) {
+                                        if (arq_imm_comma(&l)) {
                                                 continue;
                                         }
-                                        if (arq_imm_R_parenthesis_t(&l)) {
+                                        if (arq_imm_R_parenthesis(&l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
                                                         return 0;
@@ -355,11 +353,11 @@ uint32_t arq_fn(
         Arq_Option const *options, uint32_t const num_of_options
 ) {
         Arq_Arena *arena;
-        Arq_List *option_list;
         Arq_msg error_msg;
         Arq_Vector *cmd;
         Arq_Queue *queue;
-        uint32_t i;
+
+        log_tokenizer_option_t(options, num_of_options);
 
         log_memory(("Buffer capacity %d byte", buffer_size));
         arena = arq_arena_init(arena_buffer, buffer_size);
@@ -369,50 +367,13 @@ uint32_t arq_fn(
                 arena->size
         ));
 
-        option_list = (Arq_List *)arq_arena_malloc(arena, offsetof(Arq_List, at) + num_of_options * sizeof(Arq_OptVector *));
-        option_list->num_of_Vec = 0;
-        option_list->row = 0;
-
-        log_memory(("Options list        %2d + %2d pVect * %2d = %3d byte => arena.size = %4d byte",
-                (int)offsetof(Arq_List,at),
-                num_of_options,
-                (int)sizeof(option_list->at),
-                (int)offsetof(Arq_List,at) + (int)(num_of_options * sizeof(option_list->at)),
-                arena->size
-        ));
-
         {
-                uint32_t SIZE_OF_ERROR_MSG;
-                uint32_t const shrink = arena->size;
-                error_msg.at = (char *)arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
+                uint32_t SIZE_OF_ERROR_MSG = 500;
+                error_msg.at = (char *)arq_arena_malloc(arena, SIZE_OF_ERROR_MSG);
                 error_msg.SIZE = SIZE_OF_ERROR_MSG;
                 error_msg.size = 0;
-                arena->size = shrink;
         }
 
-        /* Arq_OptVector */
-        for (i = 0; i < num_of_options; i++) {
-                uint32_t NUM_OF_TOKEN;
-                uint32_t const shrink = arena->size;
-                Arq_OptVector *v = (Arq_OptVector *)arq_arena_malloc_rest(arena, offsetof(Arq_OptVector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
-                arena->size = shrink;
-
-                arq_option_tokenize(&options[i], v, NUM_OF_TOKEN);
-                {
-                        Arq_OptVector *vb = (Arq_OptVector *)arq_arena_malloc(arena,  offsetof(Arq_OptVector, at) + v->num_of_token * sizeof(Arq_Token));
-                        assert(v == vb);
-                        log_memory(("      Option vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
-                                (int)offsetof(Arq_Token, at),
-                                vb->num_of_token,
-                                (int)sizeof(vb->at[0]),
-                                (int)offsetof(Arq_Token, at) + (int)(vb->num_of_token * sizeof(vb->at[0])),
-                                arena->size
-                        ));
-                }
-                assert(option_list->num_of_Vec < num_of_options);
-                option_list->at[option_list->num_of_Vec++] = v;
-        }
-        log_tokenizer_option_t(options, num_of_options);
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
@@ -421,7 +382,7 @@ uint32_t arq_fn(
                 uint32_t const shrink = arena->size;
                 cmd = (Arq_Vector *)arq_arena_malloc_rest(arena, offsetof(Arq_Vector, at), sizeof(Arq_Token), &NUM_OF_TOKEN);
                 arena->size = shrink;
-                arq_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
+                arq_lexer_cmd_tokenize(argc, argv, cmd, NUM_OF_TOKEN);
                 assert(cmd == arq_arena_malloc(arena,  offsetof(Arq_Vector, at) + cmd->num_of_token * sizeof(Arq_Token)));
                 log_memory(("Command line vector %2d + %2d token * %2d = %3d byte => arena.size = %4d byte", 
                         (int)offsetof(Arq_Vector, at),
@@ -448,12 +409,12 @@ uint32_t arq_fn(
         while(arq_imm_cmd_has_token_left(cmd)) {
                 /* Arq_OptVector *opt = NULL; */
                 uint32_t option_idx;
-                Lexer opt = arq_lexer_create();
+                Arq_Lexer opt = arq_lexer_create();
                 log_int_ln();
                 if (arq_imm_cmd_is_long_option(cmd)) {
                         log_int_token(ARQ_CMD_LONG_OPTION);
 
-                        opt = arq_imm_get_long_t(options, num_of_options, &option_idx, cmd, &error_msg);
+                        opt = arq_imm_get_long(options, num_of_options, &option_idx, cmd, &error_msg);
                         if (opt.at == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
                                 output_cmd_line_option_failure(&error_msg, arena_buffer);
@@ -461,7 +422,7 @@ uint32_t arq_fn(
                         }
                 } else if (arq_imm_cmd_is_short_option(cmd)) {
                         log_int_token(ARQ_CMD_SHORT_OPTION);
-                        opt = arq_imm_get_short_t(options, num_of_options, &option_idx, cmd, &error_msg);
+                        opt = arq_imm_get_short(options, num_of_options, &option_idx, cmd, &error_msg);
                         if (opt.at == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
                                 output_cmd_line_option_failure(&error_msg, arena_buffer);
@@ -477,17 +438,17 @@ uint32_t arq_fn(
                         output_cmd_line_option_failure(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
-                arq_next_opt_token(&opt);
-                (void)arq_imm_L_parenthesis_t(&opt);
+                arq_lexer_next_opt_token(&opt);
+                (void)arq_imm_L_parenthesis(&opt);
                 while (true) {
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                        if (arq_imm_type_t(&opt, ARQ_OPT_UINT32_T)) {
+                        if (arq_imm_type(&opt, ARQ_OPT_UINT32_T)) {
                                 log_int_token_indent(ARQ_OPT_UINT32_T);
-                                (void)arq_imm_not_identifier_t(&opt);
-                                if (arq_imm_equal_t(&opt)) {
-                                        uint32_to num = arq_imm_default_uint32_t_t(&opt);
+                                (void)arq_imm_not_identifier(&opt);
+                                if (arq_imm_equal(&opt)) {
+                                        uint32_to num = arq_imm_default_uint32_t(&opt);
                                         if (arq_imm_optional_argument_uint32_t(cmd, &num, &error_msg)) {
                                                 /* overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -496,7 +457,7 @@ uint32_t arq_fn(
                                         }
                                         arq_push_uint32_t(queue, num.u32);
                                         log_inta(("u32 %u", num.u32));
-                                } else if (arq_imm_array_t(&opt)) {
+                                } else if (arq_imm_array(&opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("u32 %u // init array_size", *array_size));
                                         while (arq_imm_is_p_dec(cmd) || arq_imm_is_hex(cmd)) {
@@ -522,17 +483,17 @@ uint32_t arq_fn(
                                         arq_push_uint32_t(queue, num.u32);
                                         log_inta(("u32 %u", num.u32));
                                 }
-                                if (arq_imm_comma_t(&opt)) continue;
+                                if (arq_imm_comma(&opt)) continue;
                                 goto terminator;
                         }
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                        if (arq_imm_type_t(&opt, ARQ_OPT_INT32_T)) {
+                        if (arq_imm_type(&opt, ARQ_OPT_INT32_T)) {
                                 log_int_token_indent(ARQ_OPT_INT32_T);
-                                (void)arq_imm_not_identifier_t(&opt);
-                                if (arq_imm_equal_t(&opt)) {
-                                        int32_to num = arq_imm_default_int32_t_t(&opt);
+                                (void)arq_imm_not_identifier(&opt);
+                                if (arq_imm_equal(&opt)) {
+                                        int32_to num = arq_imm_default_int32_t(&opt);
                                         if (arq_imm_optional_argument_int32_t(cmd, &num, &error_msg)) {
                                                 /* overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -541,7 +502,7 @@ uint32_t arq_fn(
                                         }
                                         arq_push_int32_t(queue, num.i32);
                                         log_inta(("i32 %d", num.i32));
-                                } else if (arq_imm_array_t(&opt)) {
+                                } else if (arq_imm_array(&opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("u32 %u // init array_size", *array_size));
                                         while (arq_imm_is_p_dec(cmd) || arq_imm_is_n_dec(cmd) || arq_imm_is_hex(cmd)) {
@@ -567,17 +528,17 @@ uint32_t arq_fn(
                                         arq_push_int32_t(queue, num.i32);
                                         log_inta(("i32 %d", num.i32));
                                 }
-                                if (arq_imm_comma_t(&opt)) continue;
+                                if (arq_imm_comma(&opt)) continue;
                                 goto terminator;
                         }
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                        if (arq_imm_type_t(&opt, ARQ_OPT_FLOAT)) {
+                        if (arq_imm_type(&opt, ARQ_OPT_FLOAT)) {
                                 log_int_token_indent(ARQ_OPT_FLOAT);
-                                (void)arq_imm_not_identifier_t(&opt);
-                                if (arq_imm_equal_t(&opt)) {
-                                        float_to num = arq_imm_default_float_t(&opt);
+                                (void)arq_imm_not_identifier(&opt);
+                                if (arq_imm_equal(&opt)) {
+                                        float_to num = arq_imm_default_float(&opt);
                                         if (arq_imm_optional_argument_float(cmd, &num, &error_msg)) {
                                                 /* in the moment there is no error */
                                                 error_msg_insert_cmd_line(&error_msg, 1, cmd);
@@ -586,7 +547,7 @@ uint32_t arq_fn(
                                         }
                                         arq_push_float(queue, num.f);
                                         log_inta(("float %f", num.f));
-                                } else if (arq_imm_array_t(&opt)) {
+                                } else if (arq_imm_array(&opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("u32 %u // init array_size", *array_size));
                                         while (arq_imm_is_hexFloat(cmd)) {
@@ -612,18 +573,18 @@ uint32_t arq_fn(
                                         arq_push_float(queue, num.f);
                                         log_inta(("float %f", num.f));
                                 }
-                                if (arq_imm_comma_t(&opt)) continue;
+                                if (arq_imm_comma(&opt)) continue;
                                 goto terminator;
                         }
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                        if (arq_imm_type_t(&opt, ARQ_OPT_CSTR_T)) {
+                        if (arq_imm_type(&opt, ARQ_OPT_CSTR_T)) {
                                 char const *cstr; 
                                 log_int_token_indent(ARQ_OPT_CSTR_T);
-                                (void)arq_imm_not_identifier_t(&opt);
-                                if (arq_imm_equal_t(&opt)) {
-                                        cstr = arq_imm_default_cstr_t_t(&opt);
+                                (void)arq_imm_not_identifier(&opt);
+                                if (arq_imm_equal(&opt)) {
+                                        cstr = arq_imm_default_cstr_t(&opt);
                                         if (arq_imm_cmd_is_dashdash(cmd)) {
                                                 cstr = arq_imm_argument_csrt_t(cmd, &error_msg);
                                                 if (cstr == NULL) {
@@ -646,7 +607,7 @@ uint32_t arq_fn(
                                                 (void)arq_imm_optional_argument_cstr_t(cmd, &cstr);
                                         }
                                         arq_push_cstr_t(queue, cstr);
-                                } else if (arq_imm_array_t(&opt)) {
+                                } else if (arq_imm_array(&opt)) {
                                         struct {
                                                 bool on;
                                                 bool edge;
@@ -692,14 +653,14 @@ uint32_t arq_fn(
                                         }
                                         arq_push_cstr_t(queue, cstr);
                                 }
-                                if (arq_imm_comma_t(&opt)) continue;
+                                if (arq_imm_comma(&opt)) continue;
                                 goto terminator;
                         }
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 terminator:
-                        if (arq_imm_R_parenthesis_t(&opt)) {
+                        if (arq_imm_R_parenthesis(&opt)) {
                                 log_int_comment("call_back_function");
                                 call_back_function(options, option_idx, queue);
                                 break;

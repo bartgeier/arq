@@ -1,5 +1,5 @@
-#ifndef ARQ_OPTIONS_H
-#define ARQ_OPTIONS_H
+#ifndef ARQ_LEXER_H
+#define ARQ_LEXER_H
 
 #include "arq.h"
 #include "arq_token.h"
@@ -17,7 +17,6 @@ extern "C" {
 
 Arq_Lexer arq_lexer_create(void);
 void arq_lexer_next_opt_token(Arq_Lexer *l);
-void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t const num_of_token);
 void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token);
 
 #ifdef __cplusplus

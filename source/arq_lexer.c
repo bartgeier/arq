@@ -1,7 +1,7 @@
-#include "arq_options.h"
+#include "arq_lexer.h"
+#include "arq_bool.h"
 #include <string.h>
 #include <ctype.h>
-#include "arq_bool.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -18,8 +18,8 @@ static KeyWord const key_words[] = {
         {  ARQ_OPT_FLOAT,    "float" },
 };
 
-Lexer arq_lexer_create(void) {
-        Lexer lexer;
+Arq_Lexer arq_lexer_create(void) {
+        Arq_Lexer lexer;
         lexer.cursor_idx = 0;
         lexer.SIZE = 0;
         lexer.at = NULL;
@@ -46,7 +46,7 @@ static bool is_identifier(char const chr) {
         return isalnum(chr) || chr == '_';
 }
 
-static bool identifier_start(Lexer *l) {
+static bool identifier_start(Arq_Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if (isalpha(l->at[idx]) || l->at[idx] == '_') {
                 l->cursor_idx += 1;
@@ -55,7 +55,7 @@ static bool identifier_start(Lexer *l) {
         return false;
 }
 
-static bool array_start(Lexer *l) {
+static bool array_start(Arq_Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if ((idx + 1 < l->SIZE)
         && (l->at[idx] == '[') 
@@ -66,7 +66,7 @@ static bool array_start(Lexer *l) {
         return false;
 }
 
-static bool hex_start(Lexer *l) {
+static bool hex_start(Arq_Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if ((idx + 2 < l->SIZE)
         && (l->at[idx + 0] == '0') 
@@ -82,7 +82,7 @@ static bool has_hex_exponent(char const s) {
     return (s == 'p') || (s == 'P');
 }
 
-static bool p_dec_start(Lexer *l) {
+static bool p_dec_start(Arq_Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if (isdigit(l->at[idx])) {
                 l->cursor_idx += 1;
@@ -96,7 +96,7 @@ static bool p_dec_start(Lexer *l) {
         return false;
 }
 
-static bool n_dec_start(Lexer *l) {
+static bool n_dec_start(Arq_Lexer *l) {
         uint32_t const idx = l->cursor_idx;
         if (idx + 1 < l->SIZE 
         && l->at[idx] == '-'
@@ -107,7 +107,7 @@ static bool n_dec_start(Lexer *l) {
         return false;
 }
 
-static bool has_dec_exponent(Lexer *l) {
+static bool has_dec_exponent(Arq_Lexer *l) {
         if (l->cursor_idx + 1 < l->SIZE) { 
                 uint32_t const idx = l->cursor_idx;
                 char const chr = l->at[l->cursor_idx];
@@ -122,7 +122,7 @@ static bool has_dec_exponent(Lexer *l) {
         return false;
 }
 
-static void dec_float(Lexer *l, Arq_Token *t) {
+static void dec_float(Arq_Lexer *l, Arq_Token *t) {
         if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
                 /* fractional part */
                 t->id = ARQ_DEC_FLOAT;
@@ -145,7 +145,7 @@ static void dec_float(Lexer *l, Arq_Token *t) {
         return;
 }
 
-static void skip_space(Lexer *l) {
+static void skip_space(Arq_Lexer *l) {
     while (l->cursor_idx < l->SIZE && (l->at[l->cursor_idx] == 0 || isspace(l->at[l->cursor_idx]))) {
             l->cursor_idx++;
     }
@@ -163,7 +163,7 @@ static bool is_short_identifier(char chr) {
         return isalpha(chr) || chr == '?';
 }
 
-static bool start_short_identifier(Lexer *l) {
+static bool start_short_identifier(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && is_short_identifier(l->at[l->cursor_idx + 1])) {
                 l->cursor_idx += 2;
@@ -172,7 +172,7 @@ static bool start_short_identifier(Lexer *l) {
         return false;
 }
 
-static bool start_long_identifier(Lexer *l) {
+static bool start_long_identifier(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && l->at[l->cursor_idx + 1] == '-'
         && is_long_identifier(l->at[l->cursor_idx + 2])) {
@@ -182,7 +182,7 @@ static bool start_long_identifier(Lexer *l) {
         return false;
 }
 
-static bool start_dash_dash(Lexer *l) {
+static bool start_dash_dash(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && l->at[l->cursor_idx + 1] == '-'
         && l->SIZE == 2) {
@@ -192,7 +192,7 @@ static bool start_dash_dash(Lexer *l) {
         return false;
 }
 
-static Arq_Token next_token(Lexer *l) {
+static Arq_Token next_token(Arq_Lexer *l) {
         Arq_Token t = {0};
         skip_space(l);
         t.at = &l->at[l->cursor_idx];
@@ -380,33 +380,7 @@ static Arq_Token next_token(Lexer *l) {
         return t;
 }
 
-void arq_option_tokenize(Arq_Option const *option, Arq_OptVector *v, uint32_t const NUM_OF_TOKEN) {
-        Lexer l;
-        l.cursor_idx = 0;
-        l.SIZE = strlen(option->arguments);
-        l.at = option->arguments;
-
-        v->num_of_token = 0;
-        v->idx = 0;
-        while (l.cursor_idx < l.SIZE) {
-                assert(v->num_of_token < NUM_OF_TOKEN);
-                {
-                        Arq_Token t = next_token(&l);
-                        if (t.id == ARQ_OPT_NO_TOKEN) continue;
-                        v->at[v->num_of_token++] = t;
-                }
-        }
-        {
-                Arq_Token t;
-                t.id = ARQ_OPT_TERMINATOR; 
-                t.at = &l.at[l.SIZE]; 
-                t.size = 0;
-                assert(v->num_of_token < NUM_OF_TOKEN);
-                v->at[v->num_of_token++] = t;
-        }
-}
-
-void arq_next_opt_token(Lexer *l) {
+void arq_lexer_next_opt_token(Arq_Lexer *l) {
         l->token = next_token(l);
 }
 
@@ -414,8 +388,7 @@ void arq_next_opt_token(Lexer *l) {
 /******************************************************************************/
 /******************************************************************************/
 
-#if 1
-static Arq_Token next_cmd_token(Lexer *lexer) {
+static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
         Arq_Token token = next_token(lexer);
         if (token.id == ARQ_CMD_SHORT_OPTION) {
                 return token;
@@ -428,7 +401,7 @@ static Arq_Token next_cmd_token(Lexer *lexer) {
         return token;
 } 
 
-void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
+void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
         int i;
         assert(argc >= 1);
         argv += 1;
@@ -436,7 +409,7 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
         v->num_of_token = 0;
         v->idx = 0;
         for (i = 0; i < argc; i++) {
-                Lexer lexer;
+                Arq_Lexer lexer;
                 lexer.SIZE = strlen(argv[i]);
                 lexer.cursor_idx = 0;
                 lexer.at = argv[i];
@@ -470,5 +443,4 @@ void arq_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_o
                 v->at[v->num_of_token++] = t;
         }
 }
-#endif
 

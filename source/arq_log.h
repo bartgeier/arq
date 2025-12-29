@@ -14,9 +14,8 @@
 
 #ifdef ARQ_LOG_TOKENIZER
         #include "arq_token.h"
-        #include "arq_symbols.h"
         #include "arq_int.h"
-        #include "arq_options.h"
+        #include "arq_lexer.h"
         #include <string.h>
         #include <stdio.h>
         static void log_tokenizer(Arq_Token *t, uint32_t toknr) {
@@ -33,13 +32,13 @@
                 uint32_t n;
                 for (n = 0; n < num_of_options; n++) {
                         uint32_t i = 0;
-                        Lexer l = arq_lexer_create();
+                        Arq_Lexer l = arq_lexer_create();
                         l.at = options[n].arguments;
                         l.SIZE = strlen(options[n].arguments);
                         l.cursor_idx = 0;
                         printf("Option[%d] -%c --%s %s\n", n, options[n].chr, options[n].name, options[n].arguments);
                         do {
-                                arq_next_opt_token(&l);
+                                arq_lexer_next_opt_token(&l);
                                 log_tokenizer(&l.token, i++);
                         } while (l.token.id != ARQ_OPT_NO_TOKEN);
                         printf("\n");

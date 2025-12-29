@@ -846,14 +846,3 @@ TEST(arq, dec_float) {
                ));
         }
 }
-#if 0
-
-                {'s', "string",  NULL,  "(cstr_t str)"},
-                {'n', "nstring", NULL, "(cstr_t str = NULL)"},
-                {'u', "uint8",   NULL,   "(uint8_t number[])"},
-                {'i', "int32",   NULL,   "(int32_t number)"}, 
-                {'i', "int32",   NULL,   "(int32_t number = -56)"}, 
-
-                {'p', "print",   NULL,   "(uint32_t first_line = 0, uint32_t last_line = +1200)"},
-                {'a', "array",   NULL,   "(int32_t numbers[], cstr_t list[])"},
-#endif
