@@ -494,24 +494,23 @@ Arq_OptVector *arq_imm_get_long(
         arq_msg_append_lf(error_msg);
         return NULL;
 }
+
 Lexer arq_imm_get_long_t(
-        Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd ,
+        uint32_t const num_of_options,
+        uint32_t *idx,
+        Arq_Vector *cmd,
         Arq_msg *error_msg
 ) {
+        Lexer lexer = arq_lexer_create();
         Arq_Token const *token = &cmd->at[cmd->idx];
-        uint32_t i;
-        Lexer opt = {0};
-        for (i = 0; i < option_list->num_of_Vec; i++) {
-                char const * opt_name = options[i].name;
-                if (token_long_option_eq(token, opt_name)) {
-                        opt.at = options[i].arguments;
-                        opt.SIZE = strlen(options[i].arguments);
-                        opt.cursor_idx = 0;
-                        option_list->row = i;
+        for (*idx = 0; *idx < num_of_options; (*idx)++) {
+                if (token_long_option_eq(token, options[*idx].name)) {
+                        lexer.at = options[*idx].arguments;
+                        lexer.SIZE = strlen(options[*idx].arguments);
+                        lexer.cursor_idx = 0;
                         arq_imm_cmd_next(cmd);
-                        return opt;
+                        return lexer;
                 }
         }
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
@@ -519,7 +518,7 @@ Lexer arq_imm_get_long_t(
         arq_msg_append_str(error_msg, token->at, token->size);
         arq_msg_append_cstr(error_msg, "' unknown long option ");
         arq_msg_append_lf(error_msg);
-        return opt;
+        return lexer;
 }
 
 Arq_OptVector *arq_imm_get_short(
@@ -549,24 +548,22 @@ Arq_OptVector *arq_imm_get_short(
         return NULL; 
 }
 Lexer arq_imm_get_short_t(
-        Arq_List *option_list,
         Arq_Option const *options,
+        uint32_t const num_of_options,
+        uint32_t *idx,
         Arq_Vector *cmd,
         Arq_msg *error_msg
 ) {
         Arq_Token const token = cmd->at[cmd->idx];
         uint32_t const IDX = (token.at[0] == '-') ? 1 : 0; /* : 0 because of bundled short options */
-        Lexer opt = {0};
-        uint32_t i;
-        for (i = 0; i < option_list->num_of_Vec; i++) {
-                char opt_short_name = options[i].chr;
-                if (token.at[IDX] == opt_short_name) {
-                        opt.at = options[i].arguments;
-                        opt.SIZE = strlen(options[i].arguments);
-                        opt.cursor_idx = 0;
-                        option_list->row = i;
+        Lexer lexer = arq_lexer_create();
+        for (*idx = 0; *idx < num_of_options; (*idx)++) {
+                if (token.at[IDX] == options[*idx].chr) {
+                        lexer.at = options[*idx].arguments;
+                        lexer.SIZE = strlen(options[*idx].arguments);
+                        lexer.cursor_idx = 0;
                         arq_imm_cmd_next(cmd);
-                        return opt;
+                        return lexer;
                 }
         }
         arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
@@ -574,7 +571,7 @@ Lexer arq_imm_get_short_t(
         arq_msg_append_str(error_msg, token.at, token.size);
         arq_msg_append_cstr(error_msg, "' unknown short option ");
         arq_msg_append_lf(error_msg);
-        return opt; 
+        return lexer; 
 }
 
 void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg) {

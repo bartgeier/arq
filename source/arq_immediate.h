@@ -65,9 +65,10 @@ Arq_OptVector *arq_imm_get_long(
         Arq_msg *error_msg
 );
 Lexer arq_imm_get_long_t(
-        Arq_List *option_list,
         Arq_Option const *options,
-        Arq_Vector *cmd ,
+        uint32_t const num_of_options,
+        uint32_t *idx,
+        Arq_Vector *cmd,
         Arq_msg *error_msg
 );
 Arq_OptVector *arq_imm_get_short(
@@ -77,8 +78,9 @@ Arq_OptVector *arq_imm_get_short(
         Arq_msg *error_msg
 );
 Lexer arq_imm_get_short_t(
-        Arq_List *option_list,
         Arq_Option const *options,
+        uint32_t const num_of_options,
+        uint32_t *idx,
         Arq_Vector *cmd,
         Arq_msg *error_msg
 );
