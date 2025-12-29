@@ -11,11 +11,11 @@ typedef struct {
 } KeyWord;
 
 static KeyWord const key_words[] = {
-        {  ARQ_OPT_NULL,     "NULL" },
-        {  ARQ_OPT_CSTR_T,   "cstr_t" },
-        {  ARQ_OPT_UINT32_T, "uint32_t" },
-        {  ARQ_OPT_INT32_T,  "int32_t" },
-        {  ARQ_OPT_FLOAT,    "float" },
+        {  ARQ_NULL,          "NULL" },
+        {  ARQ_TYPE_CSTR,     "cstr_t" },
+        {  ARQ_TYPE_UINT,     "uint" },
+        {  ARQ_TYPE_INT,      "int" },
+        {  ARQ_TYPE_FLOAT,    "float" },
 };
 
 Arq_Lexer arq_lexer_create(void) {
@@ -198,41 +198,41 @@ static Arq_Token next_token(Arq_Lexer *l) {
         t.at = &l->at[l->cursor_idx];
         if (l->cursor_idx == l->SIZE ) {
                 /* space tail */
-                t.id = ARQ_OPT_NO_TOKEN;
+                t.id = ARQ_NO_TOKEN;
                 t.size = 0;
                 return t;
         }
 
         if (l->at[l->cursor_idx] == '=') {
-                t.id = ARQ_OPT_EQ; 
+                t.id = ARQ_OP_EQ; 
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
         }
 
         if (l->at[l->cursor_idx] == ',') {
-                t.id = ARQ_OPT_COMMA; 
+                t.id = ARQ_OP_COMMA; 
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
         }
 
         if (l->at[l->cursor_idx] == '(') {
-                t.id = ARQ_OPT_L_PARENTHESIS; 
+                t.id = ARQ_OP_L_PARENTHESIS; 
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
         }
 
         if (l->at[l->cursor_idx] == ')') {
-                t.id = ARQ_OPT_R_PARENTHESIS; 
+                t.id = ARQ_OP_R_PARENTHESIS; 
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
         }
 
         if (l->at[l->cursor_idx] == 0) {
-                t.id = ARQ_OPT_TERMINATOR; 
+                t.id = ARQ_OP_TERMINATOR; 
                 l->cursor_idx++;
                 t.size = 1;
                 return t; 
@@ -241,7 +241,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
 
         if (identifier_start(l)) {
                 uint32_t i;
-                t.id = ARQ_OPT_IDENTFIER; 
+                t.id = ARQ_IDENTFIER; 
                 t.size = &l->at[l->cursor_idx] - t.at;
                 while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
@@ -256,7 +256,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
         }
 
         if (array_start(l)) {
-                t.id = ARQ_OPT_ARRAY; 
+                t.id = ARQ_OP_ARRAY; 
                 t.size = &l->at[l->cursor_idx] - t.at;
                 return t; 
         }
@@ -269,7 +269,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
                         t.size++;
                 }
                 if (l->cursor_idx < l->SIZE && ('.' == l->at[l->cursor_idx])) {
-                        t.id = ARQ_OPT_NO_TOKEN;
+                        t.id = ARQ_NO_TOKEN;
                         l->cursor_idx++;
                         t.size++;
                         while (l->cursor_idx < l->SIZE && isxdigit(l->at[l->cursor_idx])) {
@@ -290,7 +290,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
                                 }
                         } 
                 } else if (l->cursor_idx < l->SIZE && has_hex_exponent(l->at[l->cursor_idx])) {
-                        t.id = ARQ_OPT_NO_TOKEN;
+                        t.id = ARQ_NO_TOKEN;
                         l->cursor_idx++;
                         t.size++;
                         if (p_dec_start(l) || n_dec_start(l)) {
@@ -370,7 +370,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
         }
 
         if (l->cursor_idx < l->SIZE) {
-                t.id = ARQ_OPT_UNKNOWN; 
+                t.id = ARQ_OP_UNKNOWN; 
                 t.size = 0;
                 while (l->cursor_idx < l->SIZE && !isspace(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
@@ -436,7 +436,7 @@ void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const
         }
         {
                 Arq_Token t;
-                t.id = ARQ_CMD_END_OF_LINE;
+                t.id = ARQ_NO_TOKEN;
                 t.size = 0;
                 t.at = NULL;
                 assert(v->num_of_token < num_of_token);

@@ -10,21 +10,14 @@
 /*///////////////////////////////////////////////////////////////////////////*/
 
 void arq_imm_opt_next(Arq_OptVector *opt);
-bool arq_imm_type(Arq_Lexer *opt, Arq_SymbolID const id);
 
-bool arq_imm_equal(Arq_Lexer *opt);
-bool arq_imm_array(Arq_Lexer *opt);
-bool arq_imm_comma(Arq_Lexer *opt);
-bool arq_imm_L_parenthesis(Arq_Lexer *opt);
-bool arq_imm_R_parenthesis(Arq_Lexer *opt);
-bool arq_imm_terminator(Arq_OptVector *opt);
+bool arq_imm(Arq_SymbolID const id, Arq_Lexer *opt);
 bool arq_imm_noToken(Arq_Token *token);
-
 bool arq_imm_not_identifier(Arq_Lexer *opt);
 
-bool arq_imm_is_a_uint32_t(Arq_Lexer *opt);
-bool arq_imm_is_a_int32_t(Arq_Lexer *opt);
-bool arq_imm_is_a_float(Arq_Lexer *opt);
+bool arq_imm_literal_uint(Arq_Lexer *opt);
+bool arq_imm_literal_int(Arq_Lexer *opt);
+bool arq_imm_literal_float(Arq_Lexer *opt);
 
 uint32_to arq_imm_default_uint32_t(Arq_Lexer *opt);
 int32_to arq_imm_default_int32_t(Arq_Lexer *opt);

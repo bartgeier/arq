@@ -277,7 +277,7 @@ float_to arq_tok_hexFloat_to_float(Arq_Token const *token) {
 
         /* integer part */
         while (i < token->size) {
-                int v = hexval(token->at[i]);
+               int v = hexval(token->at[i]);
                 if (v < 0) {
                         break;
                 }

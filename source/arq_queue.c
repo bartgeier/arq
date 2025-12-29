@@ -15,7 +15,7 @@ Arq_Queue *arq_queue_malloc(Arq_Arena *arena) {
         queue->write_idx = 0; 
         {
                 Arq_Argument a;
-                a.type_id = ARQ_OPT_UINT32_T;
+                a.type_id = ARQ_TYPE_UINT;
                 a.value.u32 = 0;
                 queue->at[0] = a;
         }
@@ -49,13 +49,13 @@ void arq_unused(Arq_Queue *queue) {
 
 uint32_t arq_uint32_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_UINT32_T);
+        assert(t.type_id == ARQ_TYPE_UINT);
         return t.value.u32;
 }
 
 uint32_t arq_array_size(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_ARRAY_SIZE_T);
+        assert(t.type_id == ARQ_TYPE_ARRAY_SIZE);
         return t.value.u32;
 }
 
@@ -69,32 +69,32 @@ uint64_t arq_uint64_t(Arq_Queue *queue) {
 
 int32_t arq_int32_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_INT32_T);
+        assert(t.type_id == ARQ_TYPE_INT);
         return t.value.i32;
 }
 
 double arq_float(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_FLOAT);
+        assert(t.type_id == ARQ_TYPE_FLOAT);
         return t.value.f;
 }
 
 char const *arq_cstr_t(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
-        assert(t.type_id == ARQ_OPT_CSTR_T);
+        assert(t.type_id == ARQ_TYPE_CSTR);
         return t.value.cstr;
 }
 
 void arq_push_uint32_t(Arq_Queue *queue, uint32_t n) {
         Arq_Argument a;
-        a.type_id = ARQ_OPT_UINT32_T;
+        a.type_id = ARQ_TYPE_UINT;
         a.value.u32 = n;
         push(queue, &a);
 }
 
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
         Arq_Argument a;
-        a.type_id = ARQ_OPT_ARRAY_SIZE_T;
+        a.type_id = ARQ_TYPE_ARRAY_SIZE;
         a.value.u32 = n;
         push(queue, &a);
         return &queue->at[queue->write_idx - 1].value.u32;
@@ -111,21 +111,21 @@ void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {
 
 void arq_push_int32_t(Arq_Queue *queue, int32_t n) {
         Arq_Argument a;
-        a.type_id = ARQ_OPT_INT32_T;
+        a.type_id = ARQ_TYPE_INT;
         a.value.i32 = n;
         push(queue, &a);
 }
 
 void arq_push_float(Arq_Queue *queue, double f) {
         Arq_Argument a;
-        a.type_id = ARQ_OPT_FLOAT;
+        a.type_id = ARQ_TYPE_FLOAT;
         a.value.f = f;
         push(queue, &a);
 }
 
 void arq_push_cstr_t(Arq_Queue *queue, char const * cstr) {
         Arq_Argument a;
-        a.type_id = ARQ_OPT_CSTR_T;
+        a.type_id = ARQ_TYPE_CSTR;
         a.value.cstr = cstr;
         push(queue, &a);
 }

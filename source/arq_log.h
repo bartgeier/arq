@@ -40,7 +40,7 @@
                         do {
                                 arq_lexer_next_opt_token(&l);
                                 log_tokenizer(&l.token, i++);
-                        } while (l.token.id != ARQ_OPT_NO_TOKEN);
+                        } while (l.token.id != ARQ_NO_TOKEN);
                         printf("\n");
                 }
         }

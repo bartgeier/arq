@@ -147,7 +147,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t"},
+                        {'v', "version", fn_failure, "(uint"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -156,8 +156,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token '' is not a parameter name\n"
-                                        "    -v --version (uint32_t\n"
-                                        "                          ^\n"
+                                        "    -v --version (uint\n"
+                                        "                      ^\n"
                                 ), 0
                         );
                 } else {
@@ -166,7 +166,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t float"},
+                        {'v', "version", fn_failure, "(uint float"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -175,8 +175,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token 'float' is not a parameter name\n"
-                                        "    -v --version (uint32_t float\n"
-                                        "                           ^\n"
+                                        "    -v --version (uint float\n"
+                                        "                       ^\n"
                                 ), 0
                         );
                 } else {
@@ -185,7 +185,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t, number)"},
+                        {'v', "version", fn_failure, "(uint, number)"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -194,8 +194,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token ',' is not a parameter name\n"
-                                        "    -v --version (uint32_t, number)\n"
-                                        "                          ^\n"
+                                        "    -v --version (uint, number)\n"
+                                        "                      ^\n"
                                 ), 0
                         );
                 } else {
@@ -204,7 +204,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t number,)"},
+                        {'v', "version", fn_failure, "(uint number,)"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -213,8 +213,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token ')' is not a type\n"
-                                        "    -v --version (uint32_t number,)\n"
-                                        "                                  ^\n"
+                                        "    -v --version (uint number,)\n"
+                                        "                              ^\n"
                                 ), 0
                         );
                 } else {
@@ -223,7 +223,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t number = sdf "},
+                        {'v', "version", fn_failure, "(uint number = sdf "},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -231,9 +231,9 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'sdf' is not a uint32_t literal\n"
-                                        "    -v --version (uint32_t number = sdf \n"
-                                        "                                    ^\n"
+                                        "    token 'sdf' is not a uint literal\n"
+                                        "    -v --version (uint number = sdf \n"
+                                        "                                ^\n"
                                 ), 0
                         );
                 } else {
@@ -242,7 +242,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t number[] = sdf "},
+                        {'v', "version", fn_failure, "(uint number[] = sdf "},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -251,8 +251,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token '=' but expected ',' or ')'\n"
-                                        "    -v --version (uint32_t number[] = sdf \n"
-                                        "                                    ^\n"
+                                        "    -v --version (uint number[] = sdf \n"
+                                        "                                ^\n"
                                 ), 0
                         );
                 } else {
@@ -261,7 +261,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint32_t number[ ] = sdf "},
+                        {'v', "version", fn_failure, "(uint number[ ] = sdf "},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -270,8 +270,8 @@ TEST(arq, verify) {
                                         buffer,
                                         "Option failure:\n"
                                         "    token '[' but expected '=' or '[]' or ',' or ')'\n"
-                                        "    -v --version (uint32_t number[ ] = sdf \n"
-                                        "                                 ^\n"
+                                        "    -v --version (uint number[ ] = sdf \n"
+                                        "                             ^\n"
                                 ), 0
                         );
                 } else {
@@ -371,9 +371,9 @@ TEST(arq, short_option_bundeling) {
         Arq_Option options[] = {
                 {'v', "version",   fn_bundeling_first, "()"},
                 {'r', "recursion", fn_bundeling, "()"},
-                {'n', "number",    fn_bundeling_number, "(uint32_t number)"},
+                {'n', "number",    fn_bundeling_number, "(uint number)"},
                 {'s', "string",    fn_bundeling_string, "(cstr_t string)"},
-                {'o', "optional",  fn_bundeling_number, "(uint32_t number = 42)"},
+                {'o', "optional",  fn_bundeling_number, "(uint number = 42)"},
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
@@ -385,7 +385,7 @@ TEST(arq, short_option_bundeling) {
                                        "CMD line failure:\n"
                                        "    -v o v n r \n"
                                        "    Token 'r' is not a positiv number\n"
-                                       "    -n --number (uint32_t number)\n"
+                                       "    -n --number (uint number)\n"
                                 ), 0
                         );
                 } else {
@@ -445,9 +445,9 @@ void fn_number32_array(Arq_Queue *queue) {
 TEST(arq, uint32_t) {
         result[0] = 0;
         Arq_Option options[] = {
-                {'a', "numberA",  fn_number32,  "(uint32_t number)"},
-                {'b', "numberB",  fn_number32,  "(uint32_t number = 324)"},
-                {'c', "numberC",  fn_number32_array,  "(uint32_t number[])"},
+                {'a', "numberA",  fn_number32,  "(uint number)"},
+                {'b', "numberB",  fn_number32,  "(uint number = 324)"},
+                {'c', "numberC",  fn_number32_array,  "(uint number[])"},
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
@@ -458,7 +458,7 @@ TEST(arq, uint32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA sdf \n"
                                         "    Token 'sdf' is not a positiv number\n"
-                                        "    -a --numberA (uint32_t number)\n"
+                                        "    -a --numberA (uint number)\n"
                                 ), 0
                         );
                 } else {
@@ -473,7 +473,7 @@ TEST(arq, uint32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 42949672950 \n"
                                         "    Token '42949672950' positive number > UINT32_MAX 4294967295\n"
-                                        "    -a --numberA (uint32_t number)\n"
+                                        "    -a --numberA (uint number)\n"
                                 ), 0
                         );
                 } else {
@@ -488,7 +488,7 @@ TEST(arq, uint32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 0xFFFFFFFF0 \n"
                                         "    Token '0xFFFFFFFF0' more than 8 hex digits\n"
-                                        "    -a --numberA (uint32_t number)\n"
+                                        "    -a --numberA (uint number)\n"
                                 ), 0
                         );
                 } else {
@@ -548,9 +548,9 @@ void fn_numberi32_array(Arq_Queue *queue) {
 TEST(arq, int32_t) {
         result[0] = 0;
         Arq_Option options[] = {
-                {'a', "numberA",  fn_numberi32,  "(int32_t number)"},
-                {'b', "numberB",  fn_numberi32,  "(int32_t number = -324)"},
-                {'c', "numberC",  fn_numberi32_array,  "(int32_t number[])"},
+                {'a', "numberA",  fn_numberi32,  "(int number)"},
+                {'b', "numberB",  fn_numberi32,  "(int number = -324)"},
+                {'c', "numberC",  fn_numberi32_array,  "(int number[])"},
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
@@ -561,7 +561,7 @@ TEST(arq, int32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA sdf \n"
                                         "    Token 'sdf' is not a signed number\n"
-                                        "    -a --numberA (int32_t number)\n"
+                                        "    -a --numberA (int number)\n"
                                 ), 0
                         );
                 } else {
@@ -576,7 +576,7 @@ TEST(arq, int32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 42949672950 \n"
                                         "    Token '42949672950' positive number > INT32_MAX 2147483647\n"
-                                        "    -a --numberA (int32_t number)\n"
+                                        "    -a --numberA (int number)\n"
                                 ), 0
                         );
                 } else {
@@ -591,7 +591,7 @@ TEST(arq, int32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA 0xFFFFFFFF0 \n"
                                         "    Token '0xFFFFFFFF0' more than 8 hex digits\n"
-                                        "    -a --numberA (int32_t number)\n"
+                                        "    -a --numberA (int number)\n"
                                 ), 0
                         );
                 } else {
@@ -606,7 +606,7 @@ TEST(arq, int32_t) {
                                         "CMD line failure:\n"
                                         "    --numberA -42949672950 \n"
                                         "    Token '-42949672950' negative number < INT32_MIN -2147483648\n"
-                                        "    -a --numberA (int32_t number)\n"
+                                        "    -a --numberA (int number)\n"
                                 ), 0
                         );
                 } else {

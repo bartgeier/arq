@@ -29,9 +29,8 @@ typedef struct {
 
 #define ARQ_LIST_OF_IDS                          \
                                                  \
-        /* helper to control option tokenizer */ \
-        X(ARQ_OPT_NO_TOKEN)                      \
-        X(ARQ_OPT_IDENTFIER)                     \
+        /* helper to control tokenizer */        \
+        X(ARQ_NO_TOKEN)                          \
                                                  \
         /* literals */                           \
         X(ARQ_P_DEC)                             \
@@ -42,28 +41,28 @@ typedef struct {
         X(ARQ_CMD_RAW_STR)                       \
                                                  \
         /* option operators */                   \
-        X(ARQ_OPT_EQ)                            \
-        X(ARQ_OPT_COMMA)                         \
-        X(ARQ_OPT_ARRAY)                         \
-        X(ARQ_OPT_L_PARENTHESIS)                 \
-        X(ARQ_OPT_R_PARENTHESIS)                 \
-        X(ARQ_OPT_TERMINATOR)                    \
-        X(ARQ_OPT_UNKNOWN)                       \
+        X(ARQ_OP_EQ)                             \
+        X(ARQ_OP_COMMA)                          \
+        X(ARQ_OP_ARRAY)                          \
+        X(ARQ_OP_L_PARENTHESIS)                  \
+        X(ARQ_OP_R_PARENTHESIS)                  \
+        X(ARQ_OP_TERMINATOR)                     \
+        X(ARQ_OP_UNKNOWN)                        \
                                                  \
+        X(ARQ_IDENTFIER)                         \
         /* option keywords */                    \
-        X(ARQ_OPT_NULL)                          \
+        X(ARQ_NULL)                              \
         /* option types */                       \
-        X(ARQ_OPT_CSTR_T)                        \
-        X(ARQ_OPT_UINT32_T)                      \
-        X(ARQ_OPT_ARRAY_SIZE_T)                  \
-        X(ARQ_OPT_INT32_T)                       \
-        X(ARQ_OPT_FLOAT)                         \
+        X(ARQ_TYPE_CSTR)                         \
+        X(ARQ_TYPE_UINT)                         \
+        X(ARQ_TYPE_ARRAY_SIZE)                   \
+        X(ARQ_TYPE_INT)                          \
+        X(ARQ_TYPE_FLOAT)                        \
                                                  \
         /* command line tokens */                \
         X(ARQ_CMD_SHORT_OPTION)                  \
         X(ARQ_CMD_LONG_OPTION)                   \
         X(ARQ_CMD_DASHDASH)                      \
-        X(ARQ_CMD_END_OF_LINE)                   \
 
 #define X(name)name,
 typedef enum {

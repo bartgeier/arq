@@ -244,7 +244,10 @@ int main(int argc, char **argv) {
         create_source_paths();
         create_include_paths();
         ok &= arq_build(flag.clean);
-        ok &= unittests_build(flag.clean);
+
+        #if 1
+            ok &= unittests_build(flag.clean); 
+        #endif
 
         if (!ok) {
                 nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n", nob_millis() - t_start);

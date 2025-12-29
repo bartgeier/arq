@@ -17,9 +17,9 @@
         X(ARQ_CMD_RAW_STR)                       \
                                                  \
         /* option operators */                   \
-        X(ARQ_OPT_EQ)                            \
-        X(ARQ_OPT_COMMA)                         \
-        X(ARQ_OPT_ARRAY)                         \
+        X(ARQ_OP_EQ)                            \
+        X(ARQ_OP_COMMA)                         \
+        X(ARQ_OP_ARRAY)                         \
         X(ARQ_OPT_L_PARENTHESIS)                 \
         X(ARQ_OPT_R_PARENTHESIS)                 \
         X(ARQ_OPT_TERMINATOR)                    \
@@ -30,7 +30,7 @@
         /* option types */                       \
         X(ARQ_OPT_CSTR_T)                        \
         X(ARQ_OPT_UINT32_T)                      \
-        X(ARQ_OPT_ARRAY_SIZE_T)                  \
+        X(ARQ_OP_ARRAY_SIZE_T)                  \
         X(ARQ_OPT_INT32_T)                       \
         X(ARQ_OPT_FLOAT)                         \
                                                  \

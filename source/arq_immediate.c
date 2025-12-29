@@ -14,7 +14,7 @@ void arq_imm_opt_next(Arq_OptVector *opt) {
         }
 }
 
-bool arq_imm_type(Arq_Lexer *opt, Arq_SymbolID const id) {
+bool arq_imm(Arq_SymbolID const id, Arq_Lexer *opt) {
         const bool b = (opt->token.id == id);
         if (b) {
                 arq_lexer_next_opt_token(opt);
@@ -22,65 +22,20 @@ bool arq_imm_type(Arq_Lexer *opt, Arq_SymbolID const id) {
         return b;
 }
 
-bool arq_imm_equal(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_EQ);
-        if (b) {
-                arq_lexer_next_opt_token(opt);
-        }
-        return b;
-}
-
-bool arq_imm_array(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_ARRAY);
-        if (b) {
-                arq_lexer_next_opt_token(opt);
-        }
-        return b;
-}
-
-bool arq_imm_comma(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_COMMA);
-        if (b) {
-                arq_lexer_next_opt_token(opt);
-        }
-        return b;
-}
-
-bool arq_imm_L_parenthesis(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_L_PARENTHESIS);
-        if (b) {
-                arq_lexer_next_opt_token(opt);
-        }
-        return b;
-}
-
-bool arq_imm_R_parenthesis(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_R_PARENTHESIS);
-        if (b) {
-                arq_lexer_next_opt_token(opt);
-        }
-        return b;
-}
-
-bool arq_imm_terminator(Arq_OptVector *opt) {
-        Arq_Token const *token = &opt->at[opt->idx];
-        const bool b = (token->id == ARQ_OPT_TERMINATOR);
-        return b;
-}
 bool arq_imm_noToken(Arq_Token *token) {
-        const bool b = (token->id == ARQ_OPT_NO_TOKEN);
+        const bool b = (token->id == ARQ_NO_TOKEN);
         return b;
 }
 
 bool arq_imm_not_identifier(Arq_Lexer *opt) {
-        const bool b = (opt->token.id == ARQ_OPT_IDENTFIER);
+        const bool b = (opt->token.id == ARQ_IDENTFIER);
         if (b) {
                 arq_lexer_next_opt_token(opt);
         }
         return !b;
 }
 
-bool arq_imm_is_a_uint32_t(Arq_Lexer *opt) {
+bool arq_imm_literal_uint(Arq_Lexer *opt) {
         uint32_to num;
         switch (opt->token.id) {
         case ARQ_P_DEC:
@@ -99,7 +54,7 @@ bool arq_imm_is_a_uint32_t(Arq_Lexer *opt) {
         return !num.error; /* return true if successful */
 }
 
-bool arq_imm_is_a_int32_t(Arq_Lexer *opt) {
+bool arq_imm_literal_int(Arq_Lexer *opt) {
         int32_to num;
         switch (opt->token.id) {
         case ARQ_P_DEC: case ARQ_N_DEC:
@@ -120,7 +75,7 @@ bool arq_imm_is_a_int32_t(Arq_Lexer *opt) {
         return !num.error; /* return true if successful */
 }
 
-bool arq_imm_is_a_float(Arq_Lexer *opt) {
+bool arq_imm_literal_float(Arq_Lexer *opt) {
         float_to num;
         switch (opt->token.id) {
         case ARQ_DEC_FLOAT:
@@ -196,7 +151,7 @@ float_to arq_imm_default_float(Arq_Lexer *opt) {
 }
 
 bool arq_imm_is_a_NULL(Arq_Lexer *opt) {
-        if (opt->token.id != ARQ_OPT_NULL) {
+        if (opt->token.id != ARQ_NULL) {
                 return false;
         }
         arq_lexer_next_opt_token(opt);
@@ -348,7 +303,7 @@ void arq_imm_cmd_not_a_option(Arq_Vector const *cmd, Arq_msg *error_msg) {
 
 bool arq_imm_end_of_line(Arq_Vector *cmd) {
         Arq_Token const *token = &cmd->at[cmd->idx];
-        const bool b = (token->id == ARQ_CMD_END_OF_LINE);
+        const bool b = (token->id == ARQ_NO_TOKEN);
         return b;
 }
 
@@ -428,7 +383,7 @@ bool arq_imm_optional_argument_cstr_t(Arq_Vector *cmd, char const **cstr) {
 
 bool arq_imm_pick_cstr_t(Arq_Vector *cmd, char const **cstr) {
         Arq_Token const *token = &cmd->at[cmd->idx];
-        if (token->id != ARQ_CMD_END_OF_LINE) {
+        if (token->id != ARQ_NO_TOKEN) {
                 *cstr = arq_imm_argument_csrt_t(cmd, NULL);
                 return true;
         }
@@ -523,7 +478,7 @@ float_to arq_imm_argument_float(Arq_Vector *cmd, Arq_msg *error_msg) {
 char const *arq_imm_argument_csrt_t(Arq_Vector *cmd, Arq_msg *error_msg) {
         Arq_Token *token = &cmd->at[cmd->idx];
         char const *result;
-        if (token->id == ARQ_CMD_END_OF_LINE) {
+        if (token->id == ARQ_NO_TOKEN) {
                 Arq_Token const tok = *token;
                 arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
                 arq_msg_append_cstr(error_msg, "Token '");
