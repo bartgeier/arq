@@ -489,6 +489,7 @@ TEST(arq, uint32_t) {
                 {'c', "numberC",  fn_number32_array,  "(uint number[])"},
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+#if 1
         {
                 set(&cmd, "arq", "--numberA", "sdf");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -504,8 +505,10 @@ TEST(arq, uint32_t) {
                         EXPECT_FALSE(true);
                 }
         }
+#endif
         {
                 set(&cmd, "arq", "--numberA", "42949672950");
+                /*set(&cmd, "arq", "--numberA", "429496");*/
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         EXPECT_EQ(
                                 strcmp(buffer,
@@ -565,6 +568,7 @@ TEST(arq, uint32_t) {
         {
                 set(&cmd, "arq", "--numberC", "0xF", "40004", "1", "42");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        printf("%s\n", buffer);
                         ASSERT_TRUE(false);
                 }
                 EXPECT_TRUE(0 == strcmp(result,"fn_number32_array 4 15 40004 1 42 "));

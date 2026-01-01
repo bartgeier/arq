@@ -408,26 +408,34 @@ Arq_LexerCmd arq_lexerCmd_create(int argc, char **argv) {
         l.lexer = base;
         l.argc = argc - 1;
         l.argv = argv + 1;
+        l.argIdx = 0;
         l.bundeling = false;
         return l;
 }
 
+void arq_lexerCmd_reset(Arq_LexerCmd *cmd) {
+        Arq_Lexer base = arq_lexer_create();
+        cmd->lexer = base;
+        cmd->argIdx = 0;
+        cmd->bundeling = false;
+        return;
+}
+
 void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
-        if (cmd->argc == 0) {
+        if (cmd->argIdx >= cmd->argc) {
                 cmd->lexer.token.id = ARQ_NO_TOKEN;
                 cmd->lexer.SIZE = 0;
                 cmd->lexer.cursor_idx = 0;
                 cmd->lexer.at = NULL;
                 cmd->lexer.token.at = NULL;
                 cmd->lexer.token.size = 0;
-                cmd->argv = NULL;
                 cmd->bundeling = false;
                 return;
         }
 
         if (!cmd->bundeling) {
-                cmd->lexer.SIZE = strlen(*cmd->argv);
-                cmd->lexer.at = *cmd->argv;
+                cmd->lexer.SIZE = strlen(cmd->argv[cmd->argIdx]);
+                cmd->lexer.at = cmd->argv[cmd->argIdx];
                 cmd->lexer.cursor_idx = 0;
                 cmd->lexer.token = next_cmd_token(&cmd->lexer);
         } else if (is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx])) {
@@ -444,15 +452,13 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 cmd->bundeling = true;
                 return;
         }
-        if (cmd->argc > 0) {
-                cmd->argc--;
-                cmd->argv++;
+        if (cmd->argIdx < cmd->argc) {
+                cmd->argIdx++;
         }
         cmd->bundeling = false;
         return;
 }
 
-#if 1
 void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
         Arq_LexerCmd cmd = arq_lexerCmd_create(argc, argv);
         v->num_of_token = 0;
@@ -463,47 +469,3 @@ void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const
                 v->at[v->num_of_token++] = cmd.lexer.token;
         } while (cmd.lexer.token.id != ARQ_NO_TOKEN);
 }
-#else 
-void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
-        int i;
-        assert(argc >= 1);
-        argv += 1;
-        argc -= 1;
-        v->num_of_token = 0;
-        v->idx = 0;
-        for (i = 0; i < argc; i++) {
-                Arq_Lexer lexer;
-                lexer.SIZE = strlen(argv[i]);
-                lexer.cursor_idx = 0;
-                lexer.at = argv[i];
-                assert( v->num_of_token < num_of_token);
-                v->at[v->num_of_token++] = next_cmd_token(&lexer);
-                while (lexer.cursor_idx < lexer.SIZE) { 
-                        /* bundled optons, Option clustering */
-                        lexer.SIZE -= lexer.cursor_idx;
-                        lexer.at = &lexer.at[lexer.cursor_idx];
-                        lexer.cursor_idx = 0;
-                        if (is_short_identifier(lexer.at[lexer.cursor_idx])) {
-                                Arq_Token t = {0};
-                                t.at = &lexer.at[lexer.cursor_idx];
-                                t.id = ARQ_CMD_SHORT_OPTION; 
-                                t.size = 1;
-                                lexer.cursor_idx++;
-                                assert(v->num_of_token < num_of_token);
-                                v->at[v->num_of_token++] = t;
-                        } else {
-                                assert( v->num_of_token < num_of_token);
-                                v->at[v->num_of_token++] = next_cmd_token(&lexer);
-                        }
-                }
-        }
-        {
-                Arq_Token t;
-                t.id = ARQ_NO_TOKEN;
-                t.size = 0;
-                t.at = NULL;
-                assert(v->num_of_token < num_of_token);
-                v->at[v->num_of_token++] = t;
-        }
-}
-#endif

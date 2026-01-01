@@ -16,6 +16,7 @@ typedef struct {
         bool bundeling;
         int argc;
         char **argv;
+        int argIdx;
 } Arq_LexerCmd;
 
 #ifdef __cplusplus
@@ -27,6 +28,7 @@ void arq_lexer_next_opt_token(Arq_Lexer *l);
 
 
 Arq_LexerCmd arq_lexerCmd_create(int argc, char **argv);
+void arq_lexerCmd_reset(Arq_LexerCmd *cmd);
 void arq_lexer_next_cmd_token(Arq_LexerCmd *l);
 void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token);
 
