@@ -180,6 +180,7 @@ uint32_t arq_verify(
         }
 
         for (i = 0; i < num_of_options; i++) {
+                bool for_loop_continue = false;
                 Arq_Lexer l = arq_lexer_create();
                 l.at = options[i].arguments;
                 l.SIZE = strlen(options[i].arguments);
@@ -190,7 +191,7 @@ uint32_t arq_verify(
                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &l)) {
                                 error_str = "' after ')' no tokens allowed!\n";
                                 if (arq_imm_noToken(&l.token)) {
-                                        return 0;
+                                        continue;
                                 } 
                                 goto error;
                         }
@@ -220,7 +221,8 @@ uint32_t arq_verify(
                                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
-                                                        return 0;
+                                                        for_loop_continue = true; 
+                                                        break;
                                                 } 
                                         }
                                         goto error;
@@ -250,7 +252,8 @@ uint32_t arq_verify(
                                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
-                                                        return 0;
+                                                        for_loop_continue = true; 
+                                                        break;
                                                 } 
                                         }
                                         goto error;
@@ -280,7 +283,8 @@ uint32_t arq_verify(
                                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
-                                                        return 0;
+                                                        for_loop_continue = true; 
+                                                        break;
                                                 } 
                                         }
                                         goto error;
@@ -310,7 +314,8 @@ uint32_t arq_verify(
                                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &l)) {
                                                 error_str = "' after ')' no tokens allowed!\n";
                                                 if (arq_imm_noToken(&l.token)) {
-                                                        return 0;
+                                                        for_loop_continue = true; 
+                                                        break;
                                                 } 
                                         }
                                         goto error;
@@ -321,6 +326,9 @@ uint32_t arq_verify(
                                 error_str = "' is not a type\n";
                                 goto error;
                         } while (l.token.id != ARQ_NO_TOKEN);
+                        if (for_loop_continue) {
+                                continue;
+                        }
                 }
 error:
                 {
@@ -342,9 +350,8 @@ error:
                         output_option_verify_failure(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
-
         } /* for loop */
-        assert(false);
+        /* assert(false); */
         return 0;
 }
 
@@ -455,7 +462,7 @@ uint32_t arq_fn(
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_idx], arena_buffer); 
                                                 return error_msg.size;
                                         }
-                                        arq_push_uint32_t(queue, num.u32);
+                                        arq_push_uint(queue, num.u32);
                                         log_inta(("u32 %u", num.u32));
                                 } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
@@ -469,7 +476,7 @@ uint32_t arq_fn(
                                                         return error_msg.size;
                                                 }
                                                 *array_size += 1;
-                                                arq_push_uint32_t(queue, num.u32);
+                                                arq_push_uint(queue, num.u32);
                                                 log_inta(("u32 %u", num.u32));
                                         }
                                 } else {
@@ -480,7 +487,7 @@ uint32_t arq_fn(
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_idx], arena_buffer); 
                                                 return error_msg.size;
                                         }
-                                        arq_push_uint32_t(queue, num.u32);
+                                        arq_push_uint(queue, num.u32);
                                         log_inta(("u32 %u", num.u32));
                                 }
                                 if (arq_imm(ARQ_OP_COMMA, &opt)) continue;
@@ -500,7 +507,7 @@ uint32_t arq_fn(
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_idx], arena_buffer); 
                                                 return error_msg.size;
                                         }
-                                        arq_push_int32_t(queue, num.i32);
+                                        arq_push_int(queue, num.i32);
                                         log_inta(("i32 %d", num.i32));
                                 } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
                                         uint32_t *array_size = arq_push_array_size(queue, 0);
@@ -514,7 +521,7 @@ uint32_t arq_fn(
                                                         return error_msg.size;
                                                 }
                                                 *array_size += 1;
-                                                arq_push_int32_t(queue, num.i32);
+                                                arq_push_int(queue, num.i32);
                                                 log_inta(("i32 %d", num.i32));
                                         }
                                 } else {
@@ -525,7 +532,7 @@ uint32_t arq_fn(
                                                 output_cmd_line_conversion_failure(&error_msg, &options[option_idx], arena_buffer); 
                                                 return error_msg.size;
                                         }
-                                        arq_push_int32_t(queue, num.i32);
+                                        arq_push_int(queue, num.i32);
                                         log_inta(("i32 %d", num.i32));
                                 }
                                 if (arq_imm(ARQ_OP_COMMA, &opt)) continue;

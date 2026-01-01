@@ -37,10 +37,10 @@ extern "C" {
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena);
 void arq_queue_clear(Arq_Queue *queue);
 
-void arq_push_uint32_t(Arq_Queue *queue, uint32_t n);
+void arq_push_uint(Arq_Queue *queue, uint32_t n);
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n);
 /* void arq_push_uint64_t(Arq_Queue *queue, uint64_t n); */
-void arq_push_int32_t(Arq_Queue *queue, int32_t n);
+void arq_push_int(Arq_Queue *queue, int32_t n);
 /* void arq_push_int64_t(Arq_Queue *queue, int64_t n); */
 void arq_push_float(Arq_Queue *queue, double f);
 void arq_push_cstr_t(Arq_Queue *queue, char const *cstr);

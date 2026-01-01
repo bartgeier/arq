@@ -3,6 +3,7 @@
 
 #include "arq_conversion.h"
 #include "arq_lexer.h"
+#include "arq.h"
 #include "arq_bool.h"
 
 #define CMD_LINE_FAILURE "CMD line failure:\n"

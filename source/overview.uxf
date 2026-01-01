@@ -220,13 +220,13 @@ symbol_names[]</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1023</x>
+      <x>990</x>
       <y>440</y>
-      <w>220</w>
+      <w>253</w>
       <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;180.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;210.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
@@ -267,17 +267,17 @@ symbol_names[]</panel_attributes>
       <x>407</x>
       <y>297</y>
       <w>286</w>
-      <h>297</h>
+      <h>275</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;250.0;240.0;250.0;240.0;10.0</additional_attributes>
+    <additional_attributes>10.0;230.0;240.0;230.0;240.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>737</x>
       <y>385</y>
-      <w>297</w>
+      <w>264</w>
       <h>165</h>
     </coordinates>
     <panel_attributes>arq_token.h
@@ -421,13 +421,13 @@ convert token to argument</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1023</x>
+      <x>990</x>
       <y>517</y>
-      <w>396</w>
+      <w>429</w>
       <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;340.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;370.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>

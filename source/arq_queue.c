@@ -47,7 +47,7 @@ void arq_unused(Arq_Queue *queue) {
         (void)pop(queue);
 }
 
-uint32_t arq_uint32_t(Arq_Queue *queue) {
+uint32_t arq_uint(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_TYPE_UINT);
         return t.value.u32;
@@ -67,7 +67,7 @@ uint64_t arq_uint64_t(Arq_Queue *queue) {
 }
 #endif
 
-int32_t arq_int32_t(Arq_Queue *queue) {
+int32_t arq_int(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_TYPE_INT);
         return t.value.i32;
@@ -85,7 +85,7 @@ char const *arq_cstr_t(Arq_Queue *queue) {
         return t.value.cstr;
 }
 
-void arq_push_uint32_t(Arq_Queue *queue, uint32_t n) {
+void arq_push_uint(Arq_Queue *queue, uint32_t n) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_UINT;
         a.value.u32 = n;
@@ -109,7 +109,7 @@ void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {
 }
 #endif
 
-void arq_push_int32_t(Arq_Queue *queue, int32_t n) {
+void arq_push_int(Arq_Queue *queue, int32_t n) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_INT;
         a.value.i32 = n;

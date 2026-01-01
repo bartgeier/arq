@@ -29,10 +29,10 @@ uint32_t arq_fn(
 );
 
 void arq_unused(Arq_Queue *queue);
-uint32_t arq_uint32_t(Arq_Queue *queue);
+uint32_t arq_uint(Arq_Queue *queue);
 uint32_t arq_array_size(Arq_Queue *queue);
 /* uint64_t arq_uint64_t(Arq_Queue *queue); */
-int32_t arq_int32_t(Arq_Queue *queue);
+int32_t arq_int(Arq_Queue *queue);
 double arq_float(Arq_Queue *queue);
 char const *arq_cstr_t(Arq_Queue *queue);
 

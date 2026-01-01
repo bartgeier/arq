@@ -147,6 +147,45 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
+                        {'v', "version", fn_failure,  "()"},
+                        {'u', "uint",    fn_failure,  "(uint32_t number = 324)"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    token 'uint32_t' is not a type\n"
+                                        "    -u --uint (uint32_t number = 324)\n"
+                                        "               ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(uint32_t number)"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    token 'uint32_t' is not a type\n"
+                                        "    -v --version (uint32_t number)\n"
+                                        "                  ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
@@ -360,7 +399,7 @@ void fn_bundeling(Arq_Queue *queue) {
 }
 void fn_bundeling_number(Arq_Queue *queue) {
         (void) queue;
-        pos += sprintf(result + pos, "number %u\n", arq_uint32_t(queue));
+        pos += sprintf(result + pos, "number %u\n", arq_uint(queue));
 }
 void fn_bundeling_string(Arq_Queue *queue) {
         (void) queue;
@@ -430,7 +469,7 @@ TEST(arq, short_option_bundeling) {
 }
 
 void fn_number32(Arq_Queue *queue) {
-        uint32_t x = arq_uint32_t(queue);
+        uint32_t x = arq_uint(queue);
         sprintf(result, "fn_number32 %u", x);
 }
 void fn_number32_array(Arq_Queue *queue) {
@@ -438,7 +477,7 @@ void fn_number32_array(Arq_Queue *queue) {
         uint32_t i;
         int pos = sprintf(result, "fn_number32_array %u ", array_size);
         for (i = 0; i < array_size; i++) {
-                pos += sprintf(result + pos, "%u ", arq_uint32_t(queue));
+                pos += sprintf(result + pos, "%u ", arq_uint(queue));
         }
 
 }
@@ -533,7 +572,7 @@ TEST(arq, uint32_t) {
 }
 
 void fn_numberi32(Arq_Queue *queue) {
-        int32_t x = arq_int32_t(queue);
+        int32_t x = arq_int(queue);
         sprintf(result, "fn_numberi32 %d", x);
 }
 void fn_numberi32_array(Arq_Queue *queue) {
@@ -541,7 +580,7 @@ void fn_numberi32_array(Arq_Queue *queue) {
         int32_t i;
         int pos = sprintf(result, "fn_numberi32_array %d ", array_size);
         for (i = 0; i < array_size; i++) {
-                pos += sprintf(result + pos, "%d ", arq_int32_t(queue));
+                pos += sprintf(result + pos, "%d ", arq_int(queue));
         }
 
 }
