@@ -9,30 +9,31 @@
 
 typedef struct {
         bool error;
-        uint32_t u32;
-} uint32_to;
+        uint32_t u;
+} uint_o;
 
 typedef struct {
         bool error;
-        int32_t i32;
-} int32_to;
+        int32_t i;
+} int_o;
 
 typedef struct {
         bool error;
         double f;
-} float_to;
+} float_o;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 bool token_long_option_eq(Arq_Token const *token, char const *cstr);
-uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
-int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
-float_to arq_tok_decFloat_to_float(Arq_Token const *token);
 
-uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
-float_to arq_tok_hexFloat_to_float(Arq_Token const *token);
+uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+uint_o arq_tok_hex_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
+
+float_o arq_tok_decFloat_to_float(Arq_Token const *token);
+float_o arq_tok_hexFloat_to_float(Arq_Token const *token);
 
 #ifdef __cplusplus
 }

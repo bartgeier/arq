@@ -57,8 +57,8 @@ void fn_array(Arq_Queue *queue) {
                         printf("        argument[%d]: %d\n", i, arq_int(queue));
                 }
         } {
-                uint32_t const array_size = arq_array_size(queue);
                 uint32_t i;
+                uint32_t const array_size = arq_array_size(queue);
                 printf("\n");
                 printf("    foo array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
@@ -113,5 +113,6 @@ int main(int argc, char **argv) {
                 printf("%s\n", (char *)buffer);
                 return 1;
         }
+        printf("\nbyby\n");
         return 0;
 }

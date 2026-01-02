@@ -19,16 +19,6 @@ static KeyWord const key_words[] = {
         {  ARQ_TYPE_FLOAT,    "float" },
 };
 
-Arq_Lexer arq_lexer_create(void) {
-        Arq_Lexer lexer;
-        lexer.cursor_idx = 0;
-        lexer.SIZE = 0;
-        lexer.at = NULL;
-        lexer.token.at = NULL;
-        lexer.token.id = 0;
-        lexer.token.size = 0;
-        return lexer;
-}
 
 static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
         uint32_t i;
@@ -381,8 +371,26 @@ static Arq_Token next_token(Arq_Lexer *l) {
         return t;
 }
 
-void arq_lexer_next_opt_token(Arq_Lexer *l) {
-        l->token = next_token(l);
+void arq_lexer_next_opt_token(Arq_LexerOpt *opt) {
+        opt->lexer.token = next_token(&opt->lexer);
+}
+
+Arq_Lexer arq_lexer_create(void) {
+        Arq_Lexer lexer;
+        lexer.cursor_idx = 0;
+        lexer.SIZE = 0;
+        lexer.at = NULL;
+        lexer.token.at = NULL;
+        lexer.token.id = 0;
+        lexer.token.size = 0;
+        return lexer;
+}
+
+Arq_LexerOpt arq_lexerOpt_create(void) {
+        Arq_LexerOpt opt;
+        opt.lexer = arq_lexer_create();
+        opt.idx = 0;
+        return opt;
 }
 
 /******************************************************************************/
@@ -403,19 +411,17 @@ static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
 } 
 
 Arq_LexerCmd arq_lexerCmd_create(int argc, char **argv) {
-        Arq_Lexer base = arq_lexer_create();
-        Arq_LexerCmd l;
-        l.lexer = base;
-        l.argc = argc - 1;
-        l.argv = argv + 1;
-        l.argIdx = 0;
-        l.bundeling = false;
-        return l;
+        Arq_LexerCmd cmd;
+        cmd.lexer = arq_lexer_create();
+        cmd.argc = argc - 1;
+        cmd.argv = argv + 1;
+        cmd.argIdx = 0;
+        cmd.bundeling = false;
+        return cmd;
 }
 
 void arq_lexerCmd_reset(Arq_LexerCmd *cmd) {
-        Arq_Lexer base = arq_lexer_create();
-        cmd->lexer = base;
+        cmd->lexer = arq_lexer_create();
         cmd->argIdx = 0;
         cmd->bundeling = false;
         return;

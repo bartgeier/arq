@@ -20,8 +20,8 @@ bool token_long_option_eq(Arq_Token const *token, char const *cstr) {
         return true;
 }
 
-uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
-        uint32_to result = {0};
+uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        uint_o result = {0};
         uint32_t i;
         assert(token->id == ARQ_P_DEC);
         if (token->at[0] == '+') {
@@ -31,7 +31,7 @@ uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, c
         }
         for (; i < token->size; i++) {
                 uint32_t digit = token->at[i] - '0';
-                if (result.u32 > (UINT32_MAX - digit) / 10) {
+                if (result.u > (UINT32_MAX - digit) / 10) {
                         if (error_msg != NULL) {
                                 Arq_Token tok = *token;
                                 char buffer[12];
@@ -47,13 +47,13 @@ uint32_to arq_tok_pDec_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, c
                         result.error = true;
                         return result;
                 }
-                result.u32 = result.u32 * 10 + digit;
+                result.u = result.u * 10 + digit;
         } 
         return result;
 }
 
-int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
-        int32_to result = {0};
+int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        int_o result = {0};
         int32_t SIGN;
         uint32_t i;
         assert(token->id == ARQ_P_DEC || token->id == ARQ_N_DEC);
@@ -75,7 +75,7 @@ int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, cha
                 int32_t const digit = ch - '0';
 
                 if (SIGN > 0) {
-                        if (result.i32 > (INT32_MAX - digit) / 10) {
+                        if (result.i > (INT32_MAX - digit) / 10) {
                                 result.error = true;
                                 if (error_msg != NULL) {
                                         Arq_Token tok = *token;
@@ -91,9 +91,9 @@ int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, cha
                                 }
                                 return result;
                         }
-                        result.i32 = result.i32 * 10 + digit;
+                        result.i = result.i * 10 + digit;
                 } else {
-                        if (result.i32 < (INT32_MIN + digit) / 10) {
+                        if (result.i < (INT32_MIN + digit) / 10) {
                                 result.error = true;
                                 if (error_msg != NULL) {
                                         Arq_Token tok = *token;
@@ -109,7 +109,7 @@ int32_to arq_tok_sDec_to_int32_t(Arq_Token const *token, Arq_msg *error_msg, cha
                                 }
                                 return result;
                         }
-                        result.i32 = result.i32 * 10 - digit;
+                        result.i = result.i * 10 - digit;
                 }
         }
         return result;
@@ -126,15 +126,15 @@ static int decval(char c) {
     return -1;
 }
 
-uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
-        uint32_to result = {0};
+uint_o arq_tok_hex_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
+        uint_o result = {0};
         uint32_t i;
         assert(token->id == ARQ_HEX);
         for (i = 2; i < token->size; i++) {
                 char const ch = token->at[i];
                 int const digit = hexval(ch);
                 assert(digit >= 0);
-                if (result.u32 > (UINT32_MAX - digit) / 10) {
+                if (result.u > (UINT32_MAX - digit) / 10) {
                         result.error = true;
                         if (error_msg != NULL) {
                                 Arq_Token tok = *token;
@@ -147,7 +147,7 @@ uint32_to arq_tok_hex_to_uint32_t(Arq_Token const *token, Arq_msg *error_msg, ch
                         }
                         return result;
                 }
-                result.u32 = result.u32 * 16 + digit;
+                result.u = result.u * 16 + digit;
         }
         return result;
 }
@@ -175,8 +175,8 @@ static double arq_pow(double base, int exp) {
         return result;
 }
 
-float_to arq_tok_decFloat_to_float(Arq_Token const *token) {
-        float_to result;
+float_o arq_tok_decFloat_to_float(Arq_Token const *token) {
+        float_o result;
         double value = 0.0;
         int mantissa_sign = 1;
         int exp10 = 0;
@@ -264,8 +264,8 @@ float_to arq_tok_decFloat_to_float(Arq_Token const *token) {
         }
 }
 
-float_to arq_tok_hexFloat_to_float(Arq_Token const *token) {
-        float_to result;
+float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
+        float_o result;
         double value = 0.0;
         int exp10 = 0;
         int exp_sign = 1;

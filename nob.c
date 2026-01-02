@@ -45,7 +45,7 @@ bool arq_build(bool const clean) {
         nob_cmd_append(&c_ompiler, "-mshstk");
 #endif
 #if 1
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
@@ -245,7 +245,7 @@ int main(int argc, char **argv) {
         create_include_paths();
         ok &= arq_build(flag.clean);
 
-        #if 1
+        #if 0
             ok &= unittests_build(flag.clean); 
         #endif
 

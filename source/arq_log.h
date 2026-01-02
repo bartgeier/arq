@@ -12,7 +12,7 @@
         #define log_memory(args) do {} while (0)
 #endif
 
-#ifdef ARQ_LOG_TOKENIZER
+#ifdef ARQ_LOG_TOKENS
         #include "arq_token.h"
         #include "arq_int.h"
         #include "arq_lexer.h"
@@ -33,36 +33,34 @@
                 uint32_t n;
                 for (n = 0; n < num_of_options; n++) {
                         uint32_t i = 0;
-                        Arq_Lexer l = arq_lexer_create();
-                        l.at = options[n].arguments;
-                        l.SIZE = strlen(options[n].arguments);
-                        l.cursor_idx = 0;
+                        Arq_LexerOpt opt = arq_lexerOpt_create();
+                        opt.lexer.at = options[n].arguments;
+                        opt.lexer.SIZE = strlen(options[n].arguments);
+                        opt.lexer.cursor_idx = 0;
                         printf("Option[%d] -%c --%s %s\n", n, options[n].chr, options[n].name, options[n].arguments);
                         do {
-                                arq_lexer_next_opt_token(&l);
-                                log_print_token_member(&l.token, i++);
-                        } while (l.token.id != ARQ_NO_TOKEN);
+                                arq_lexer_next_opt_token(&opt);
+                                log_print_token_member(&opt.lexer.token, i++);
+                        } while (opt.lexer.token.id != ARQ_NO_TOKEN);
                         printf("\n");
                 }
         }
 
-        static void log_cmd_line_tokens(Arq_LexerCmd *cmd)  {
+        static void log_cmd_tokens(int argc, char **argv)  {
+                Arq_LexerCmd cmd = arq_lexerCmd_create(argc, argv);
                 uint32_t i = 0;
-                printf("Command line token:\n");
-                cmd->argIdx = 0;
-                cmd->lexer = arq_lexer_create();
+                printf("Command line tokens:\n");
                 do {
-                        arq_lexer_next_cmd_token(cmd);
-                        log_print_token_member(&cmd->lexer.token, i++);
+                        arq_lexer_next_cmd_token(&cmd);
+                        log_print_token_member(&cmd.lexer.token, i++);
 
-                } while(cmd->lexer.token.id != ARQ_NO_TOKEN);
-                arq_lexerCmd_reset(cmd); 
+                } while(cmd.lexer.token.id != ARQ_NO_TOKEN);
                 printf("\n");
         }
 #else
         #define log_print_token_member(token, nr) ((void)0)
         #define log_options_tokens(opt, num_of_options) ((void)0)
-        #define log_cmd_line_tokens(cmd) ((void)0)
+        #define log_cmd_tokens(argc, argv) ((void)0)
 #endif
 
 #ifdef ARQ_LOG_TOKENIZER
