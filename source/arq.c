@@ -1,3 +1,4 @@
+#include "arq_arena.h"
 #include "arq_lexer.h"
 #include "arq_queue.h"
 #include "arq_immediate.h"
@@ -254,13 +255,7 @@ uint32_t arq_verify(
         Arq_Arena *arena;
         (void) buffer_size;
 
-        log_memory(("Buffer capacity %d byte", buffer_size));
         arena = arq_arena_init(arena_buffer, buffer_size);
-        log_memory(("Arena head %d byte, capacity %d byte,                arena.size = %4d byte", 
-                (int)offsetof(Arq_Arena,at),
-                arena->SIZE, 
-                arena->size
-        ));
 
         {
                 uint32_t SIZE_OF_ERROR_MSG;
@@ -459,35 +454,37 @@ uint32_t arq_fn(
         Arq_msg error_msg;
         Arq_Queue *queue;
 
+        log_memory( ("size of arq_int %ld bit\n", 8 * sizeof(((uint_o *)0)->u) ));
+
         log_options_tokens(options, num_of_options);
         log_cmd_tokens(argc, argv);
 
-        log_memory(("Buffer capacity %d byte", buffer_size));
+        log_memory(("------- memory usage in byte --------"));
+        log_memory(("%11shead %2scapacity %6srest", "", "", ""));
+        log_memory(("Buffer    %5d %10d %10s", 0, buffer_size, "-"));
         arena = arq_arena_init(arena_buffer, buffer_size);
-        log_memory(("Arena head %d byte, capacity %d byte,                arena.size = %4d byte", 
-                (int)offsetof(Arq_Arena,at),
-                arena->SIZE, 
-                arena->size
-        ));
+        log_memory(("Arena     %5d %10d %10s", (int)offsetof(Arq_Arena, at), arena->SIZE, "-"));
 
         {
                 uint32_t SIZE_OF_ERROR_MSG = 500;
                 error_msg.at = (char *)arq_arena_malloc(arena, SIZE_OF_ERROR_MSG);
                 error_msg.SIZE = SIZE_OF_ERROR_MSG;
                 error_msg.size = 0;
+                log_memory(("error_msg %5d %10d %10d", 0, error_msg.SIZE, (int)(arena->SIZE - arena->size)));
         }
 
         log_int_banner("interpreter");
 
         queue = arq_queue_malloc(arena);
-        log_memory(("Argument queue      %2d + %2d argum * %2d = %3d byte => arena.size = %4d byte", 
-                (int)offsetof(Arq_Queue, at),
-                queue->NUM_OF_ARGUMENTS,
-                (int)sizeof(queue->at[0]),
-                (int)offsetof(Arq_Queue, at) + (int)(queue->NUM_OF_ARGUMENTS * sizeof(queue->at[0])),
-                arena->size
-        ));
-        log_memory(("%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS));
+
+        log_memory(("Arq_Queue %5d %10d %10d", 
+                (int)offsetof(Arq_Queue, at), 
+                (int)(queue->NUM_OF_ARGUMENTS * sizeof(queue->at[0])),
+                (int)(arena->SIZE - arena->size))
+                /*(int)(arena->SIZE - queue->NUM_OF_ARGUMENTS * sizeof(queue->at[0])))*/
+
+        );
+        log_memory(("\n%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS));
 
 
         arq_lexer_next_cmd_token(&cmd);

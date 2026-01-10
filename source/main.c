@@ -100,7 +100,6 @@ int main(int argc, char **argv) {
         /* ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello */
         char buffer[10000];
 
-        printf("size of size_t %ld\n", sizeof(size_t));
 
         if (0 < arq_verify(        buffer, sizeof(buffer), options, sizeof(options)/sizeof(Arq_Option))) {
                 printf("%s\n", (char *)buffer);

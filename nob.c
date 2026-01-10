@@ -58,7 +58,6 @@ bool arq_build(bool const clean) {
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-fomit-frame-pointer",
                 "-shared", "-o", "build/libarq.so"
         );
-
 #endif
         Nob_Cmd cmd = {0};
         nob_cmd_append_cmd(&cmd, &c_ompiler);
@@ -245,7 +244,7 @@ int main(int argc, char **argv) {
         create_include_paths();
         ok &= arq_build(flag.clean);
 
-        #if 0
+        #if 1
             ok &= unittests_build(flag.clean); 
         #endif
 
