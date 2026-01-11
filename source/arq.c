@@ -29,80 +29,6 @@ static void error_msg_append_option(Arq_msg *error_msg, Arq_Option const *o) {
         arq_msg_append_lf(error_msg);
 }
 
-#if 0
-static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_Vector *cmd) {
-        uint32_t A_IDX, B_IDX, C_IDX, D_IDX, ARGV_LEN; 
-        uint32_t ln_count = 0;
-        uint32_t i;
-        A_IDX = 0;
-        for (i = 0; i < m->size; i++) {
-                if (m->at[i] == '\n') {
-                        ln_count++;
-                        if (line_nr == ln_count) {
-                                A_IDX = i + 1;
-                        }
-                }
-        }
-
-        B_IDX = m->size;
-        for (i = 0; i <= cmd->idx; i++) {
-                /* render argv to calculate argv_len */
-                if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
-                        uint32_t const x = cmd->at[i].at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
-                        arq_msg_append_chr(m, cmd->at[i].at[0]);
-                        arq_msg_append_nchr(m, cmd->at[i].at[1], x);
-                        arq_msg_append_chr(m, '_');
-                } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
-                        /* arq_msg_append_nchr(m, '-', 2); */
-                        arq_msg_append_cstr(m, cmd->at[i].at);
-                        arq_msg_append_chr(m, '_');
-                } else if (cmd->at[i].id == ARQ_NO_TOKEN) {
-                } else {
-                        arq_msg_append_cstr(m, cmd->at[i].at);
-                        arq_msg_append_chr(m, '_');
-                }
-        }
-        arq_msg_append_lf(m);
-        C_IDX = m->size;
-        ARGV_LEN = C_IDX - B_IDX;
-        {
-                uint32_t const shift_right = B_IDX - A_IDX;
-                for (i = 0; i < shift_right; i++) {
-                        uint32_t const idx = B_IDX - 1 - i;
-                        m->at[idx + ARGV_LEN] = m->at[idx];
-                }
-        }
-
-        D_IDX = m->size;
-        for (i = 0; i <= cmd->idx; i++) {
-                /* render argv once more for moving argv */
-                if (cmd->at[i].id == ARQ_CMD_SHORT_OPTION) {
-                        uint32_t const x = cmd->at[i].at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
-                        arq_msg_append_chr(m, cmd->at[i].at[0]);
-                        arq_msg_append_nchr(m, cmd->at[i].at[1], x);
-                        arq_msg_append_chr(m, ' ');
-                } else if (cmd->at[i].id == ARQ_CMD_LONG_OPTION) {
-                        /* arq_msg_append_nchr(m, '-', 2); */
-                        arq_msg_append_cstr(m, cmd->at[i].at);
-                        arq_msg_append_chr(m, ' ');
-                } else if (cmd->at[i].id == ARQ_NO_TOKEN) {
-                } else {
-                        arq_msg_append_cstr(m, cmd->at[i].at);
-                        arq_msg_append_chr(m, ' ');
-                }
-        }
-        arq_msg_append_lf(m);
-
-        {
-                /* moving rendered argv */
-                for (i = 0; i < ARGV_LEN; i++) {
-                        m->at[i + A_IDX] =  m->at[i + D_IDX];
-                }
-                /* delete argv */
-                m->size = D_IDX;
-        }
-}
-#else
 static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd *cmd) {
         Arq_Token const token = cmd->lexer.token;
         uint32_t A_IDX, B_IDX, C_IDX, D_IDX, ARGV_LEN; 
@@ -191,32 +117,9 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
                 m->size = D_IDX;
         }
 }
-#endif
 
-
-static void output_option_verify_failure(Arq_msg *error_msg, char *arena_buffer) {
+static void output_error_msg(Arq_msg *error_msg, char *arena_buffer) {
         uint32_t i;
-        arq_msg_format(error_msg);
-        for (i = 0; i < error_msg->size; i++) {
-                arena_buffer[i] = error_msg->at[i];
-        }
-        arena_buffer[error_msg->size] = 0;
-        assert(arena_buffer[error_msg->size] == 0);
-}
-
-static void output_cmd_line_option_failure(Arq_msg *error_msg, char *arena_buffer) {
-        uint32_t i;
-        arq_msg_format(error_msg);
-        for (i = 0; i < error_msg->size; i++) {
-                arena_buffer[i] = error_msg->at[i];
-        }
-        arena_buffer[error_msg->size] = 0;
-        assert(arena_buffer[error_msg->size] == 0);
-}
-
-static void output_cmd_line_conversion_failure(Arq_msg *error_msg, Arq_Option const *o, char *arena_buffer) {
-        uint32_t i;
-        error_msg_append_option(error_msg, o);
         arq_msg_format(error_msg);
         for (i = 0; i < error_msg->size; i++) {
                 arena_buffer[i] = error_msg->at[i];
@@ -435,7 +338,7 @@ error:
                         error_msg_append_option(&error_msg, &options[i]);
                         arq_msg_append_nchr(&error_msg, ' ', n);
                         arq_msg_append_cstr(&error_msg, "^\n");
-                        output_option_verify_failure(&error_msg, arena_buffer);
+                        output_error_msg(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
         } /* for loop */
@@ -496,7 +399,7 @@ uint32_t arq_fn(
                         opt = arq_imm_get_long(options, num_of_options, &cmd, &error_msg);
                         if (opt.lexer.at == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                output_cmd_line_option_failure(&error_msg, arena_buffer);
+                                output_error_msg(&error_msg, arena_buffer);
                                 return error_msg.size;
                         }
                 } else if (arq_imm_cmd_is_short_option(&cmd)) {
@@ -504,7 +407,7 @@ uint32_t arq_fn(
                         opt = arq_imm_get_short(options, num_of_options, &cmd, &error_msg);
                         if (opt.lexer.at == NULL) {
                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                output_cmd_line_option_failure(&error_msg, arena_buffer);
+                                output_error_msg(&error_msg, arena_buffer);
                                 return error_msg.size;
                         }
                 } else if (arq_imm_end_of_line(&cmd)) {
@@ -514,7 +417,7 @@ uint32_t arq_fn(
                 } else {
                         arq_imm_cmd_not_a_option(&cmd, &error_msg);
                         error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                        output_cmd_line_option_failure(&error_msg, arena_buffer);
+                        output_error_msg(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
                 arq_lexer_next_opt_token(&opt);
@@ -531,7 +434,8 @@ uint32_t arq_fn(
                                         if (arq_imm_optional_argument_uint(&cmd, &num, &error_msg)) {
                                                 /* overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_uint(queue, num.u);
@@ -544,7 +448,8 @@ uint32_t arq_fn(
                                                 if (arq_imm_optional_argument_uint(&cmd, &num, &error_msg)) {
                                                         /* overflow */
                                                         error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                        output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                        error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                        output_error_msg(&error_msg, arena_buffer);
                                                         return error_msg.size;
                                                 }
                                                 *array_size += 1;
@@ -556,7 +461,8 @@ uint32_t arq_fn(
                                         if (num.error) { 
                                                 /* wasn't an uint32_t number or overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer);
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_uint(queue, num.u);
@@ -576,7 +482,8 @@ uint32_t arq_fn(
                                         if (arq_imm_optional_argument_int(&cmd, &num, &error_msg)) {
                                                 /* overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_int(queue, num.i);
@@ -589,7 +496,8 @@ uint32_t arq_fn(
                                                 if (arq_imm_optional_argument_int(&cmd, &num, &error_msg)) {
                                                         /* overflow */
                                                         error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                        output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                        error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                        output_error_msg(&error_msg, arena_buffer);
                                                         return error_msg.size;
                                                 }
                                                 *array_size += 1;
@@ -601,7 +509,8 @@ uint32_t arq_fn(
                                         if (num.error) { 
                                                 /* wasn't an int32_t number or overflow */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_int(queue, num.i);
@@ -621,7 +530,8 @@ uint32_t arq_fn(
                                         if (arq_imm_optional_argument_float(&cmd, &num, &error_msg)) {
                                                 /* in the moment there is no error */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_float(queue, num.f);
@@ -634,7 +544,8 @@ uint32_t arq_fn(
                                                 if (arq_imm_optional_argument_float(&cmd, &num, &error_msg)) {
                                                         /* in the moment there is no error */
                                                         error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                        output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                        error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                        output_error_msg(&error_msg, arena_buffer);
                                                         return error_msg.size;
                                                 }
                                                 *array_size += 1;
@@ -646,7 +557,8 @@ uint32_t arq_fn(
                                         if (num.error) { 
                                                 /* wasn't an float number */
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer); 
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_float(queue, num.f);
@@ -671,7 +583,8 @@ uint32_t arq_fn(
                                                         arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' allows you to set an argument that looks like an option -- --hello\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' undoes optional behavior in case of an cstr_t = NULL\n");
-                                                        output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer);
+                                                        error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                        output_error_msg(&error_msg, arena_buffer);
                                                         return error_msg.size;
                                                 }
                                         } else {
@@ -704,7 +617,8 @@ uint32_t arq_fn(
                                                         arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' allows to set an argument that looks like an option -- --hello\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' switch to positional arguments in case of an cstr_t array\n");
-                                                        output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer);
+                                                        error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                        output_error_msg(&error_msg, arena_buffer);
                                                         return error_msg.size;
                                                 } 
                                                 if (!dashdash.on && !arq_imm_optional_argument_cstr_t(&cmd, &cstr)) { 
@@ -727,7 +641,8 @@ uint32_t arq_fn(
                                         cstr = arq_imm_argument_csrt_t(&cmd, &error_msg);
                                         if (cstr == NULL) {
                                                 error_msg_insert_cmd_line(&error_msg, 1, &cmd);
-                                                output_cmd_line_conversion_failure(&error_msg, &options[opt.idx], arena_buffer);
+                                                error_msg_append_option(&error_msg, &options[opt.idx]);
+                                                output_error_msg(&error_msg, arena_buffer);
                                                 return error_msg.size;
                                         }
                                         arq_push_cstr_t(queue, cstr);
