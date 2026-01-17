@@ -6,7 +6,8 @@
 #include "arq.h"
 #include "arq_bool.h"
 
-#define CMD_LINE_FAILURE "CMD line failure:\n"
+#define CMD_LINE_FAILURE "CMD line failure:\nToken '"
+#define OPTION_FAILURE "Option failure:\nToken '"
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
@@ -16,7 +17,9 @@ bool arq_imm(Arq_SymbolID const id, Arq_LexerOpt *opt);
 bool arq_imm_noToken(Arq_Token *token);
 bool arq_imm_not_identifier(Arq_LexerOpt *opt);
 
-bool arq_imm_literal_uint(Arq_LexerOpt *opt);
+/* uint_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg); */
+/* bool arq_imm_literal_uint(Arq_LexerOpt *opt); */
+uint_o arq_imm_literal_uint(Arq_LexerOpt *opt,  Arq_msg *error_msg);
 bool arq_imm_literal_int(Arq_LexerOpt *opt);
 bool arq_imm_literal_float(Arq_LexerOpt *opt);
 

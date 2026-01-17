@@ -38,7 +38,6 @@ uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char con
                                 sprintf(buffer, "%" PRIu32, UINT32_MAX);
                                 arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
-                                arq_msg_append_cstr(error_msg, "Token '");
                                 arq_msg_append_str(error_msg, tok.at, tok.size);
                                 arq_msg_append_cstr(error_msg, "' positive number > UINT32_MAX ");
                                 arq_msg_append_cstr(error_msg, buffer);
@@ -83,7 +82,6 @@ int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const
                                         sprintf(buffer, "%" PRId32, INT32_MAX);
                                         arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, cstr);
-                                        arq_msg_append_cstr(error_msg, "Token '");
                                         arq_msg_append_str(error_msg, tok.at, tok.size);
                                         arq_msg_append_cstr(error_msg, "' positive number > INT32_MAX ");
                                         arq_msg_append_cstr(error_msg, buffer);
@@ -101,7 +99,6 @@ int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const
                                         sprintf(buffer, "%" PRId32, INT32_MIN);
                                         arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, cstr);
-                                        arq_msg_append_cstr(error_msg, "Token '");
                                         arq_msg_append_str(error_msg, tok.at, tok.size);
                                         arq_msg_append_cstr(error_msg, "' negative number < INT32_MIN ");
                                         arq_msg_append_cstr(error_msg, buffer);
@@ -140,7 +137,6 @@ uint_o arq_tok_hex_to_uint(Arq_Token const *token, Arq_msg *error_msg, char cons
                                 Arq_Token tok = *token;
                                 arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
-                                arq_msg_append_cstr(error_msg, "Token '");
                                 arq_msg_append_str(error_msg, tok.at, tok.size);
                                 arq_msg_append_cstr(error_msg, "' more than 8 hex digits");
                                 arq_msg_append_lf(error_msg);

@@ -98,7 +98,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token ')' missing open parenthesis '('\n"
+                                        "    Token ')' missing open parenthesis '('\n"
                                         "    -v --version )\n"
                                         "                 ^\n"
                                 ), 0
@@ -117,7 +117,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token '' is not a type\n"
+                                        "    Token '' is not a type\n"
                                         "    -v --version (\n"
                                         "                  ^\n"
                                 ), 0
@@ -136,7 +136,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'asdf' is not a type\n"
+                                        "    Token 'asdf' is not a type\n"
                                         "    -v --version (asdf\n"
                                         "                  ^\n"
                                 ), 0
@@ -156,7 +156,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'uint32_t' is not a type\n"
+                                        "    Token 'uint32_t' is not a type\n"
                                         "    -u --uint (uint32_t number = 324)\n"
                                         "               ^\n"
                                 ), 0
@@ -175,7 +175,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'uint32_t' is not a type\n"
+                                        "    Token 'uint32_t' is not a type\n"
                                         "    -v --version (uint32_t number)\n"
                                         "                  ^\n"
                                 ), 0
@@ -194,7 +194,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token '' is not a parameter name\n"
+                                        "    Token '' is not a parameter name\n"
                                         "    -v --version (uint\n"
                                         "                      ^\n"
                                 ), 0
@@ -213,7 +213,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'float' is not a parameter name\n"
+                                        "    Token 'float' is not a parameter name\n"
                                         "    -v --version (uint float\n"
                                         "                       ^\n"
                                 ), 0
@@ -232,7 +232,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token ',' is not a parameter name\n"
+                                        "    Token ',' is not a parameter name\n"
                                         "    -v --version (uint, number)\n"
                                         "                      ^\n"
                                 ), 0
@@ -251,7 +251,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token ')' is not a type\n"
+                                        "    Token ')' is not a type\n"
                                         "    -v --version (uint number,)\n"
                                         "                              ^\n"
                                 ), 0
@@ -270,7 +270,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token 'sdf' is not a uint literal\n"
+                                        "    Token 'sdf' is not a uint literal\n"
                                         "    -v --version (uint number = sdf \n"
                                         "                                ^\n"
                                 ), 0
@@ -281,7 +281,7 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
-                        {'v', "version", fn_failure, "(uint number[] = sdf "},
+                        {'v', "version", fn_failure, "(uint number = 99999999999999999999"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
@@ -289,8 +289,8 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token '=' but expected ',' or ')'\n"
-                                        "    -v --version (uint number[] = sdf \n"
+                                        "    Token '99999999999999999999' positive number > UINT32_MAX 4294967295\n"
+                                        "    -v --version (uint number = 99999999999999999999\n"
                                         "                                ^\n"
                                 ), 0
                         );
@@ -308,7 +308,7 @@ TEST(arq, verify) {
                                 strcmp(
                                         buffer,
                                         "Option failure:\n"
-                                        "    token '[' but expected '=' or '[]' or ',' or ')'\n"
+                                        "    Token '[' but expected '=' or '[]' or ',' or ')'\n"
                                         "    -v --version (uint number[ ] = sdf \n"
                                         "                             ^\n"
                                 ), 0
@@ -378,7 +378,7 @@ TEST(arq, no_parameter) {
                                 strcmp(buffer,
                                 "CMD line failure:\n"
                                 "    v \n"
-                                "    'v' is not an option\n"
+                                "    Token 'v' is not an option\n"
                                      ), 0
                         );
                 } else {

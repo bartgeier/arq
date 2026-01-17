@@ -1,5 +1,6 @@
 #include "arq_arena.h"
 #include "arq_lexer.h"
+#include "arq_msg.h"
 #include "arq_queue.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
@@ -191,32 +192,40 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
                                 if (arq_imm(ARQ_TYPE_UINT, &opt)) {
-                                        error_str = "' but expected '=' or '[]' or ',' or ')'\n";
                                         if (arq_imm_not_identifier(&opt)) {
-                                                error_str = "' is not a parameter name\n";
-                                                goto error;
-
+                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                                arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
+                                                goto error2;
                                         }
                                         if (arq_imm(ARQ_OP_EQ, &opt)) {
-                                                if (false == arq_imm_literal_uint(&opt)) {
-                                                        error_str = "' is not a uint literal\n";
-                                                        goto error;
+                                                if (arq_imm_literal_uint(&opt, &error_msg).error) {
+                                                        goto error2;
                                                 }
-                                                error_str = "' but expected ',' or ')'\n";
+                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
                                         } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                                error_str = "' but expected ',' or ')'\n";
+                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
                                         }
                                         if (arq_imm(ARQ_OP_COMMA, &opt)) {
                                                 continue;
                                         }
                                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                                error_str = "' after ')' no tokens allowed!\n";
+                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                                arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
                                                 if (arq_imm_noToken(&opt.lexer.token)) {
                                                         for_loop_continue = true; 
                                                         break;
                                                 } 
                                         }
-                                        goto error;
+                                        arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                        arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                        arq_msg_append_cstr(&error_msg, "' but expected '=' or '[]' or ',' or ')'\n");
+                                        goto error2;
                                 }
 /******************************************************************************/
 /******************************************************************************/
@@ -329,8 +338,7 @@ error:
                         ups.error = true; 
                         ups.u = opt.lexer.cursor_idx - opt.lexer.token.size;
                         arq_msg_clear(&error_msg);
-                        arq_msg_append_cstr(&error_msg, "Option failure:\n");
-                        arq_msg_append_cstr(&error_msg, "token '");
+                        arq_msg_append_cstr(&error_msg, OPTION_FAILURE);
                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
                         arq_msg_append_cstr(&error_msg, error_str);
 
@@ -341,6 +349,21 @@ error:
                         output_error_msg(&error_msg, arena_buffer);
                         return error_msg.size;
                 }
+error2:
+                {
+                        /* error */
+                        uint32_t n;
+                        uint_o ups; 
+                        ups.error = true; 
+                        ups.u = opt.lexer.cursor_idx - opt.lexer.token.size;
+                        n = arq_option_parameter_idx(&options[i]) + ups.u;
+                        error_msg_append_option(&error_msg, &options[i]);
+                        arq_msg_append_nchr(&error_msg, ' ', n);
+                        arq_msg_append_cstr(&error_msg, "^\n");
+                        output_error_msg(&error_msg, arena_buffer);
+                        return error_msg.size;
+                }
+
         } /* for loop */
         /* assert(false); */
         return 0;

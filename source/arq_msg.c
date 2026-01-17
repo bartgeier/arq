@@ -36,6 +36,7 @@ void arq_msg_format(Arq_msg *m) {
         }
 }
 
+
 void arq_msg_append_chr(Arq_msg *m, char const chr) {
         assert(m->size + 1 < m->SIZE);
         m->at[m->size++] = chr;
@@ -66,4 +67,34 @@ void arq_msg_append_str(Arq_msg *m, char const *str, uint32_t const size) {
         for (i = 0; i < size; i++) {
                 arq_msg_append_chr(m, str[i]);
         }
+}
+
+void arq_msg_insert_line_str(Arq_msg *m, uint32_t line_number, char const *str, uint32_t const size) {
+        uint32_t A, B, C;
+        uint32_t line_counter = 0;
+        assert(m->size + size <= m->SIZE);
+        for (A = 0; A < m->size; A++) {
+                /* find start idx A */
+                if (m->at[A] == '\n') line_counter++;
+                if (line_counter == line_number) break;
+        }
+        for (B = m->size - 1; B > A; B--) {
+                /* shift right, create space for insertion of str */
+                m->at[B + size] = m->at[B]; 
+        }
+        m->size = m->size + size;
+        A++;
+        for(C = 0; C < size; C++) {
+                /* copy str into arq->msg */
+                m->at[A++] = str[C];
+        }
+}
+
+void arq_msg_set_cstr(Arq_msg *m, char const *cstr) {
+        arq_msg_clear(m);
+        arq_msg_append_cstr(m, cstr);
+}
+
+void arq_msg_insert_line_cstr(Arq_msg *m, uint32_t line_number, char const *cstr) {
+        arq_msg_insert_line_str(m, line_number, cstr, strlen(cstr));
 }
