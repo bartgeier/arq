@@ -186,6 +186,46 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
+                        {'v', "version", fn_failure,  "()"},
+                        {'u', "uint",    fn_failure,  "(uint number = 324 asdf)"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'asdf' but expected ',' or ')'\n"
+                                        "    -u --uint (uint number = 324 asdf)\n"
+                                        "                                 ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure,  "()"},
+                        {'u', "uint",    fn_failure,  "(uint number[] xxx"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'xxx' but expected ',' or ')'\n"
+                                        "    -u --uint (uint number[] xxx\n"
+                                        "                             ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint32_t number)"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);

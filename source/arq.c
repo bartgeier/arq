@@ -194,166 +194,56 @@ uint32_t arq_verify(
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-                                if (arq_imm(ARQ_TYPE_UINT, &opt)) {
-                                        if (arq_imm_not_identifier(&opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
-                                                goto error;
-                                        }
-                                        if (arq_imm(ARQ_OP_EQ, &opt)) {
-                                                if (arq_imm_literal_uint(&opt, &error_msg).error) {
-                                                        goto error;
-                                                }
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        }
-                                        if (arq_imm(ARQ_OP_COMMA, &opt)) {
-                                                continue;
-                                        }
-                                        if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
-                                                if (arq_imm_noToken(&opt.lexer.token)) {
-                                                        for_loop_continue = true; 
-                                                        break;
-                                                } 
-                                        }
+                                arq_fn_imm_literal_error LITERAL_ERROR = NULL;
+                                if      (arq_imm(ARQ_TYPE_UINT,  &opt)) LITERAL_ERROR = arq_imm_literal_uint_error;
+                                else if (arq_imm(ARQ_TYPE_INT,   &opt)) LITERAL_ERROR = arq_imm_literal_int_error;
+                                else if (arq_imm(ARQ_TYPE_FLOAT, &opt)) LITERAL_ERROR = arq_imm_literal_float_error;
+                                else if (arq_imm(ARQ_TYPE_CSTR,  &opt)) LITERAL_ERROR = arq_imm_literal_NULL_error;
+                                else {
                                         arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
                                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                        arq_msg_append_cstr(&error_msg, "' but expected '=' or '[]' or ',' or ')'\n");
+                                        arq_msg_append_cstr(&error_msg, "' is not a type\n");
                                         goto error;
                                 }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                                if (arq_imm(ARQ_TYPE_INT, &opt)) {
-                                        if (arq_imm_not_identifier(&opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
-                                                goto error;
-                                        }
-                                        if (arq_imm(ARQ_OP_EQ, &opt)) {
-                                                if (arq_imm_literal_int(&opt, &error_msg).error) {
-                                                        goto error;
-                                                }
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        }
-                                        if (arq_imm(ARQ_OP_COMMA, &opt)) {
-                                                continue;
-                                        }
-                                        if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
-                                                if (arq_imm_noToken(&opt.lexer.token)) {
-                                                        for_loop_continue = true; 
-                                                        break;
-                                                } 
-                                        }
+
+                                if (arq_imm_not_identifier(&opt)) {
+                                        arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                        arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                        arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
+                                        goto error;
+                                } else {
                                         arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
                                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
                                         arq_msg_append_cstr(&error_msg, "' but expected '=' or '[]' or ',' or ')'\n");
-                                        goto error;
                                 }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                                if (arq_imm(ARQ_TYPE_FLOAT, &opt)) {
-                                        if (arq_imm_not_identifier(&opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
+                                if (arq_imm(ARQ_OP_EQ, &opt)) {
+                                        if (LITERAL_ERROR(&opt, &error_msg)) {
                                                 goto error;
-                                        }
-                                        if (arq_imm(ARQ_OP_EQ, &opt)) {
-                                                if (arq_imm_literal_float(&opt, &error_msg).error) {
-                                                        goto error;
-                                                }
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        }
-                                        if (arq_imm(ARQ_OP_COMMA, &opt)) {
-                                                continue;
-                                        }
-                                        if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
-                                                if (arq_imm_noToken(&opt.lexer.token)) {
-                                                        for_loop_continue = true; 
-                                                        break;
-                                                } 
                                         }
                                         arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
                                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                        arq_msg_append_cstr(&error_msg, "' but expected '=' or '[]' or ',' or ')'\n");
-                                        goto error;
+                                        arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
+                                } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
+                                        arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
+                                        arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
+                                        arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
                                 }
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                                if (arq_imm(ARQ_TYPE_CSTR, &opt)) {
-                                        if (arq_imm_not_identifier(&opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' is not a parameter name\n");
-                                                goto error;
-                                        }
-                                        if (arq_imm(ARQ_OP_EQ, &opt)) {
-                                                if (false == arq_imm_literal_NULL(&opt, &error_msg)) {
-                                                        goto error;
-                                                }
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' but expected ',' or ')'\n");
-                                        }
-                                        if (arq_imm(ARQ_OP_COMMA, &opt)) {
-                                                continue;
-                                        }
-                                        if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                                arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
-                                                if (arq_imm_noToken(&opt.lexer.token)) {
-                                                        for_loop_continue = true; 
-                                                        break;
-                                                } 
-                                        }
+                                if (arq_imm(ARQ_OP_COMMA, &opt)) {
+                                        continue;
+                                }
+                                if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
                                         arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
                                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                        arq_msg_append_cstr(&error_msg, "' but expected '=' or '[]' or ',' or ')'\n");
-                                        goto error;
-                                } 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-                                arq_msg_set_cstr(&error_msg, OPTION_FAILURE);
-                                arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
-                                arq_msg_append_cstr(&error_msg, "' is not a type\n");
+                                        arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
+                                        if (arq_imm_noToken(&opt.lexer.token)) {
+                                                for_loop_continue = true; 
+                                                break;
+                                        } 
+                                }
                                 goto error;
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         } while (opt.lexer.token.id != ARQ_NO_TOKEN);
                         if (for_loop_continue) {
                                 continue;

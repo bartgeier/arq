@@ -9,6 +9,9 @@
 #define CMD_LINE_FAILURE "CMD line failure:\nToken '"
 #define OPTION_FAILURE "Option failure:\nToken '"
 
+typedef  bool (*arq_fn_imm_literal_error)(Arq_LexerOpt*,  Arq_msg*);
+
+
 /*///////////////////////////////////////////////////////////////////////////*/
 
 void arq_imm_opt_next(Arq_OptVector *opt);
@@ -17,10 +20,10 @@ bool arq_imm(Arq_SymbolID const id, Arq_LexerOpt *opt);
 bool arq_imm_noToken(Arq_Token *token);
 bool arq_imm_not_identifier(Arq_LexerOpt *opt);
 
-uint_o arq_imm_literal_uint(Arq_LexerOpt *opt,  Arq_msg *error_msg);
-int_o arq_imm_literal_int(Arq_LexerOpt *opt,  Arq_msg *error_msg);
-float_o arq_imm_literal_float(Arq_LexerOpt *opt,  Arq_msg *error_msg);
-bool arq_imm_literal_NULL(Arq_LexerOpt *opt,  Arq_msg *error_msg);
+bool arq_imm_literal_uint_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
+bool arq_imm_literal_int_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
+bool arq_imm_literal_float_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
+bool arq_imm_literal_NULL_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
 
 uint_o arq_imm_default_uint(Arq_LexerOpt *opt);
 int_o arq_imm_default_int(Arq_LexerOpt *opt);
