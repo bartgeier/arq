@@ -35,9 +35,6 @@ bool arq_imm_not_identifier(Arq_LexerOpt *opt) {
         return !b;
 }
 
-/* uint_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg); */
-/* bool arq_imm_literal_uint(Arq_LexerOpt *opt); */
-#if 1
 uint_o arq_imm_literal_uint(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
         uint_o num;
         switch (opt->lexer.token.id) {
@@ -62,32 +59,12 @@ uint_o arq_imm_literal_uint(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
         }
         return num; /* return true if successful */
 }
-#else
-bool arq_imm_literal_uint(Arq_LexerOpt *opt) {
-        uint_o num;
-        switch (opt->lexer.token.id) {
-        case ARQ_P_DEC:
-                num = arq_tok_pDec_to_uint(&opt->lexer.token, NULL, "");
-                break;
-        case ARQ_HEX:
-                num = arq_tok_hex_to_uint(&opt->lexer.token, NULL, "");
-                break;
-        default:
-                return false;
-        }
-        if (!num.error) {
-                /* success */
-                arq_lexer_next_opt_token(opt);
-        }
-        return !num.error; /* return true if successful */
-}
-#endif
 
-bool arq_imm_literal_int(Arq_LexerOpt *opt) {
+int_o arq_imm_literal_int(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
         int_o num;
         switch (opt->lexer.token.id) {
         case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int(&opt->lexer.token, NULL, "");
+                num = arq_tok_sDec_to_int(&opt->lexer.token, error_msg, OPTION_FAILURE);
                 break;
         case ARQ_HEX: {
                 uint_o const n = arq_tok_hex_to_uint(&opt->lexer.token, NULL, "");
@@ -95,15 +72,62 @@ bool arq_imm_literal_int(Arq_LexerOpt *opt) {
                 num.error = n.error;
                 } break;
         default:
-                return false;
+                arq_msg_clear(error_msg);
+                arq_msg_append_cstr(error_msg, OPTION_FAILURE);
+                arq_msg_append_str(error_msg, opt->lexer.token.at, opt->lexer.token.size);
+                arq_msg_append_cstr(error_msg, "' is not a int literal\n");
+                num.i = 0;
+                num.error = true;
+                break;
         }
         if (!num.error) {
                 /* success */
                 arq_lexer_next_opt_token(opt);
         }
-        return !num.error; /* return true if successful */
+        return num; /* return true if successful */
 }
 
+#if 1
+float_o arq_imm_literal_float(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
+        float_o num;
+        switch (opt->lexer.token.id) {
+        case ARQ_DEC_FLOAT:
+                num = arq_tok_decFloat_to_float(&opt->lexer.token);
+                break;
+        case ARQ_HEX_FLOAT:
+                num = arq_tok_hexFloat_to_float(&opt->lexer.token);
+                break;
+        default:
+                arq_msg_clear(error_msg);
+                arq_msg_append_cstr(error_msg, OPTION_FAILURE);
+                arq_msg_append_str(error_msg, opt->lexer.token.at, opt->lexer.token.size);
+                arq_msg_append_cstr(error_msg, "' is not a float literal\n");
+                num.f = 0.0;
+                num.error = true;
+                break;
+        }
+        if (!num.error) {
+                /* success */
+                arq_lexer_next_opt_token(opt);
+        }
+        return num; /* return true if successful */
+}
+
+bool arq_imm_literal_NULL(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
+        bool const b = opt->lexer.token.id == ARQ_NULL;
+        if (b) {
+                /* success */
+                arq_lexer_next_opt_token(opt);
+                return true;
+        } else {
+                arq_msg_clear(error_msg);
+                arq_msg_append_cstr(error_msg, OPTION_FAILURE);
+                arq_msg_append_str(error_msg, opt->lexer.token.at, opt->lexer.token.size);
+                arq_msg_append_cstr(error_msg, "' must be NULL\n");
+                return false;
+        }
+}
+#else
 bool arq_imm_literal_float(Arq_LexerOpt *opt) {
         float_o num;
         switch (opt->lexer.token.id) {
@@ -122,6 +146,14 @@ bool arq_imm_literal_float(Arq_LexerOpt *opt) {
         }
         return !num.error; /* return true if successful */
 }
+bool arq_imm_is_a_NULL(Arq_LexerOpt *opt) {
+        if (opt->lexer.token.id != ARQ_NULL) {
+                return false;
+        }
+        arq_lexer_next_opt_token(opt);
+        return true;
+}
+#endif
 
 uint_o arq_imm_default_uint(Arq_LexerOpt *opt) {
         uint_o num = {0};
@@ -179,13 +211,6 @@ float_o arq_imm_default_float(Arq_LexerOpt *opt) {
         return num;
 }
 
-bool arq_imm_is_a_NULL(Arq_LexerOpt *opt) {
-        if (opt->lexer.token.id != ARQ_NULL) {
-                return false;
-        }
-        arq_lexer_next_opt_token(opt);
-        return true;
-}
 
 char const *arq_imm_default_cstr_t(Arq_LexerOpt *opt) {
         arq_lexer_next_opt_token(opt);

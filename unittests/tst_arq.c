@@ -128,6 +128,25 @@ TEST(arq, verify) {
         }
         {
                 Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(  ) sdf"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'sdf' after ')' no tokens allowed!\n"
+                                        "    -v --version (  ) sdf\n"
+                                        "                      ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
                         {'v', "version", fn_failure, "(asdf"},
                 };
                 uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
@@ -197,6 +216,82 @@ TEST(arq, verify) {
                                         "    Token '' is not a parameter name\n"
                                         "    -v --version (uint\n"
                                         "                      ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(uint number = xxx"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'xxx' is not a uint literal\n"
+                                        "    -v --version (uint number = xxx\n"
+                                        "                                ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(int number = xxx"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'xxx' is not a int literal\n"
+                                        "    -v --version (int number = xxx\n"
+                                        "                               ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(float number = xxx"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'xxx' is not a float literal\n"
+                                        "    -v --version (float number = xxx\n"
+                                        "                                 ^\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                Arq_Option options[] = {
+                        {'v', "version", fn_failure, "(cstr_t text = xxx"},
+                };
+                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                if (0 < arq_verify(buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "Option failure:\n"
+                                        "    Token 'xxx' must be NULL\n"
+                                        "    -v --version (cstr_t text = xxx\n"
+                                        "                                ^\n"
                                 ), 0
                         );
                 } else {
