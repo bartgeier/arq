@@ -2,6 +2,7 @@
 #include "arq.h"
 #include "arq_queue.h"
 #include "arq_arena.h"
+#include "arq_conversion.h"
 
 TEST(arq_queue, arq_queue_malloc) {
         char array[100] = {0};
@@ -28,18 +29,23 @@ TEST(arq_queue, arq_queue_malloc) {
 }
 
 TEST(arq_queue, push_and_pop) {
+        union_o x;
         char array[100] = {0};
         Arq_Arena *arena = arq_arena_init(&array, sizeof(array));
         Arq_Queue *queue = arq_queue_malloc(arena);
         EXPECT_EQ(queue->read_idx, (uint32_t)0);
         EXPECT_EQ(queue->read_idx, queue->write_idx);
-        arq_push_uint(queue, (uint32_t)69);
+        x.ou.u = 69;
+        arq_push_uint(queue, &x);
         EXPECT_EQ(arq_uint(queue), (uint32_t)69);
 
-        arq_push_uint(queue, (uint32_t)1);
-        arq_push_uint(queue, (uint32_t)2);
+        x.ou.u = 1;
+        arq_push_uint(queue, &x);
+        x.ou.u = 2;
+        arq_push_uint(queue, &x);
         EXPECT_EQ(arq_uint(queue), (uint32_t)1);
-        arq_push_uint(queue, (uint32_t)3);
+        x.ou.u = 3;
+        arq_push_uint(queue, &x);
         EXPECT_EQ(arq_uint(queue), (uint32_t)2);
         EXPECT_EQ(arq_uint(queue), (uint32_t)3);
         EXPECT_EQ(queue->read_idx, queue->write_idx);

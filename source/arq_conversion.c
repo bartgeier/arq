@@ -38,6 +38,7 @@ uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char con
                                 sprintf(buffer, "%" PRIu32, UINT32_MAX);
                                 arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
+                                /*arq_msg_append_cstr(error_msg, "Token '");*/
                                 arq_msg_append_str(error_msg, tok.at, tok.size);
                                 arq_msg_append_cstr(error_msg, "' positive number > UINT32_MAX ");
                                 arq_msg_append_cstr(error_msg, buffer);

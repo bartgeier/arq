@@ -25,9 +25,10 @@ bool arq_imm_literal_int_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
 bool arq_imm_literal_float_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
 bool arq_imm_literal_NULL_error(Arq_LexerOpt *opt,  Arq_msg *error_msg);
 
-uint_o arq_imm_default_uint(Arq_LexerOpt *opt);
-int_o arq_imm_default_int(Arq_LexerOpt *opt);
-float_o arq_imm_default_float(Arq_LexerOpt *opt);
+typedef union_o (*arq_imm_default)(Arq_LexerOpt *opt);
+union_o arq_imm_default_uint(Arq_LexerOpt *opt);
+union_o arq_imm_default_int(Arq_LexerOpt *opt);
+union_o arq_imm_default_float(Arq_LexerOpt *opt);
 char const *arq_imm_default_cstr_t(Arq_LexerOpt *opt);
 
 bool arq_imm_is_a_NULL(Arq_LexerOpt *opt);
@@ -57,20 +58,22 @@ void arq_imm_cmd_not_a_option(Arq_LexerCmd const *cmd, Arq_msg *error_msg);
 bool arq_imm_cmd_is_long_option(Arq_LexerCmd *cmd);
 bool arq_imm_cmd_is_short_option(Arq_LexerCmd *cmd);
 
-bool arq_imm_is_p_dec(Arq_LexerCmd *cmd);
-bool arq_imm_is_n_dec(Arq_LexerCmd *cmd);
-bool arq_imm_is_hex(Arq_LexerCmd *cmd);
-bool arq_imm_is_hexFloat(Arq_LexerCmd *cmd);
+typedef bool (*arq_imm_is)(Arq_LexerCmd *cmd);
+bool arq_imm_is_uint(Arq_LexerCmd *cmd);
+bool arq_imm_is_int(Arq_LexerCmd *cmd);
+bool arq_imm_is_float(Arq_LexerCmd *cmd);
 
-bool arq_imm_optional_argument_uint(Arq_LexerCmd *cmd, uint_o *num, Arq_msg *error_msg);
-bool arq_imm_optional_argument_int(Arq_LexerCmd *cmd, int_o *num, Arq_msg *error_msg);
+typedef bool (*arq_imm_optional_argument)(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg);
+bool arq_imm_optional_argument_uint(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg);
+bool arq_imm_optional_argument_int(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg);
+bool arq_imm_optional_argument_float(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg);
 bool arq_imm_optional_argument_cstr_t(Arq_LexerCmd *cmd, char const **cstr);
-bool arq_imm_optional_argument_float(Arq_LexerCmd *cmd, float_o *num, Arq_msg *error_msg);
 bool arq_imm_pick_cstr_t(Arq_LexerCmd *cmd, char const **cstr);
 
-uint_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg);
-int_o arq_imm_argument_int(Arq_LexerCmd *cmd, Arq_msg *error_msg);
-float_o arq_imm_argument_float(Arq_LexerCmd *cmd, Arq_msg *error_msg);
+typedef union_o (*arq_imm_argument)(Arq_LexerCmd *cmd, Arq_msg *error_msg);
+union_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg);
+union_o arq_imm_argument_int(Arq_LexerCmd *cmd, Arq_msg *error_msg);
+union_o arq_imm_argument_float(Arq_LexerCmd *cmd, Arq_msg *error_msg);
 char const *arq_imm_argument_csrt_t(Arq_LexerCmd *cmd, Arq_msg *error_msg);
 
 #endif 

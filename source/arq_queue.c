@@ -85,12 +85,21 @@ char const *arq_cstr_t(Arq_Queue *queue) {
         return t.value.cstr;
 }
 
+#if 0
 void arq_push_uint(Arq_Queue *queue, uint32_t n) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_UINT;
         a.value.u32 = n;
         push(queue, &a);
 }
+#else
+void arq_push_uint(Arq_Queue *queue, union_o const *x) {
+        Arq_Argument a;
+        a.type_id = ARQ_TYPE_UINT;
+        a.value.u32 = x->ou.u;
+        push(queue, &a);
+}
+#endif
 
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
         Arq_Argument a;
@@ -109,19 +118,37 @@ void arq_push_uint64_t(Arq_Queue *queue, uint64_t n) {
 }
 #endif
 
+#if 0
 void arq_push_int(Arq_Queue *queue, int32_t n) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_INT;
         a.value.i32 = n;
         push(queue, &a);
 }
+#else
+void arq_push_int(Arq_Queue *queue, union_o const *x) {
+        Arq_Argument a;
+        a.type_id = ARQ_TYPE_INT;
+        a.value.i32 = x->oi.i;
+        push(queue, &a);
+}
+#endif
 
+#if 0
 void arq_push_float(Arq_Queue *queue, double f) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_FLOAT;
         a.value.f = f;
         push(queue, &a);
 }
+#else
+void arq_push_float(Arq_Queue *queue, union_o const *f) {
+        Arq_Argument a;
+        a.type_id = ARQ_TYPE_FLOAT;
+        a.value.f = f->of.f;
+        push(queue, &a);
+}
+#endif
 
 void arq_push_cstr_t(Arq_Queue *queue, char const * cstr) {
         Arq_Argument a;

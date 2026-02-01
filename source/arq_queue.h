@@ -5,6 +5,7 @@
 #include "arq_arena.h"
 #include "arq_token.h"
 #include "arq_int.h"
+#include "arq_conversion.h"
 
 typedef struct {
         Arq_SymbolID type_id;
@@ -37,12 +38,16 @@ extern "C" {
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena);
 void arq_queue_clear(Arq_Queue *queue);
 
-void arq_push_uint(Arq_Queue *queue, uint32_t n);
+typedef void (*arq_push)(Arq_Queue *queue, union_o const *x);
+void arq_push_uint(Arq_Queue *queue, union_o const *x);
+void arq_push_int(Arq_Queue *queue, union_o const *x);
+void arq_push_float(Arq_Queue *queue, union_o const *f);
 uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n);
+#if 0
 /* void arq_push_uint64_t(Arq_Queue *queue, uint64_t n); */
-void arq_push_int(Arq_Queue *queue, int32_t n);
 /* void arq_push_int64_t(Arq_Queue *queue, int64_t n); */
 void arq_push_float(Arq_Queue *queue, double f);
+#endif
 void arq_push_cstr_t(Arq_Queue *queue, char const *cstr);
 
 #ifdef __cplusplus

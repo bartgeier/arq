@@ -127,66 +127,71 @@ bool arq_imm_literal_NULL_error(Arq_LexerOpt *opt,  Arq_msg *error_msg) {
         }
 }
 
-uint_o arq_imm_default_uint(Arq_LexerOpt *opt) {
-        uint_o num = {0};
+union_o arq_imm_default_uint(Arq_LexerOpt *opt) {
+        union_o num = {0};
         switch (opt->lexer.token.id) {
         case ARQ_P_DEC: 
-                num = arq_tok_pDec_to_uint(&opt->lexer.token, NULL, "");
+                num.ou = arq_tok_pDec_to_uint(&opt->lexer.token, NULL, "");
                 break;
         case ARQ_HEX:
-                num = arq_tok_hex_to_uint(&opt->lexer.token, NULL, "");
+                num.ou = arq_tok_hex_to_uint(&opt->lexer.token, NULL, "");
                 break;
         default:
                 assert(false);
                 break;
         }
-        assert(num.error == false);
+        assert(num.ou.error == false);
         arq_lexer_next_opt_token(opt);
         return num;
 }
 
-int_o arq_imm_default_int(Arq_LexerOpt *opt) {
-        int_o num = {0};
+union_o arq_imm_default_int(Arq_LexerOpt *opt) {
+        union_o num = {0};
         switch (opt->lexer.token.id) {
         case ARQ_P_DEC: case ARQ_N_DEC:
-                num = arq_tok_sDec_to_int(&opt->lexer.token, NULL, "");
+                num.oi = arq_tok_sDec_to_int(&opt->lexer.token, NULL, "");
                 break;
         case ARQ_HEX: {
                 uint_o const x = arq_tok_hex_to_uint(&opt->lexer.token, NULL, "");
-                num.i = (int32_t)x.u;
-                num.error = x.error;
+                num.oi.i = (int32_t)x.u;
+                num.oi.error = x.error;
                 } break;
         default:
                 assert(false);
                 break;
         }
-        assert(num.error == false);
+        assert(num.oi.error == false);
         arq_lexer_next_opt_token(opt);
         return num;
 }
 
-float_o arq_imm_default_float(Arq_LexerOpt *opt) {
-        float_o num = {0};
+union_o arq_imm_default_float(Arq_LexerOpt *opt) {
+        union_o num = {0};
         switch (opt->lexer.token.id) {
         case ARQ_DEC_FLOAT:
-                num = arq_tok_decFloat_to_float(&opt->lexer.token);
+                num.of = arq_tok_decFloat_to_float(&opt->lexer.token);
                 break;
         case ARQ_HEX_FLOAT:
-                num = arq_tok_hexFloat_to_float(&opt->lexer.token);
+                num.of = arq_tok_hexFloat_to_float(&opt->lexer.token);
                 break;
         default:
                 assert(false);
                 break;
         }
-        assert(num.error == false);
+        assert(num.of.error == false);
         arq_lexer_next_opt_token(opt);
         return num;
 }
 
-
 char const *arq_imm_default_cstr_t(Arq_LexerOpt *opt) {
         arq_lexer_next_opt_token(opt);
         return NULL;
+}
+
+union_o arq_imm_default_value(Arq_LexerOpt *opt) {
+        union_o a = {0};
+        (void) opt;
+        return a;
 }
 
 /*///////////////////////////////////////////////////////////////////////////*/
@@ -238,19 +243,16 @@ bool arq_imm_cmd_is_short_option(Arq_LexerCmd *cmd) {
         return (cmd->lexer.token.id == ARQ_CMD_SHORT_OPTION);
 }
 
-bool arq_imm_is_p_dec(Arq_LexerCmd *cmd) {
-        return (cmd->lexer.token.id == ARQ_P_DEC);
+
+bool arq_imm_is_uint(Arq_LexerCmd *cmd) {
+        return (cmd->lexer.token.id == ARQ_P_DEC) || (cmd->lexer.token.id == ARQ_HEX);
 }
 
-bool arq_imm_is_n_dec(Arq_LexerCmd *cmd) {
-        return (cmd->lexer.token.id == ARQ_N_DEC);
+bool arq_imm_is_int(Arq_LexerCmd *cmd) {
+        return (cmd->lexer.token.id == ARQ_P_DEC) || (cmd->lexer.token.id == ARQ_N_DEC) || (cmd->lexer.token.id == ARQ_HEX);
 }
 
-bool arq_imm_is_hex(Arq_LexerCmd *cmd) {
-        return (cmd->lexer.token.id == ARQ_HEX);
-}
-
-bool arq_imm_is_hexFloat(Arq_LexerCmd *cmd) {
+bool arq_imm_is_float(Arq_LexerCmd *cmd) {
         return (cmd->lexer.token.id == ARQ_DEC_FLOAT) || (cmd->lexer.token.id == ARQ_HEX_FLOAT);
 }
 
@@ -315,61 +317,61 @@ bool arq_imm_end_of_line(Arq_LexerCmd *cmd) {
         return (cmd->lexer.token.id == ARQ_NO_TOKEN);
 }
 
-bool arq_imm_optional_argument_uint(Arq_LexerCmd *cmd, uint_o *num, Arq_msg *error_msg) {
+bool arq_imm_optional_argument_uint(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
         switch (token->id) {
         case ARQ_P_DEC:
-                *num = arq_tok_pDec_to_uint(token, error_msg, CMD_LINE_FAILURE);
+                num->ou = arq_tok_pDec_to_uint(token, error_msg, CMD_LINE_FAILURE);
                 break;
         case ARQ_HEX:
-                *num = arq_tok_hex_to_uint(token, error_msg, CMD_LINE_FAILURE);
+                num->ou = arq_tok_hex_to_uint(token, error_msg, CMD_LINE_FAILURE);
                 break;
         default:
                 return false;
         }
-        if (num->error) {
+        if (num->ou.error) {
                 return true; /* overflow */
         } 
         arq_imm_cmd_next(cmd);
         return false;
 }
 
-bool arq_imm_optional_argument_int(Arq_LexerCmd *cmd, int_o *num, Arq_msg *error_msg) {
+bool arq_imm_optional_argument_int(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
         switch (token->id) {
         case ARQ_P_DEC:
         case ARQ_N_DEC:
-                *num = arq_tok_sDec_to_int(token, error_msg, CMD_LINE_FAILURE);
+                num->oi = arq_tok_sDec_to_int(token, error_msg, CMD_LINE_FAILURE);
                 break;
         case ARQ_HEX: {
                 uint_o n = arq_tok_hex_to_uint(token, error_msg, CMD_LINE_FAILURE);
-                num->i = (int32_t)n.u;
-                num->error = n.error;
+                num->oi.i = (int32_t)n.u;
+                num->oi.error = n.error;
                 } break;
         default:
                 return false;
         }
-        if (num->error) {
+        if (num->oi.error) {
                 return true; /* overflow */
         } 
         arq_imm_cmd_next(cmd);
         return false;
 }
 
-bool arq_imm_optional_argument_float(Arq_LexerCmd *cmd, float_o *num, Arq_msg *error_msg) {
+bool arq_imm_optional_argument_float(Arq_LexerCmd *cmd, union_o *num, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
         (void)error_msg;
         switch (token->id) {
         case ARQ_DEC_FLOAT:
-                *num = arq_tok_decFloat_to_float(token);
+                num->of = arq_tok_decFloat_to_float(token);
                 break;
         case ARQ_HEX_FLOAT:
-                *num = arq_tok_hexFloat_to_float(token);
+                num->of = arq_tok_hexFloat_to_float(token);
                 break;
         default:
                 return false;
         }
-        if (num->error) {
+        if (num->of.error) {
                 return true;
         }
         arq_imm_cmd_next(cmd);
@@ -399,16 +401,16 @@ bool arq_imm_pick_cstr_t(Arq_LexerCmd *cmd, char const **cstr) {
         return false;
 }
 
-uint_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
+union_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
-        uint_o result = {0};
+        union_o result = {0};
         char const *cstr = CMD_LINE_FAILURE;
         switch (token->id) {
         case ARQ_HEX:
-                result = arq_tok_hex_to_uint(token, error_msg, cstr);
+                result.ou = arq_tok_hex_to_uint(token, error_msg, cstr);
                 break;
         case ARQ_P_DEC:
-                result = arq_tok_pDec_to_uint(token, error_msg, cstr);
+                result.ou = arq_tok_pDec_to_uint(token, error_msg, cstr);
                 break;
         default:
                 if (error_msg != NULL) {
@@ -418,26 +420,26 @@ uint_o arq_imm_argument_uint(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
                         arq_msg_append_cstr(error_msg, "' is not a positiv number");
                         arq_msg_append_lf(error_msg);
                 }
-                result.error = true;
+                result.ou.error = true;
                 return result;
         }
         arq_imm_cmd_next(cmd);
         return result;
 }
 
-int_o arq_imm_argument_int(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
+union_o arq_imm_argument_int(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
-        int_o result = {0};
+        union_o result = {0};
         char const *cstr = CMD_LINE_FAILURE;
         switch (token->id) {
         case ARQ_HEX: {
                 uint_o const r = arq_tok_hex_to_uint(token, error_msg, cstr);
-                result.i = (int32_t) r.u;
-                result.error = r.error;
+                result.oi.i = (int32_t) r.u;
+                result.oi.error = r.error;
                 } break;
         case ARQ_P_DEC:
         case ARQ_N_DEC:
-                result = arq_tok_sDec_to_int(token, error_msg, cstr);
+                result.oi = arq_tok_sDec_to_int(token, error_msg, cstr);
                 break;
         default:
                 if (error_msg != NULL) {
@@ -447,23 +449,24 @@ int_o arq_imm_argument_int(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
                         arq_msg_append_cstr(error_msg, "' is not a signed number");
                         arq_msg_append_lf(error_msg);
                 }
-                result.error = true;
+                result.oi.error = true;
                 return result;
         }
         arq_imm_cmd_next(cmd);
         return result;
 }
 
-float_o arq_imm_argument_float(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
+
+union_o arq_imm_argument_float(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
         Arq_Token const *token = &cmd->lexer.token;
-        float_o result = {0};
+        union_o result = {0};
         char const *cstr = CMD_LINE_FAILURE;
         switch (token->id) {
         case ARQ_HEX_FLOAT:
-                result = arq_tok_hexFloat_to_float(token);
+                result.of = arq_tok_hexFloat_to_float(token);
                 break;
         case ARQ_DEC_FLOAT:
-                result = arq_tok_decFloat_to_float(token);
+                result.of = arq_tok_decFloat_to_float(token);
                 break;
         default:
                 if (error_msg != NULL) {
@@ -473,7 +476,7 @@ float_o arq_imm_argument_float(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
                         arq_msg_append_cstr(error_msg, "' is not a float number");
                         arq_msg_append_lf(error_msg);
                 }
-                result.error = true;
+                result.of.error = true;
                 return result;
         }
         arq_imm_cmd_next(cmd);

@@ -22,6 +22,12 @@ typedef struct {
         double f;
 } float_o;
 
+typedef union {
+        uint_o ou;
+        int_o oi;
+        float_o of;
+} union_o;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
