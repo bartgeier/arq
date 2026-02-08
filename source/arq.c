@@ -475,8 +475,6 @@ uint32_t arq_fn(
                                         return error_msg.size;
                                 }
                                 imm.PUSH(queue, &x);
-                                todo logging make more polymorph union_o
-                                log_inta(("u32 %u", num.u));
                         } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
                                 uint32_t *array_size = arq_push_array_size(queue, 0);
                                 log_inta(("u32 %u // init array_size", *array_size));
@@ -491,7 +489,6 @@ uint32_t arq_fn(
                                         }
                                         *array_size += 1;
                                         imm.PUSH(queue, &x);
-                                        log_inta(("u32 %u", num.u));
                                 }
                         } else {
                                 union_o x = {0};
@@ -505,11 +502,10 @@ uint32_t arq_fn(
                                         return error_msg.size;
                                 }
                                 imm.PUSH(queue, &x);
-                                log_inta(("u32 %u", num.u));
                         }
-                        if (arq_imm(ARQ_OP_COMMA, &opt)) continue;
 terminator:
                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
+                                log_int_comment("call_back_function");
                                 log_int_comment("call_back_function");
                                 call_back_function(options, opt.idx, queue);
                                 break;

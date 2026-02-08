@@ -25,6 +25,7 @@ void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/arq_symbols.c");
         nob_cmd_append(&source_paths, "./source/arq_queue.c");
         nob_cmd_append(&source_paths, "./source/arq_lexer.c");
+        nob_cmd_append(&source_paths, "./source/arq_log.c");
         nob_cmd_append(&source_paths, "./source/arq_conversion.c");
         nob_cmd_append(&source_paths, "./source/arq_msg.c");
         nob_cmd_append(&source_paths, "./source/arq_arena.c");
@@ -52,7 +53,7 @@ bool arq_build(bool const clean) {
                 "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
         ); 
 #endif
-#if 1
+#if 0
         nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
@@ -60,7 +61,7 @@ bool arq_build(bool const clean) {
                 "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
         ); 
 #endif
-#if 0
+#if 1
         nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",

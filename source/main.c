@@ -11,19 +11,26 @@ typedef struct {
         uint8_t number;
 } Context;
 
+void indent_log(void) {
+        printf("        ");
+}
+
 void fn_version(Arq_Queue *queue) {
         (void) queue;
+        indent_log();
         printf("version 1.1.1 \n");
 }
 
 void fn_string(Arq_Queue *queue) {
         char const *str = arq_cstr_t(queue);
         assert(str != NULL);
+        indent_log();
         printf("fn_string str = %s\n", str);
 }
 
 void fn_nstring(Arq_Queue *queue) {
         char const *str = arq_cstr_t(queue);
+        indent_log();
         if (str != NULL) {
                 printf("fn_nstring s = %s\n", str);
         } else {
@@ -33,17 +40,20 @@ void fn_nstring(Arq_Queue *queue) {
 
 void fn_uint(Arq_Queue *queue) {
         uint32_t number = arq_uint(queue);
+        indent_log();
         printf("fn_uint number = %u\n", number);
 }
 
 void fn_int(Arq_Queue *queue) {
         int32_t number = arq_int(queue);
+        indent_log();
         printf("fn_int number = %d\n", number);
 }
 
 void fn_print(Arq_Queue *queue) {
         uint32_t begin = arq_uint(queue);
         uint32_t end = arq_uint(queue);
+        indent_log();
         printf("fn_print begin = %d, end = %d\n", begin, end);
 }
 
@@ -70,12 +80,14 @@ void fn_array(Arq_Queue *queue) {
 
 void fn_float(Arq_Queue *queue) {
         double number = arq_float(queue);
+        indent_log();
         printf("fn_float number = %.10f\n", number);
 }
 
 void fn_test(Arq_Queue *queue) {
         uint32_t num_0 = arq_uint(queue);
         uint32_t num_1 = arq_uint(queue);
+        indent_log();
         printf("fn_test %u %u\n", num_0, num_1);
 }
 
