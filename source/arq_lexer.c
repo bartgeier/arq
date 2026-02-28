@@ -464,14 +464,3 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
         cmd->bundeling = false;
         return;
 }
-
-void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token) {
-        Arq_LexerCmd cmd = arq_lexerCmd_create(argc, argv);
-        v->num_of_token = 0;
-        v->idx = 0;
-        do {
-                arq_lexer_next_cmd_token(&cmd);
-                assert( v->num_of_token < num_of_token);
-                v->at[v->num_of_token++] = cmd.lexer.token;
-        } while (cmd.lexer.token.id != ARQ_NO_TOKEN);
-}

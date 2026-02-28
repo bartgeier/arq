@@ -9,24 +9,6 @@ typedef struct {
         char const *at;
 } Arq_Token;
 
-typedef struct {
-        uint32_t num_of_token;
-        uint32_t idx;
-        Arq_Token at[1];
-} Arq_OptVector;
-
-typedef struct {
-        uint32_t num_of_token;
-        uint32_t idx;
-        Arq_Token at[1];
-} Arq_Vector;
-
-typedef struct {
-        uint32_t num_of_Vec;
-        uint32_t row;
-        Arq_OptVector *at[1];
-} Arq_List;
-
 #define ARQ_LIST_OF_IDS                          \
                                                  \
         /* helper to control tokenizer */        \

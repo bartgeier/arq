@@ -37,7 +37,6 @@ void arq_lexer_next_opt_token(Arq_LexerOpt *l);
 
 void arq_lexerCmd_reset(Arq_LexerCmd *cmd);
 void arq_lexer_next_cmd_token(Arq_LexerCmd *l);
-void arq_lexer_cmd_tokenize(int argc, char **argv, Arq_Vector *v, uint32_t const num_of_token);
 
 #ifdef __cplusplus
 }

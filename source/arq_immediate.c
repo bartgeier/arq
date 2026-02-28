@@ -8,12 +8,6 @@
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
-void arq_imm_opt_next(Arq_OptVector *opt) {
-        if (opt->idx + 1 < opt->num_of_token) {
-                opt->idx++;
-        }
-}
-
 bool arq_imm(Arq_SymbolID const id, Arq_LexerOpt *opt) {
         const bool b = (opt->lexer.token.id == id);
         if (b) {

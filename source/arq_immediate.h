@@ -14,8 +14,6 @@ typedef  bool (*arq_fn_imm_literal_error)(Arq_LexerOpt*,  Arq_msg*);
 
 /*///////////////////////////////////////////////////////////////////////////*/
 
-void arq_imm_opt_next(Arq_OptVector *opt);
-
 bool arq_imm(Arq_SymbolID const id, Arq_LexerOpt *opt);
 bool arq_imm_noToken(Arq_Token *token);
 bool arq_imm_not_identifier(Arq_LexerOpt *opt);

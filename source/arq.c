@@ -398,7 +398,6 @@ uint32_t arq_fn(
                                                                 break; 
                                                         }
                                                         arq_msg_append_cstr(&error_msg, CMD_LINE_FAILURE);
-                                                        error_msg_insert_cmd_line(&error_msg, 1, &cmd);
                                                         arq_msg_append_cstr(&error_msg, "'--' alone isn't enough if you want '--' as an argument then do -- --\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' allows to set an argument that looks like an option -- --hello\n");
                                                         arq_msg_append_cstr(&error_msg, "'--' switch to positional arguments in case of an cstr_t array\n");
@@ -434,7 +433,9 @@ uint32_t arq_fn(
                                 }
                                 if (arq_imm(ARQ_OP_COMMA, &opt)) continue;
                                 goto terminator;
-
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
                         } else if (arq_imm(ARQ_TYPE_UINT, &opt)) {
                                 log_int_token_indent(ARQ_TYPE_UINT);
                                 imm.DEFAULT_VALUE = arq_imm_default_uint;
