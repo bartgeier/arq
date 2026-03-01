@@ -21,7 +21,7 @@ void create_include_paths(void) {
 Nob_Cmd source_paths = {0};
 void create_source_paths(void) {
         nob_cmd_append(&source_paths, "./source/main.c");
-        nob_cmd_append(&source_paths, "./source/arq.c");
+        nob_cmd_append(&source_paths, "./source/arq_main.c");
         nob_cmd_append(&source_paths, "./source/arq_symbols.c");
         nob_cmd_append(&source_paths, "./source/arq_queue.c");
         nob_cmd_append(&source_paths, "./source/arq_lexer.c");
@@ -37,7 +37,7 @@ bool arq_build(bool const clean) {
                 return true;
         }
         nob_log(NOB_INFO, "BUILD: arq ----> cmd line argument library");
-        Nob_Cmd c_ompiler = {0};
+        Nob_Cmd c_compiler = {0};
         //nob_cmd_append(&cmd, "gcc", "-O0", "-ggdb", "-pedantic");
         //nob_cmd_append(&c_ompiler, "gcc", "-O3", "-Wall", "-Wextra", "-pedantic", "-Wno-parentheses"); 
 #if 0
@@ -53,7 +53,7 @@ bool arq_build(bool const clean) {
                 "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
         ); 
 #endif
-#if 1
+#if 0
         nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_MEMORY", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
@@ -61,8 +61,8 @@ bool arq_build(bool const clean) {
                 "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
         ); 
 #endif
-#if 0
-        nob_cmd_append(&c_ompiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+#if 1
+        nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
@@ -77,22 +77,48 @@ bool arq_build(bool const clean) {
         );
 #endif
         Nob_Cmd cmd = {0};
-        nob_cmd_append_cmd(&cmd, &c_ompiler);
+        nob_cmd_append_cmd(&cmd, &c_compiler);
         nob_cmd_append_cmd(&cmd, &include_paths);
         nob_cmd_append(&cmd, "-o", "build/arq");
         nob_cmd_append_cmd(&cmd, &source_paths);
         bool ok = nob_cmd_run_sync(cmd);
 
         cmd.count = 0;
-        nob_cmd_append_cmd(&cmd, &c_ompiler);
+        nob_cmd_append_cmd(&cmd, &c_compiler);
         nob_cmd_append(&cmd, "-o", "build/arq");
         nob_cmd_append_cmd(&cmd, &include_paths);
         // Language server
         generate_compile_commands("/home/berni/projects/arq", &cmd, &source_paths);
 
-        nob_cmd_free(c_ompiler);
+        nob_cmd_free(c_compiler);
         nob_cmd_free(cmd);
         return ok;
+}
+
+void amalgamate_arq(void) {
+        {
+                // https://github.com/rindeal/Amalgamate/releases/tag/v0.99.0
+                // whereis amalgamate /usr/local/bin
+                Nob_Cmd cmd = {0};
+                nob_cmd_append(&cmd, "amalgamate", "source/amalgamate.c", "build/arq.h", "-i", "source");
+                bool ok = nob_cmd_run_sync(cmd);
+        }
+
+        {
+                Nob_Cmd c_compiler = {0};
+                nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+                        // "-Os", "-s", 
+                        // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                        // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
+                        "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
+                ); 
+                Nob_Cmd cmd = {0};
+                nob_cmd_append_cmd(&cmd, &c_compiler);
+                nob_cmd_append(&cmd, "./amalgamate/main2.c");
+                nob_cmd_append(&cmd, "-o", "./build/main2");
+                nob_cmd_append(&cmd, "-I", "./amalgamate");
+                nob_cmd_run_sync(cmd);
+        }
 }
 
 bool download_build_googleTest(bool const clean) {
@@ -185,7 +211,7 @@ bool unittests_build(bool const clean) {
         nob_cmd_append(&cmd, "-I", "source/"); 
         nob_cmd_append(&cmd, "-L", "googletest/build/lib/");
         nob_cmd_append(&cmd, "-o", "build/test");
-        nob_cmd_append(&cmd, "./source/arq.c");
+        nob_cmd_append(&cmd, "./source/arq_main.c");
         nob_cmd_append(&cmd, "./source/arq_symbols.c");
         nob_cmd_append(&cmd, "./source/arq_queue.c");
         nob_cmd_append(&cmd, "./source/arq_lexer.c");
@@ -270,5 +296,6 @@ int main(int argc, char **argv) {
                 return false;
         }
         nob_log(NOB_INFO ,"Successful done! %llu ms\n", nob_millis() - t_start);
+        amalgamate_arq();
         return  0;
 }

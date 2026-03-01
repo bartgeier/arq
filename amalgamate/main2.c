@@ -1,17 +1,8 @@
+#define ARQ_IMPLEMENTATION
+#include "../build/arq.h"
 #include <stdio.h>
-#include "arq_bool.h"
-#if 0
-#include "arq_int.h"
-#endif
-
-#include "arq_main.h"
 #include <memory.h>
 #include <assert.h>
-
-typedef struct {
-        bool help;
-        uint8_t number;
-} Context;
 
 void indent_log(void) {
         printf("        ");

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "arq.h"
+#include "arq_main.h"
 #include "arq_queue.h"
 #include "arq_arena.h"
 #include "arq_conversion.h"

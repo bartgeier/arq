@@ -4,7 +4,6 @@
 #include "arq_queue.h"
 #include "arq_immediate.h"
 #include "arq_log.h"
-#include "arq_bool.h"
 #include "arq_token.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -506,7 +505,6 @@ uint32_t arq_fn(
                         }
 terminator:
                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
-                                log_int_comment("call_back_function");
                                 log_int_comment("call_back_function");
                                 call_back_function(options, opt.idx, queue);
                                 break;

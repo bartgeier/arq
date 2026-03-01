@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "arq.h"
+#include "arq_main.h"
 #include <stdio.h>
 #include <stdarg.h>
 

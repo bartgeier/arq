@@ -1,5 +1,4 @@
 #include "arq_lexer.h"
-#include "arq_bool.h"
 #include "arq_token.h"
 #include <string.h>
 #include <ctype.h>

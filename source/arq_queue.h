@@ -1,10 +1,9 @@
 #ifndef ARQ_QUEUE_H
 #define ARQ_QUEUE_H
 
-#include "arq.h"
+#include "arq_main.h"
 #include "arq_arena.h"
 #include "arq_token.h"
-#include "arq_int.h"
 #include "arq_conversion.h"
 
 typedef struct {

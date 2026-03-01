@@ -3,8 +3,7 @@
 
 #include "arq_conversion.h"
 #include "arq_lexer.h"
-#include "arq.h"
-#include "arq_bool.h"
+#include "arq_main.h"
 
 #define CMD_LINE_FAILURE "CMD line failure:\nToken '"
 #define OPTION_FAILURE "Option failure:\nToken '"

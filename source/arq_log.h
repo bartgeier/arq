@@ -15,8 +15,7 @@
 #ifdef ARQ_LOG_TOKENS
         #include "arq_token.h"
         #include "arq_int.h"
-        #include "arq_lexer.h"
-        #include "arq.h"
+        #include "arq_main.h"
         #include <string.h>
         #include <stdio.h>
         void log_print_token_member(Arq_Token *t, uint32_t toknr);

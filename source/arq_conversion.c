@@ -1,9 +1,8 @@
 #include "arq_conversion.h"
-#include "arq_symbols.h"
+#include "arq_inttypes.h"
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <arq_inttypes.h>
 #include <math.h>
 
 bool token_long_option_eq(Arq_Token const *token, char const *cstr) {

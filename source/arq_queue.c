@@ -1,7 +1,5 @@
 #include "arq_queue.h"
-#include "arq.h"
 #include "arq_log.h"
-#include "arq_symbols.h"
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
