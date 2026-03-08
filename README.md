@@ -1,14 +1,40 @@
-# ARQ
+ # ARQ
 
 > [!WARNING]
 > This software is unfinished. Keep your expectations low.
 
-# Nob
-Build system from Tsoding\
-https://youtu.be/eRt7vhosgKE?si=ECJcNhP0EiBCh3Ib \
-https://youtu.be/l9_TUMZSewo?si=gic5P1pCdEyIOB0Y \
-https://youtu.be/wH963jJ1lRM?si=8i0S8ofyEtxvPAvk \
-I made some modifications to nob.h for my needs.
+Arq is a getopt-like C library for parsing command-line options.
+https://linux.die.net/man/3/getopt
 
+## amalgamate/arq.h
+* It's all you need.
+* It's a single-header library.
+* Written in c89.
 
+## Example
+```
+cd amalgamate 
+gcc main2.c -o main2 
+./main2 --help
+```
+
+# arq versus getopt
+
+| Feature                                             | getopt | arq |
+|-----------------------------------------------------|--------|-----|
+| long options like --help                            | yes    | yes |
+| short options like -h                               | yes    | yes |
+| option with multiple arguments                      | no     | yes |
+| option without argument                             | yes    | yes |
+| option required argument                            | yes    | yes |
+| option with optional argument (ctsr)                | yes    | yes |
+| option with optional argument with default value    | no     | yes |
+| -- positional arguments end of command-line options | yes    | no  |
+| -- switch from optional to required cstr argument   | no     | yes |
+| option with array of arguments                      | no     | yes |
+| bundled short options                               | yes    | yes |
+| cstr parameter pointer to argv argument             | yes    | yes |
+| uint parameter                                      | no     | yes |
+| int parameter                                       | no     | yes |
+| float parameter                                     | no     | yes |
 

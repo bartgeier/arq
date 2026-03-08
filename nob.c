@@ -100,7 +100,7 @@ void amalgamate_arq(void) {
                 // https://github.com/rindeal/Amalgamate/releases/tag/v0.99.0
                 // whereis amalgamate /usr/local/bin
                 Nob_Cmd cmd = {0};
-                nob_cmd_append(&cmd, "amalgamate", "source/amalgamate.c", "build/arq.h", "-i", "source");
+                nob_cmd_append(&cmd, "amalgamate", "source/amalgamate.c", "amalgamate/arq.h", "-i", "source");
                 bool ok = nob_cmd_run_sync(cmd);
         }
 

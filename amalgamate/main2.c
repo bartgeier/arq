@@ -10,8 +10,7 @@ void indent_log(void) {
 
 void fn_version(Arq_Queue *queue) {
         (void) queue;
-        indent_log();
-        printf("version 1.1.1 \n");
+        printf("version 1\n");
 }
 
 void fn_string(Arq_Queue *queue) {
@@ -84,22 +83,44 @@ void fn_test(Arq_Queue *queue) {
         printf("fn_test %u %u\n", num_0, num_1);
 }
 
+void fn_help(Arq_Queue *queue);
+
+#if 0
+typedef struct {
+        char chr;                /* -v        */
+        const char *name;        /* --version */
+        function_pointer_t fn;
+        const char *arguments;   /* "uint8_t, bool = false" */
+} Arq_Option;
+#endif
+
+Arq_Option options[] = {
+
+        {'h', "help",    fn_help,    "()"},
+        {'v', "version", fn_version, "()"},
+        {'s', "string",  fn_string,  "(cstr_t str)"},
+        {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
+
+        {'u', "uint",    fn_uint,  "(uint number = 324)"},
+        {'U', "UU",      fn_uint,  "(uint number)"}, 
+        {'i', "int",     fn_int,   "( int number = -56)"}, 
+
+        {'p', "print",   fn_print,   "(uint first_line = 0, uint last_line = +1200)"},
+        {'a', "array",   fn_array,   "(int numbers[], cstr_t list[])"},
+
+        {'f', "float",   fn_float,   "(float number = 0.1e0)"}, 
+};
+
+void fn_help(Arq_Queue *queue) {
+        (void) queue;
+        printf("help\n");
+        for (int i = 0; i < sizeof(options)/sizeof(Arq_Option); i++) {
+                printf("-%c --%s%s\n", options[i].chr, options[i].name, options[i].arguments);
+        }
+}
+
 
 int main(int argc, char **argv) {
-        Arq_Option options[] = {
-                {'v', "version", fn_version, "()"},
-                {'s', "string",  fn_string,  "(cstr_t str)"},
-                {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
-
-                {'u', "uint",    fn_uint,  "(uint number = 324)"},
-                {'U', "UU",      fn_uint,  "(uint number)"}, 
-                {'i', "int",     fn_int,   "( int number = -56)"}, 
-
-                {'p', "print",   fn_print,   "(uint first_line = 0, uint last_line = +1200)"},
-                {'a', "array",   fn_array,   "(int numbers[], cstr_t list[])"},
-
-                {'f', "float",   fn_float,   "(float number = 0.1e0)"}, 
-        };
 
         /* testen mit */
         /* ./nob && build/arq -v -t 4 5 --sstring  f --cstring hello */
