@@ -2738,6 +2738,7 @@ uint32_t arq_fn(
                                 }
                                 imm.PUSH(queue, &x);
                         }
+                        if (arq_imm(ARQ_OP_COMMA, &opt)) continue;
 terminator:
                         if (arq_imm(ARQ_OP_R_PARENTHESIS, &opt)) {
                                 log_int_comment("call_back_function");
