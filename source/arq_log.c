@@ -1,7 +1,9 @@
 #include "arq_log.h"
 
 #ifdef ARQ_LOG_TOKENS
-static void log_print_token_member(Arq_Token *t, uint32_t toknr) {
+#include "arq_lexer.h"
+
+void log_print_token_member(Arq_Token *t, uint32_t toknr) {
         uint32_t i;
         printf("%3d %30s -> ", toknr, symbol_names[t->id]);
         printf("%2d ", t->size);

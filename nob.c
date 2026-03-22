@@ -62,7 +62,15 @@ bool arq_build(bool const clean) {
         ); 
 #endif
 #if 1
-        nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+        nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER",
+                // "-Os", "-s", 
+                // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
+                "-Wall", "-Wextra", "-pedantic", "-Wparentheses"
+        ); 
+#endif
+#if 0
+        nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", "-DARQ_LOG_TOKENS", 
                 // "-Os", "-s", 
                 // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",

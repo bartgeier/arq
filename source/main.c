@@ -5,6 +5,7 @@
 #endif
 
 #include "arq_main.h"
+
 #include <memory.h>
 #include <assert.h>
 
