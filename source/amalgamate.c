@@ -1,3 +1,4 @@
+/* see license at the end of file */
 #include "arq_int.h"
 #include "arq_main.h"
 #ifdef ARQ_IMPLEMENTATION
@@ -25,3 +26,5 @@
 
 #include "arq_main.c"
 #endif
+#include "../build/license.h"
+

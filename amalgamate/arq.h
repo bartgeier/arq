@@ -1,3 +1,4 @@
+/* see license at the end of file */
 
 /*** Start of inlined file: arq_int.h ***/
 #ifndef ARQ_STDINT_H
@@ -76,6 +77,7 @@
 /*** End of inlined file: arq_int.h ***/
 
 
+
 /*** Start of inlined file: arq_main.h ***/
 #ifndef ARQ_H
 #define ARQ_H
@@ -108,7 +110,6 @@ uint32_t arq_fn(
 void arq_unused(Arq_Queue *queue);
 uint32_t arq_uint(Arq_Queue *queue);
 uint32_t arq_array_size(Arq_Queue *queue);
-/* uint64_t arq_uint64_t(Arq_Queue *queue); */
 int32_t arq_int(Arq_Queue *queue);
 double arq_float(Arq_Queue *queue);
 char const *arq_cstr_t(Arq_Queue *queue);
@@ -953,7 +954,7 @@ static void skip_space(Arq_Lexer *l) {
 /******************************************************************************/
 /* cmd_ */
 static bool is_long_identifier(char chr) {
-        return isalnum(chr) || chr == '-';
+        return isalnum(chr) || chr == '-' || chr == '_';
 }
 
 static bool is_short_identifier(char chr) {
@@ -993,6 +994,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
         Arq_Token t = {0};
         skip_space(l);
         t.at = &l->at[l->cursor_idx];
+        t.size = 0;
         if (l->cursor_idx == l->SIZE ) {
                 /* space tail */
                 t.id = ARQ_NO_TOKEN;
@@ -1167,7 +1169,6 @@ static Arq_Token next_token(Arq_Lexer *l) {
 
         if (l->cursor_idx < l->SIZE) {
                 t.id = ARQ_OP_UNKNOWN;
-                t.size = 0;
                 while (l->cursor_idx < l->SIZE && !isspace(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;
@@ -2758,4 +2759,33 @@ terminator:
 /*** End of inlined file: arq_main.c ***/
 
 #endif
+
+/*** Start of inlined file: license.h ***/
+#if 1
+/*
+The MIT License (MIT)
+
+Copyright (c) 2026 Bernhard Bertrand
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#endif
+/*** End of inlined file: license.h ***/
+
 

@@ -146,7 +146,7 @@ static void skip_space(Arq_Lexer *l) {
 /******************************************************************************/
 /* cmd_ */
 static bool is_long_identifier(char chr) {
-        return isalnum(chr) || chr == '-';
+        return isalnum(chr) || chr == '-' || chr == '_';
 }
 
 static bool is_short_identifier(char chr) {
@@ -186,6 +186,7 @@ static Arq_Token next_token(Arq_Lexer *l) {
         Arq_Token t = {0};
         skip_space(l);
         t.at = &l->at[l->cursor_idx];
+        t.size = 0;
         if (l->cursor_idx == l->SIZE ) {
                 /* space tail */
                 t.id = ARQ_NO_TOKEN;
@@ -361,7 +362,6 @@ static Arq_Token next_token(Arq_Lexer *l) {
 
         if (l->cursor_idx < l->SIZE) {
                 t.id = ARQ_OP_UNKNOWN; 
-                t.size = 0;
                 while (l->cursor_idx < l->SIZE && !isspace(l->at[l->cursor_idx])) {
                         l->cursor_idx++;
                         t.size++;

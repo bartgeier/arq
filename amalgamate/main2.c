@@ -104,10 +104,10 @@ Arq_Option options[] = {
         {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = NULL)"},
 
         {'u', "uint",         fn_uint, "(uint number)"},
-        {'U', "uintdefault",  fn_uintdefault, "(uint number = 69)"}, 
+        {'U', "uint-default", fn_uintdefault, "(uint number = 69)"}, 
 
         {'i', "int",          fn_int, "(int number)"}, 
-        {'I', "intdefault",   fn_intdefault, "(int number = -69)"}, 
+        {'I', "int_default",  fn_intdefault, "(int number = -69)"}, 
 
         {'f', "float",        fn_float, "(float number)"}, 
         {'F', "floatdefault", fn_floatdefault, "(float number = 5.1e1)"}, 

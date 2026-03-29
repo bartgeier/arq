@@ -104,6 +104,29 @@ bool arq_build(bool const clean) {
 }
 
 void amalgamate_arq(void) {
+#if 1
+        {
+                FILE *file_r = fopen("LICENSE", "r");
+                if (!file_r) {
+                        perror("Failed to open LICENSE");
+                        return;
+                }
+                FILE *file_w = fopen("build/license.h", "w");
+                if (!file_w) {
+                        perror("Failed to open file");
+                        return;
+                }
+                fprintf(file_w, "#if 1\n/*\n");
+                char line[1024];
+                while (fgets(line, sizeof(line), file_r)) {
+                        fprintf(file_w, "%s", line);  // print each line
+                } 
+                fprintf(file_w, "*/\n#endif");
+                fclose(file_r);
+                fclose(file_w);
+                fflush(stdout);
+        }
+#endif
         {
                 // https://github.com/rindeal/Amalgamate/releases/tag/v0.99.0
                 // whereis amalgamate /usr/local/bin
@@ -111,7 +134,6 @@ void amalgamate_arq(void) {
                 nob_cmd_append(&cmd, "amalgamate", "source/amalgamate.c", "amalgamate/arq.h", "-i", "source");
                 bool ok = nob_cmd_run_sync(cmd);
         }
-
         {
                 Nob_Cmd c_compiler = {0};
                 nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 

@@ -20,6 +20,7 @@ gcc main2.c -o main2
 
 # arq versus getopt
 
+Just you know a dash '-' in the table means no.
 <!-- ttps://www.tablesgenerator.com/markdown_tables -->
 | Feature                                             | getopt | arq |
 |-----------------------------------------------------|--------|-----|
@@ -42,10 +43,6 @@ gcc main2.c -o main2
 | float parameter                                     | -      | yes |
 
 # Todos
-
-./main2 -m 4 4  
-main: ../build/arq.h:2747: arq_fn: Assertion `false' failed.  
-Abgebrochen (Speicherabzug geschrieben)  
-
-./main2 --default_number 42  
-underline in option name results in crash
+* How to use -- 
+* conclusion 
+* Why not = 
