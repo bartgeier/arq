@@ -1,5 +1,6 @@
+/* #define ARQ_LOG_TOKENS    */
 /* #define ARQ_LOG_TOKENIZER */
-/* #define ARQ_LOG_MEMORY */
+/* #define ARQ_LOG_MEMORY    */
 #define ARQ_IMPLEMENTATION
 #include "arq.h"
 #include <stdio.h>
@@ -88,7 +89,7 @@ void fn_mixed(Arq_Queue *queue) {
         printf("u_nr = %u\ni_nr = %d\nf_nr = %f\ncomment = %s\n", u_nr, i_nr, f_nr, comment);
 }
 
-void fn_positionlargument(Arq_Queue *queue) {
+void fn_positionalargument(Arq_Queue *queue) {
         printf("-p --positional_argument\n");
         {
                 int32_t const number = arq_int(queue);
@@ -126,7 +127,7 @@ Arq_Option options[] = {
         {'m', "multiple",     fn_multiple, "(uint first_line = 0, uint last_line = +1200)"},
         {'x', "mixed",        fn_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
 
-        {'p', "positional_argument", fn_positionlargument, "(int number, cstr_t list[])"},
+        {'p', "positional_argument", fn_positionalargument, "(int number, cstr_t list[])"},
 };
 
 void fn_help(Arq_Queue *queue) {

@@ -12,7 +12,7 @@ https://linux.die.net/man/3/getopt
 * Written in c89.
 
 ## Example
-[Open example.c](amalgamate/example.c)
+[amalgamate/example.c](amalgamate/example.c)
 ```
 cd amalgamate 
 gcc example.c -o example 
