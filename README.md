@@ -14,8 +14,8 @@ https://linux.die.net/man/3/getopt
 ## Example
 ```
 cd amalgamate 
-gcc main2.c -o main2 
-./main2 --help
+gcc example.c -o example 
+./example --help
 ```
 
 ## arq versus getopt
@@ -67,7 +67,7 @@ Because it consumes all remaining values, you cannot place another argument afte
 Example:
 
 ```
-./main2 --positional_argument 69 hello world ok abc
+./example --positional_argument 69 hello world ok abc
 
 Output:
 
@@ -94,14 +94,14 @@ The -- separator tells the parser that everything after it should be treated as 
 {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = NULL)"},
 ```
 ```
-./main2 --optionalstr -- --hello
+./example --optionalstr -- --hello
 -o --optionalstr
 str = --hello
 ```
 
 ## = Is not implemented
 
-I might implement support for this later
+I might implement support for this later.
 
 In many command-line tools, you can assign an argument using =.  
 However, when an cstr argument has multiple values, this becomes ambiguous.  
@@ -112,7 +112,7 @@ For example, consider this option with two integers:
 
 You could write:
 ```
-./main2 --ints=42=69
+./example --ints=42=69
 ```
 
 The parser correctly interprets this as 42 and 69. No problem.
@@ -123,7 +123,7 @@ Now, consider an option with two cstr_t values:
 
 You cannot use:
 ```
-./main2 --cstrs=hello=world
+./example --cstrs=hello=world
 ```
 
 because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
@@ -132,4 +132,3 @@ because the parser interprets the first argument as ```"hello=world"``` and the 
 * conclusion 
 * hex values
 * comment n example positional arguments
-* example instead of main2.c and main
