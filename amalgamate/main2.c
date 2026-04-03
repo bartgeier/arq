@@ -31,7 +31,7 @@ void fn_uint(Arq_Queue *queue) {
 
 void fn_uintdefault(Arq_Queue *queue) {
         uint32_t number = arq_uint(queue);
-        printf("-U --uintdefault\n");
+        printf("-U --uint-default\n");
         printf("number = %u\n", number);
 }
 
@@ -43,8 +43,21 @@ void fn_int(Arq_Queue *queue) {
 
 void fn_intdefault(Arq_Queue *queue) {
         int32_t number = arq_int(queue);
-        printf("-I --intdefault\n");
+        printf("-I --int_default\n");
         printf("number = %d\n", number);
+}
+
+void fn_intarray(Arq_Queue *queue) {
+        printf("-j --int_array\n");
+        {
+                uint32_t i;
+                uint32_t const array_size = arq_array_size(queue);
+                printf("\n");
+                printf("list array_size: %d\n", array_size);
+                for (i = 0; i < array_size; i++) {
+                        printf("    argument[%d]: %d\n", i, arq_int(queue));
+                }
+        }
 }
 
 void fn_float(Arq_Queue *queue) {
@@ -75,22 +88,19 @@ void fn_mixed(Arq_Queue *queue) {
         printf("u_nr = %u\ni_nr = %d\nf_nr = %f\ncomment = %s\n", u_nr, i_nr, f_nr, comment);
 }
 
-void fn_array(Arq_Queue *queue) {
-        printf("-a --array\n");
+void fn_positionlargument(Arq_Queue *queue) {
+        printf("-p --positional_argument\n");
         {
-                uint32_t const array_size = arq_array_size(queue);
-                uint32_t i;
-                printf("numbers array_size: %d\n", array_size);
-                for (i = 0; i < array_size; i++) {
-                        printf("    argument[%d]: %d\n", i, arq_int(queue));
-                }
+                int32_t const number = arq_int(queue);
+                printf("numbere: %d\n", number);
         } {
                 uint32_t i;
                 uint32_t const array_size = arq_array_size(queue);
                 printf("\n");
                 printf("list array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
-                        printf("    argument[%d]: %s\n", i, arq_cstr_t(queue));
+                        char const *list = arq_cstr_t(queue);
+                        printf("    list[%d]: %s\n", i, list);
                 }
         }
 }
@@ -108,6 +118,7 @@ Arq_Option options[] = {
 
         {'i', "int",          fn_int, "(int number)"}, 
         {'I', "int_default",  fn_intdefault, "(int number = -69)"}, 
+        {'j', "int_array",    fn_intarray, "(int numbers[])"},
 
         {'f', "float",        fn_float, "(float number)"}, 
         {'F', "floatdefault", fn_floatdefault, "(float number = 5.1e1)"}, 
@@ -115,7 +126,7 @@ Arq_Option options[] = {
         {'m', "multiple",     fn_multiple, "(uint first_line = 0, uint last_line = +1200)"},
         {'x', "mixed",        fn_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
 
-        {'a', "array",        fn_array, "(int numbers[], cstr_t list[])"},
+        {'p', "positional_argument", fn_positionlargument, "(int number, cstr_t list[])"},
 };
 
 void fn_help(Arq_Queue *queue) {
