@@ -129,7 +129,84 @@ You cannot use:
 
 because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
 
+## Hexadecimal integer values
+
+Both `int` and `uint` arguments can be specified using **hexadecimal notation**.
+
+- Hexadecimal values must start with the `0x` prefix
+- Negative hexadecimal values are **not allowed**
+- For signed integers, the hexadecimal value is interpreted according to the integer type size
+
+### Valid examples
+
+```
+./example --uint 0xFFFFFFFF
+-u --uint
+number = 4294967295
+```
+
+```
+./example --int 0xFFFFFFFF
+-i --int
+number = -1
+```
+### Invalid examples
+Don't sign the hexadecimal values.
+```
+./example --int -0x01
+CMD line failure:
+    --int -0x01 
+    Token '-0x01' is not a signed number
+    -i --int (int number)
+```
+```
+./example --int +0x01
+CMD line failure:
+    --int +0x01 
+    Token '+0x01' is not a signed number
+    -i --int (int number)
+```
+
+## Hexadecimal floating-point values
+
+The `float` argument can also be specified using **hexadecimal floating-point notation**.
+
+Hexadecimal floating-point numbers use this format:
+
+```text
+0x<hexadecimal_fraction>p<exponent>
+```
+
+Where:
+
+- `0x` indicates hexadecimal notation
+- the fractional part is written in base 16
+- `p` introduces the exponent
+- the exponent is a **power of 2**, not 10
+
+### Example
+```
+./example --float 0xA.E1p1
+-f --float
+fn_float number = 21.7578125000
+```
+### How this value is interpreted
+
+```text
+ 0xA.E1p1= 0xA.E1 × 2¹
+```
+
+- `0xA` = 10  
+- `.E1` = 14/16 + 1/256 = 0.87890625  
+- 10 + 0.87890625 = 10.87890625  
+- 10.87890625 × 2¹ = 21.7578125  
+
+So the final result is:
+```text
+21.7578125000
+```
+
 # Todos
+* sign hex float
+* terminate cstr[] ?
 * conclusion 
-* hex values
-* comment n example positional arguments
