@@ -213,6 +213,5 @@ So the final result is:
 ```
 
 # Todos
-* sign hex float
 * terminate cstr[] ?
 * conclusion 
