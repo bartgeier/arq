@@ -265,11 +265,23 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         double value = 0.0;
         int exp10 = 0;
         int exp_sign = 1;
+        int frac_sign;
 
-        uint32_t i = 2;
+        uint32_t i = 0;
+
+        if (token->at[i] == '-') {
+                frac_sign = -1;
+                i++;
+        } else if (token->at[i] == '+') {
+                frac_sign = 1;
+                i++;
+        } else {
+                frac_sign = 1;
+        }
 
         assert(token->id == ARQ_HEX_FLOAT);
-        assert(token->at[0] == '0' && (token->at[1] == 'x' || token->at[1] == 'X'));
+        assert(token->at[i] == '0' && (token->at[i + 1] == 'x' || token->at[i + 1] == 'X'));
+        i = i + 2;
 
         /* integer part */
         while (i < token->size) {
@@ -330,8 +342,9 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         /* scale by 2^final_exp */
         {
                 int final_exp = exp_sign * exp10;
-                result.f =  ldexp(value, final_exp);
+                result.f = frac_sign * ldexp(value, final_exp);
                 result.error = false;
                 return result;
         }
 }
+

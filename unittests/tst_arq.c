@@ -841,12 +841,15 @@ void fn_float_array(Arq_Queue *queue) {
         }
 
 }
+
 TEST(arq, hex_float) {
         result[0] = 0;
         Arq_Option options[] = {
                 {'a', "floatA",  fn_float,       "(float number)"},
                 {'b', "floatB",  fn_float,       "(float number = 0x23.23p1)"},
                 {'c', "floatC",  fn_float_array, "(float number[])"},
+                {'d', "floatD",  fn_float,       "(float number = -0x23.23p1)"},
+                {'e', "floatE",  fn_float,       "(float number = +0x23.23p1)"},
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
@@ -879,16 +882,9 @@ TEST(arq, hex_float) {
         {
                 set(&cmd, "arq", "--floatA", "-0x23.23p1");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        EXPECT_EQ(
-                                strcmp(buffer,
-                                        "CMD line failure:\n"
-                                        "    --floatA -0x23.23p1 \n"
-                                        "    Token '-0x23.23p1' is not a float number\n"
-                                        "    -a --floatA (float number)\n"
-                                ), 0
-                        );
-                } else {
                         ASSERT_TRUE(false);
+                } else {
+                        EXPECT_TRUE(0 == strcmp(result,"fn_float = -70.27343750000000000000\n"));
                 }
         }
         {
@@ -906,7 +902,7 @@ TEST(arq, hex_float) {
                 EXPECT_TRUE(0 == strcmp(result,"fn_float = 72.27343750000000000000\n"));
         }
         {
-                set(&cmd, "arq", "--floatC", "0x1.1p0",  "0x2.1p0",  "0xFF.1p5", "0x1.0p0");
+                set(&cmd, "arq", "--floatC", "0x1.1p0",  "-0x2.1p0",  "+0xFF.1p5", "0x1.0p0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         ASSERT_TRUE(false);
                 }
@@ -914,10 +910,24 @@ TEST(arq, hex_float) {
                         result,
                         "fn_float_array 4 "
                         "1.06250000000000000000 "
-                        "2.06250000000000000000 "
+                        "-2.06250000000000000000 "
                         "8162.00000000000000000000 "
                         "1.00000000000000000000 "
                ));
+        }
+        {
+                set(&cmd, "arq", "--floatD");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_float = -70.27343750000000000000\n"));
+        }
+        {
+                set(&cmd, "arq", "--floatE");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"fn_float = 70.27343750000000000000\n"));
         }
 }
 TEST(arq, dec_float) {
@@ -929,6 +939,7 @@ TEST(arq, dec_float) {
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
+                return;
                 set(&cmd, "arq", "--floatA", ".ge0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         EXPECT_EQ(

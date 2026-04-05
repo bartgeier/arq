@@ -689,11 +689,23 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         double value = 0.0;
         int exp10 = 0;
         int exp_sign = 1;
+        int frac_sign;
 
-        uint32_t i = 2;
+        uint32_t i = 0;
+
+        if (token->at[i] == '-') {
+                frac_sign = -1;
+                i++;
+        } else if (token->at[i] == '+') {
+                frac_sign = 1;
+                i++;
+        } else {
+                frac_sign = 1;
+        }
 
         assert(token->id == ARQ_HEX_FLOAT);
-        assert(token->at[0] == '0' && (token->at[1] == 'x' || token->at[1] == 'X'));
+        assert(token->at[i] == '0' && (token->at[i + 1] == 'x' || token->at[i + 1] == 'X'));
+        i = i + 2;
 
         /* integer part */
         while (i < token->size) {
@@ -754,7 +766,7 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         /* scale by 2^final_exp */
         {
                 int final_exp = exp_sign * exp10;
-                result.f =  ldexp(value, final_exp);
+                result.f = frac_sign * ldexp(value, final_exp);
                 result.error = false;
                 return result;
         }
@@ -865,15 +877,32 @@ static bool array_start(Arq_Lexer *l) {
 }
 
 static bool hex_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
-        if ((idx + 2 < l->SIZE)
-        && (l->at[idx + 0] == '0')
-        && (l->at[idx + 1] == 'x' || l->at[idx + 1] == 'X')
-        && isxdigit(l->at[idx + 2])) {
-                l->cursor_idx += 3;
-                return true;
+        uint32_t idx = l->cursor_idx;
+        if (l->at[idx] == '+' || l->at[idx] == '-') {
+                if (idx + 1 == l->SIZE) {
+                        return false;
+                }
+                idx++;
         }
-        return false;
+        if (l->at[idx] != '0') {
+                return false;
+        }
+        if (idx + 1 == l->SIZE) {
+                return false;
+        }
+        idx++;
+        if (l->at[idx] != 'x' && l->at[idx + 1] != 'X') {
+                return false;
+        }
+        if (idx + 1 == l->SIZE) {
+                return false;
+        }
+        idx++;
+        if (!isxdigit(l->at[idx])) {
+                return false;
+        }
+        l->cursor_idx = idx + 1;
+        return true;
 }
 
 static bool has_hex_exponent(char const s) {
@@ -1101,8 +1130,13 @@ static Arq_Token next_token(Arq_Lexer *l) {
                                 return t;
                         }
                 } else {
-                        return t;
+                        if (t.at[0] == '0') {
+                                return t;
+                        }
+                        t.size = 0;
+                        t.id = ARQ_NO_TOKEN;
                 }
+
         }
 
         if (l->at[l->cursor_idx] ==  '.') {

@@ -57,15 +57,32 @@ static bool array_start(Arq_Lexer *l) {
 }
 
 static bool hex_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
-        if ((idx + 2 < l->SIZE)
-        && (l->at[idx + 0] == '0') 
-        && (l->at[idx + 1] == 'x' || l->at[idx + 1] == 'X') 
-        && isxdigit(l->at[idx + 2])) {
-                l->cursor_idx += 3;
-                return true;
+        uint32_t idx = l->cursor_idx;
+        if (l->at[idx] == '+' || l->at[idx] == '-') {
+                if (idx + 1 == l->SIZE) { 
+                        return false;
+                }
+                idx++;
         }
-        return false;
+        if (l->at[idx] != '0') {
+                return false;
+        }
+        if (idx + 1 == l->SIZE) { 
+                return false;
+        }
+        idx++;
+        if (l->at[idx] != 'x' && l->at[idx + 1] != 'X') {
+                return false;
+        }
+        if (idx + 1 == l->SIZE) { 
+                return false;
+        }
+        idx++;
+        if (!isxdigit(l->at[idx])) {
+                return false;
+        } 
+        l->cursor_idx = idx + 1;
+        return true;
 }
 
 static bool has_hex_exponent(char const s) {
@@ -294,8 +311,13 @@ static Arq_Token next_token(Arq_Lexer *l) {
                                 return t;
                         }
                 } else { 
-                        return t;
+                        if (t.at[0] == '0') {
+                                return t;
+                        }
+                        t.size = 0;
+                        t.id = ARQ_NO_TOKEN;
                 }
+
         }
 
         if (l->at[l->cursor_idx] ==  '.') {

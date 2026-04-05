@@ -169,18 +169,19 @@ CMD line failure:
 
 ## Hexadecimal floating-point values
 
-The `float` argument can also be specified using **hexadecimal floating-point notation**.
+The `float` argument can also be specified using **C99 hexadecimal floating-point notation**.
 
-Hexadecimal floating-point numbers use this format:
+The format is:
 
 ```text
-0x<hexadecimal_fraction>p<exponent>
+[+|-]0x<hexadecimal_fraction>p<exponent>
 ```
 
 Where:
-
+- `[+|-]` is an optional sign
 - `0x` indicates hexadecimal notation
-- the fractional part is written in base 16
+- integer and fractional parts are written in **base 16**  
+Each digit after the decimal point represents a negative power of 16
 - `p` introduces the exponent
 - the exponent is a **power of 2**, not 10
 
@@ -189,6 +190,11 @@ Where:
 ./example --float 0xA.E1p1
 -f --float
 fn_float number = 21.7578125000
+```
+```
+./example --float -0xA.E1p1
+-f --float
+fn_float number = -21.7578125000
 ```
 ### How this value is interpreted
 

@@ -144,8 +144,8 @@ void amalgamate_arq(void) {
                 ); 
                 Nob_Cmd cmd = {0};
                 nob_cmd_append_cmd(&cmd, &c_compiler);
-                nob_cmd_append(&cmd, "./amalgamate/main2.c");
-                nob_cmd_append(&cmd, "-o", "./build/main2");
+                nob_cmd_append(&cmd, "./amalgamate/example.c");
+                nob_cmd_append(&cmd, "-o", "./build/example");
                 nob_cmd_append(&cmd, "-I", "./amalgamate");
                 nob_cmd_run_sync(cmd);
         }
