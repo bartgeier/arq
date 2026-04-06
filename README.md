@@ -29,8 +29,9 @@ Just you know a dash '-' in the table means no.
 | - short options like -h                             | yes    | yes |
 | option with multiple arguments                      | -      | yes |
 | option without argument                             | yes    | yes |
-| option required argument                            | yes    | yes |
-| option with optional argument with default value    | -      | yes |
+| option with required argument                       | yes    | yes |
+| option with optional argument                       | yes    | yes |
+| argument with default values                        | yes    | yes |
 | -- positional arguments end of command-line options | yes    | yes |
 | -- switch from optional to required cstr argument   | -      | yes |
 | = connects token --std=c99                          | yes    | -   |
@@ -42,8 +43,9 @@ Just you know a dash '-' in the table means no.
 | int parameter                                       | -      | yes |
 | float parameter                                     | -      | yes |
 
-## Default values for cstr_t
+## cstr_t
 
+cstr_t is a cstring ```const char*``` it points into the argv list.  
 For cstr_t, the only supported default value is NULL.  
 A string literal such as "hello world" cannot be used as the default value.  
 Valid:
@@ -54,43 +56,9 @@ Infalid:
 ```
 {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = \"hello world\")"},
 ```
-
-
-## Positional argument
-
-An array of cstr_t behaves like a positional argument list.  
-Because it consumes all remaining values, you cannot place another argument after the cstr_t[] parameter. Any following values will be treated as part of the cstr_t array.
-
-```
-{'p', "positional_argument", fn_positionlargument, "(int number, cstr_t list[])"},
-
-```
-Example:
-
-```
-./example --positional_argument 69 hello world ok abc
-
-Output:
-
--p --positional_argument
-number: 69
-
-list array_size: 4
-    list[0]: hello
-    list[1]: world
-    list[2]: ok
-    list[3]: abc
-```
-#### Invalid parameter order
-
-The following does not work, because number is interpreted as part of the positional argument array:
-```
-{'p', "positional_argument", fn_positionlargument, "(cstr_t list[], int number)"},
-```
-
-## When to use --
-Use -- only with a cstr_t argument whose default value is set to NULL.  
-The -- separator tells the parser that everything after it should be treated as the argument’s value, even if it starts with --.
+### -- seperator
+Use -- with a cstr_t argument whose default value is set to NULL.  
+The -- separator tells the parser that everything after it should be treated as the argument’s value, even if it starts with -- or -.
 ```
 {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = NULL)"},
 ```
@@ -100,35 +68,58 @@ The -- separator tells the parser that everything after it should be treated as 
 str = --hello
 ```
 
-## = Is not implemented
 
-I might implement support for this later.
+## cstr_t[]
 
-In many command-line tools, you can assign an argument using =.  
-However, when an cstr argument has multiple values, this becomes ambiguous.  
-For example, consider this option with two integers:
+Put a cstr_t[] always at the end of a parameter list.  
+Because a cstr_t[] consumes all remaining values,  
+you cannot place another parameter after the cstr_t[] parameter.  
+Any following values will be treated as part of the cstr_t array.
+
 ```
-{'i', "ints", fn_int, "(int number_0, int number_1)"},
+{'a', "cstring_array", fn_cstringarray, "(int number, cstr_t list[])"},
+{'u', "uint",          fn_uint, "(uint number)"},
+```
+Example:
+
+```
+./example --cstring_array 69 hello world --uint 42
+
+Output:
+
+-a --cstring_array
+number: 69
+list array_size: 2
+    list[0]: hello
+    list[1]: world
+
+-u --uint
+number = 42
+```
+#### Invalid parameter order
+
+The following does not work, because number is interpreted as part of the positional argument array:
+```
+{'a', "cstring_array", fn_cstringarray, "(cstr_t list[], int number)"},
 ```
 
-You could write:
-```
-./example --ints=42=69
-```
 
-The parser correctly interprets this as 42 and 69. No problem.
-Now, consider an option with two cstr_t values:
-```
-{'s', "cstrs", fn_cstrs, "(cstr_t s_0, cstr_t s_1)"},
-```
+### -- Positional argument
+Use -- to turn a cstr_t[] array into a positional argument list.
 
-You cannot use:
 ```
-./example --cstrs=hello=world
+./example --cstring_array 69 -- hello world --uint 42
+
+Output:
+
+-a --cstring_array
+numbere: 69
+list array_size: 4
+    list[0]: hello
+    list[1]: world
+    list[2]: --uint
+    list[3]: 42
 ```
-
-because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
-
 ## Hexadecimal integer values
 
 Both `int` and `uint` arguments can be specified using **hexadecimal notation**.
@@ -211,7 +202,35 @@ So the final result is:
 ```text
 21.7578125000
 ```
+## = Is not implemented
+
+I might implement support for this later.
+
+In many command-line tools, you can assign an argument using =.  
+However, when an cstr argument has multiple values, this becomes ambiguous.  
+For example, consider this option with two integers:
+```
+{'i', "ints", fn_int, "(int number_0, int number_1)"},
+```
+
+You could write:
+```
+./example --ints=42=69
+```
+
+The parser correctly interprets this as 42 and 69. No problem.
+Now, consider an option with two cstr_t values:
+```
+{'s', "cstrs", fn_cstrs, "(cstr_t s_0, cstr_t s_1)"},
+```
+
+You cannot use:
+```
+./example --cstrs=hello=world
+```
+
+because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
+
 
 # Todos
-* terminate cstr[] ?
 * conclusion 
