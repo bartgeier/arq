@@ -52,7 +52,7 @@ Valid:
 ```
 {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = NULL)"},
 ```
-Infalid:
+Invalid:
 ```
 {'o', "optionalstr",  fn_optionalstr, "(cstr_t str = \"hello world\")"},
 ```
