@@ -1239,6 +1239,7 @@ Arq_LexerOpt arq_lexerOpt_create(void) {
 
 static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
         Arq_Token token = next_token(lexer);
+#if 0
         if (token.id == ARQ_CMD_SHORT_OPTION) {
                 return token;
         }
@@ -1247,6 +1248,7 @@ static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
                 token.size = lexer->SIZE;
                 lexer->cursor_idx = lexer->SIZE;
         }
+#endif
         return token;
 }
 
@@ -1267,6 +1269,7 @@ void arq_lexerCmd_reset(Arq_LexerCmd *cmd) {
         return;
 }
 
+#if 1
 void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
         if (cmd->argIdx >= cmd->argc) {
                 cmd->lexer.token.id = ARQ_NO_TOKEN;
@@ -1304,6 +1307,90 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
         cmd->bundeling = false;
         return;
 }
+#else
+void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
+        if (cmd->argIdx >= cmd->argc) {
+                cmd->lexer.token.id = ARQ_NO_TOKEN;
+                cmd->lexer.SIZE = 0;
+                cmd->lexer.cursor_idx = 0;
+                cmd->lexer.at = NULL;
+                cmd->lexer.token.at = NULL;
+                cmd->lexer.token.size = 0;
+                cmd->bundeling = false;
+                return;
+        }
+
+        if (cmd->state == 0) {
+                /* Init */
+                cmd->lexer.SIZE = strlen(cmd->argv[cmd->argIdx]);
+                cmd->lexer.at = cmd->argv[cmd->argIdx];
+                cmd->lexer.cursor_idx = 0;
+                cmd->lexer.token = next_cmd_token(&cmd->lexer);
+
+                if (cmd->lexer.cursor_idx == cmd->lexer.SIZE) {
+                        cmd->argIdx++;
+                        return;
+                }
+
+                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                cmd->lexer.token.id == ARQ_CMD_SHORT_OPTION &&
+                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx]) {
+                        cmd->state = 2; /* bundeling */
+                        return;
+                }
+
+                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
+                        cmd->lexer.cursor_idx++;
+                        cmd->state = 1; /* token */
+                        return;
+                }
+        }
+        if (cmd->state == 1) {
+                /* token */
+                cmd->lexer.token = next_cmd_token(&cmd->lexer);
+                if (cmd->lexer.cursor_idx == cmd->lexer.SIZE) {
+                        cmd->state = 0; /* init */
+                        cmd->argIdx++;
+                        return;
+                }
+
+                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
+                        cmd->lexer.cursor_idx++;
+                        return;
+                }
+
+        }
+        if (cmd->state == 2) {
+                /* bundeling */
+
+                cmd->lexer.token.at = &cmd->lexer.at[cmd->lexer.cursor_idx];
+                cmd->lexer.token.id = ARQ_CMD_SHORT_OPTION;
+                cmd->lexer.token.size = 1;
+                cmd->lexer.cursor_idx++;
+
+                if (cmd->lexer.cursor_idx == cmd->lexer.SIZE) {
+                        cmd->state = 0; /* init */
+                        cmd->argIdx++;
+                        return;
+                }
+
+                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx]) {
+                        return;
+                }
+
+                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
+                        cmd->lexer.cursor_idx++;
+                        cmd->state = 1; /* token */
+                        return;
+                }
+
+        }
+}
+#endif
 
 /*** End of inlined file: arq_lexer.c ***/
 
