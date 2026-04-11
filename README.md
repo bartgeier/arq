@@ -234,3 +234,6 @@ because the parser interprets the first argument as ```"hello=world"``` and the 
 
 # Todos
 * conclusion 
+* lexer cmd state 0 token identifier ? hello!
+* uinttest test_argc.c :591 
+* lexer = 

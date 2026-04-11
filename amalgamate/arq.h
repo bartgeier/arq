@@ -793,7 +793,7 @@ typedef struct {
 
 typedef struct {
         Arq_Lexer lexer;
-        bool bundeling;
+        uint32_t state;
         int argc;
         char **argv;
         int argIdx;
@@ -1258,18 +1258,17 @@ Arq_LexerCmd arq_lexerCmd_create(int argc, char **argv) {
         cmd.argc = argc - 1;
         cmd.argv = argv + 1;
         cmd.argIdx = 0;
-        cmd.bundeling = false;
+        cmd.state = 0;
         return cmd;
 }
 
 void arq_lexerCmd_reset(Arq_LexerCmd *cmd) {
         cmd->lexer = arq_lexer_create();
         cmd->argIdx = 0;
-        cmd->bundeling = false;
         return;
 }
 
-#if 1
+#if 0
 void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
         if (cmd->argIdx >= cmd->argc) {
                 cmd->lexer.token.id = ARQ_NO_TOKEN;
@@ -1316,12 +1315,12 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 cmd->lexer.at = NULL;
                 cmd->lexer.token.at = NULL;
                 cmd->lexer.token.size = 0;
-                cmd->bundeling = false;
+                cmd->state = 0; /* init=0, token=1, bundeling=2 */
                 return;
         }
 
-        if (cmd->state == 0) {
-                /* Init */
+        switch (cmd->state) {
+        case 0: /* Init */ {
                 cmd->lexer.SIZE = strlen(cmd->argv[cmd->argIdx]);
                 cmd->lexer.at = cmd->argv[cmd->argIdx];
                 cmd->lexer.cursor_idx = 0;
@@ -1334,7 +1333,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
 
                 if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
                 cmd->lexer.token.id == ARQ_CMD_SHORT_OPTION &&
-                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx]) {
+                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx])) {
                         cmd->state = 2; /* bundeling */
                         return;
                 }
@@ -1345,9 +1344,10 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         cmd->state = 1; /* token */
                         return;
                 }
+                /*cmd->argIdx++;*/
+                return;
         }
-        if (cmd->state == 1) {
-                /* token */
+        case 1: /* token */ {
                 cmd->lexer.token = next_cmd_token(&cmd->lexer);
                 if (cmd->lexer.cursor_idx == cmd->lexer.SIZE) {
                         cmd->state = 0; /* init */
@@ -1360,11 +1360,8 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         cmd->lexer.cursor_idx++;
                         return;
                 }
-
-        }
-        if (cmd->state == 2) {
-                /* bundeling */
-
+                } return;
+        case 2: /* bundeling */ {
                 cmd->lexer.token.at = &cmd->lexer.at[cmd->lexer.cursor_idx];
                 cmd->lexer.token.id = ARQ_CMD_SHORT_OPTION;
                 cmd->lexer.token.size = 1;
@@ -1377,7 +1374,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 }
 
                 if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
-                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx]) {
+                is_short_identifier(cmd->lexer.at[cmd->lexer.cursor_idx])) {
                         return;
                 }
 
@@ -1388,6 +1385,11 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         return;
                 }
 
+                cmd->state = 1; /* token */
+                } return;
+        default:
+                assert(false);
+                return;
         }
 }
 #endif
@@ -2407,7 +2409,6 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         B_IDX = m->size;
         cmd->argIdx = 0;
         cmd->lexer = arq_lexer_create();
-        cmd->bundeling = 0;
         arq_lexer_next_cmd_token(cmd);
         while(true) {
                 /* render argv to calculate argv_len */
@@ -2444,7 +2445,6 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         D_IDX = m->size;
         cmd->argIdx = 0;
         cmd->lexer = arq_lexer_create();
-        cmd->bundeling = 0;
         arq_lexer_next_cmd_token(cmd);
         while(true) {
                 /* render argv once more for moving argv */

@@ -18,7 +18,7 @@ typedef struct {
 
 typedef struct {
         Arq_Lexer lexer;
-        bool bundeling;
+        uint32_t state;
         int argc;
         char **argv;
         int argIdx;
