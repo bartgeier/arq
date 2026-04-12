@@ -603,6 +603,194 @@ TEST(arq, short_option_bundeling) {
         }
 }
 
+void fn_assign_version(Arq_Queue *queue) {
+        (void) queue;
+        pos += sprintf(result + pos, "version ");
+}
+void fn_assign_number(Arq_Queue *queue) {
+        (void) queue;
+        pos += sprintf(result + pos, "number %u\n", arq_uint(queue));
+}
+void fn_assign_3number(Arq_Queue *queue) {
+        (void) queue;
+        uint32_t n1 = arq_uint(queue);
+        uint32_t n2 = arq_uint(queue);
+        uint32_t n3 = arq_uint(queue);
+        pos += sprintf(result + pos, "number %u %u %u\n", n1, n2, n3);
+}
+void fn_assign_mixed(Arq_Queue *queue) {
+        uint32_t u_nr = arq_uint(queue);
+        int32_t i_nr = arq_int(queue);
+        double f_nr = arq_float(queue);
+        char const *comment = arq_cstr_t(queue);
+        pos += sprintf(result + pos, "u_nr = %u\ni_nr = %d\nf_nr = %f\ncomment = %s\n", u_nr, i_nr, f_nr, comment);
+}
+void fn_assign_string(Arq_Queue *queue) {
+        const char *s1 = arq_cstr_t(queue);
+        const char *s2 = arq_cstr_t(queue); 
+        pos += sprintf(result + pos, "s1 = %s\ns2 = %s\n", s1, s2);
+}
+TEST(arq, assignment_operator) {
+        result[0] = 0;
+        Arq_Option options[] = {
+                {'v', "version",   fn_assign_version, "()"},
+                {'n', "number",    fn_assign_number, "(uint number)"},
+                {'m', "numbers",   fn_assign_3number, "(uint n1, uint n2, uint n3)"},
+                {'x', "mixed",     fn_assign_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
+                {'s', "string",    fn_assign_string, "(cstr_t s1, cstr_t s2)"},
+        };
+        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        {
+                pos = 0;
+                set(&cmd, "arq", "--number=8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"number 8\n"));
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "-n=8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"number 8\n"));
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "-vn=8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(result,"version number 8\n"));
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--number=",  "8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    --number= \n"
+                                        "    Token '--number=' is not an option\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "-n=", "8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    -n = \n"
+                                        "    Token '=' is not a positiv number\n"
+                                        "    -n --number (uint number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "-vn=", "8");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    -v n = \n"
+                                        "    Token '=' is not a positiv number\n"
+                                        "    -n --number (uint number)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--numbers=8=7=6=");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    --numbers=8=7=6= 8=7=6= 7=6= 6= = \n"
+                                        "    Token '=' is not an option\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "-x=8=7=6.0=hello");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(
+                        result,
+                        "u_nr = 8\n"
+                        "i_nr = 7\n"
+                        "f_nr = 6.000000\n"
+                        "comment = hello\n"
+                        )
+                );
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--string", "hello", "world");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(
+                        result,
+                        "s1 = hello\n"
+                        "s2 = world\n"
+                        )
+                );
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--string=hello", "world");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        ASSERT_TRUE(false);
+                }
+                EXPECT_TRUE(0 == strcmp(
+                        result,
+                        "s1 = hello\n"
+                        "s2 = world\n"
+                        )
+                );
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--string=hello=world");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp_verbose(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    --string=hello=world hello=world \n"
+                                        "    Token '' is not a c string => expected an argument\n"
+                                        "    -s --string (cstr_t s1, cstr_t s2)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+}
+
 void fn_number32(Arq_Queue *queue) {
         uint32_t x = arq_uint(queue);
         sprintf(result, "fn_number32 %u", x);

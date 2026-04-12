@@ -199,7 +199,7 @@ static bool start_dash_dash(Arq_Lexer *l) {
         return false;
 }
 
-static Arq_Token next_token(Arq_Lexer *l) {
+static Arq_Token next_token(Arq_Lexer *l, bool has_identifier) {
         Arq_Token t = {0};
         skip_space(l);
         t.at = &l->at[l->cursor_idx];
@@ -246,23 +246,23 @@ static Arq_Token next_token(Arq_Lexer *l) {
                 return t; 
         }
 
-
-        if (identifier_start(l)) {
-                uint32_t i;
-                t.id = ARQ_IDENTFIER; 
-                t.size = &l->at[l->cursor_idx] - t.at;
-                while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
-                        l->cursor_idx++;
-                        t.size++;
-                }
-                for (i = 0; i < sizeof(key_words)/sizeof(KeyWord); i++) {
-                        if (str_eq_keyword(t.at,t.size, &key_words[i])) {
-                                t.id = key_words[i].id;
+        if (has_identifier) {
+                if (identifier_start(l)) {
+                        uint32_t i;
+                        t.id = ARQ_IDENTFIER; 
+                        t.size = &l->at[l->cursor_idx] - t.at;
+                        while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
+                                l->cursor_idx++;
+                                t.size++;
                         }
+                        for (i = 0; i < sizeof(key_words)/sizeof(KeyWord); i++) {
+                                if (str_eq_keyword(t.at,t.size, &key_words[i])) {
+                                        t.id = key_words[i].id;
+                                }
+                        }
+                        return t;
                 }
-                return t;
         }
-
         if (array_start(l)) {
                 t.id = ARQ_OP_ARRAY; 
                 t.size = &l->at[l->cursor_idx] - t.at;
@@ -374,6 +374,9 @@ static Arq_Token next_token(Arq_Lexer *l) {
                 if (l->cursor_idx == l->SIZE) {
                         return t;
                 }
+                if (l->cursor_idx + 1 < l->SIZE && l->at[l->cursor_idx] == '=') {
+                        return t;
+                }
         }
 
         if (start_dash_dash(l)) {
@@ -393,7 +396,8 @@ static Arq_Token next_token(Arq_Lexer *l) {
 }
 
 void arq_lexer_next_opt_token(Arq_LexerOpt *opt) {
-        opt->lexer.token = next_token(&opt->lexer);
+        bool has_identifier = true;
+        opt->lexer.token = next_token(&opt->lexer, has_identifier);
 }
 
 Arq_Lexer arq_lexer_create(void) {
@@ -419,7 +423,8 @@ Arq_LexerOpt arq_lexerOpt_create(void) {
 /******************************************************************************/
 
 static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
-        Arq_Token token = next_token(lexer);
+        bool has_identifier = false;
+        Arq_Token token = next_token(lexer, has_identifier);
 #if 0 
         if (token.id == ARQ_CMD_SHORT_OPTION) {
                 return token;
@@ -519,13 +524,13 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         return;
                 }
 
-                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                if (cmd->lexer.cursor_idx + 1 < cmd->lexer.SIZE &&
                 cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
                         cmd->lexer.cursor_idx++;
                         cmd->state = 1; /* token */
                         return;
                 }
-                cmd->argIdx++;
+                cmd->state = 1; /* token */
                 return;
         }
         case 1: /* token */ {
@@ -536,7 +541,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         return;
                 }
 
-                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                if (cmd->lexer.cursor_idx + 1 < cmd->lexer.SIZE &&
                 cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
                         cmd->lexer.cursor_idx++;
                         return;
@@ -559,7 +564,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                         return;
                 }
 
-                if (cmd->lexer.cursor_idx < cmd->lexer.SIZE &&
+                if (cmd->lexer.cursor_idx + 1 < cmd->lexer.SIZE &&
                 cmd->lexer.at[cmd->lexer.cursor_idx] == '=') {
                         cmd->lexer.cursor_idx++;
                         cmd->state = 1; /* token */

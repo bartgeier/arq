@@ -483,7 +483,6 @@ char const *arq_imm_argument_csrt_t(Arq_LexerCmd *cmd, Arq_msg *error_msg) {
         if (token->id == ARQ_NO_TOKEN) {
                 Arq_Token const tok = *token;
                 arq_msg_append_cstr(error_msg, CMD_LINE_FAILURE);
-                arq_msg_append_cstr(error_msg, "Token '");
                 arq_msg_append_str(error_msg, tok.at, tok.size);
                 arq_msg_append_cstr(error_msg, "' is not a c string => expected an argument");
                 arq_msg_append_lf(error_msg);

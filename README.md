@@ -34,7 +34,7 @@ Just you know a dash '-' in the table means no.
 | argument with default values                        | yes    | yes |
 | -- positional arguments end of command-line options | yes    | yes |
 | -- switch from optional to required cstr argument   | -      | yes |
-| = connects token --std=c99                          | yes    | -   |
+| = cmd-line assignment operator like --std=c99       | yes    | yes |
 | option with array of arguments                      | -      | yes |
 | bundled short options                               | yes    | yes |
 | types for argument                                  | -      | yes |
@@ -202,11 +202,9 @@ So the final result is:
 ```text
 21.7578125000
 ```
-## = Is not implemented
+## = Command-line Assignment operator
 
-I might implement support for this later.
-
-In many command-line tools, you can assign an argument using =.  
+You can assign an argument using =.  
 However, when an cstr argument has multiple values, this becomes ambiguous.  
 For example, consider this option with two integers:
 ```
@@ -234,6 +232,17 @@ because the parser interprets the first argument as ```"hello=world"``` and the 
 
 # Todos
 * conclusion 
-* lexer cmd state 0 token identifier ? hello!
-* uinttest test_argc.c :591 
-* lexer = 
+* -n9 short operator with argument => documentation
+* Assignment better explanation => documentation
+* CMD line failure message print token as slice
+```
+"CMD line failure:\n"
+"    --string=hello=world hello=world \n"
+"    Token '' is not a c string => expected an argument\n"
+"    -s --string (cstr_t s1, cstr_t s2)\n"
+
+"CMD line failure:\n"
+"    --numbers=8=7=6= 8=7=6= 7=6= 6= = \n"
+"    Token '=' is not an option\n"
+```
+
