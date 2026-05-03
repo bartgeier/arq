@@ -7,6 +7,12 @@
 #include <memory.h>
 #include <assert.h>
 
+void fn_version(Arq_Queue *queue) {
+        (void) queue;
+        printf("example version 1\n");
+        printf("\n");
+}
+
 void fn_cstring(Arq_Queue *queue) {
         char const *str = arq_cstr_t(queue);
         printf("-c --cstring\n");
@@ -120,6 +126,7 @@ void fn_mixed(Arq_Queue *queue) {
 void fn_help(Arq_Queue *queue);
 
 Arq_Option options[] = {
+        {'v', "version",       fn_version, "()"},
         {'h', "help",          fn_help, "()"},
 
         {'c', "cstring",       fn_cstring, "(cstr_t str)"},

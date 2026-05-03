@@ -216,6 +216,7 @@ You could write:
 ./example --ints=42=69
 ```
 
+
 The parser correctly interprets this as 42 and 69. No problem.
 Now, consider an option with two cstr_t values:
 ```
@@ -229,6 +230,48 @@ You cannot use:
 
 because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
 
+# Short options
+Short options use a single dash followed by one character, for example -v or -h.  
+You can combine (bundle) short options into a single flag:  
+```./example -vh```  
+prints version and help.
+
+```
+example version 1
+
+help
+-v --version()
+-h --help()
+-c --cstring(cstr_t str)
+-o --optionalstr(cstr_t str = NULL)
+-a --cstring_array(int number, cstr_t list[])
+-u --uint(uint number)
+-U --uint-default(uint number = 69)
+-i --int(int number)
+-I --int_default(int number = -69)
+-j --int_array(int numbers[])
+-f --float(float number)
+-F --floatdefault(float number = 5.1e1)
+-m --multiple(uint first_line = 0, uint last_line = +1200)
+-x --mixed(uint u_nr, int i_nr, float f_nr, cstr_t comment)
+```
+## Direct assignment
+Direct assignment is only supported for short options:  
+```
+./example -f3.5
+-f --float
+fn_float number = 3.5000000000
+```
+```
+./example -f 3.5
+-f --float
+fn_float number = 3.5000000000
+```
+```
+./example -f=3.5
+-f --float
+fn_float number = 3.5000000000
+```
 
 # Todos
 * conclusion 

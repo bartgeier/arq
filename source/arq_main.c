@@ -48,6 +48,7 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         B_IDX = m->size;
         cmd->argIdx = 0;
         cmd->lexer = arq_lexer_create();
+        cmd->state = 0;
         arq_lexer_next_cmd_token(cmd);
         while(true) {
                 /* render argv to calculate argv_len */
@@ -84,6 +85,7 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         D_IDX = m->size;
         cmd->argIdx = 0;
         cmd->lexer = arq_lexer_create();
+        cmd->state = 0;
         arq_lexer_next_cmd_token(cmd);
         while(true) {
                 /* render argv once more for moving argv */
@@ -309,7 +311,6 @@ uint32_t arq_fn(
 
         );
         log_memory(("\n%d arguments fit in the queue.\n", queue->NUM_OF_ARGUMENTS));
-
 
         arq_lexer_next_cmd_token(&cmd);
         while(arq_imm_cmd_has_token_left(&cmd)) {

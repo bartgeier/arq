@@ -136,7 +136,7 @@ void amalgamate_arq(void) {
         }
         {
                 Nob_Cmd c_compiler = {0};
-                nob_cmd_append(&c_compiler, "gcc", "-std=c89", "-DARQ_LOG_TOKENIZER", 
+                nob_cmd_append(&c_compiler, "gcc", "-std=c89", // "-DARQ_LOG_TOKENIZER", 
                         // "-Os", "-s", 
                         // "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                         // "-fomit-frame-pointer", "-fno-stack-protector", "-fno-asynchronous-unwind-tables",
@@ -145,7 +145,7 @@ void amalgamate_arq(void) {
                 Nob_Cmd cmd = {0};
                 nob_cmd_append_cmd(&cmd, &c_compiler);
                 nob_cmd_append(&cmd, "./amalgamate/example.c");
-                nob_cmd_append(&cmd, "-o", "./build/example");
+                nob_cmd_append(&cmd, "-o", "./amalgamate/example");
                 nob_cmd_append(&cmd, "-I", "./amalgamate");
                 nob_cmd_run_sync(cmd);
         }

@@ -511,7 +511,6 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 cmd->lexer.at = cmd->argv[cmd->argIdx];
                 cmd->lexer.cursor_idx = 0;
                 cmd->lexer.token = next_cmd_token(&cmd->lexer);
-
                 if (cmd->lexer.cursor_idx == cmd->lexer.SIZE) {
                         cmd->argIdx++;
                         return;

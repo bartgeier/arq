@@ -777,12 +777,28 @@ TEST(arq, assignment_operator) {
                 set(&cmd, "arq", "--string=hello=world");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         EXPECT_EQ(
-                                strcmp_verbose(
+                                strcmp(
                                         buffer,
                                         "CMD line failure:\n"
                                         "    --string=hello=world hello=world \n"
                                         "    Token '' is not a c string => expected an argument\n"
                                         "    -s --string (cstr_t s1, cstr_t s2)\n"
+                                ), 0
+                        );
+                } else {
+                        ASSERT_TRUE(false);
+                }
+        }
+        {
+                pos = 0;
+                set(&cmd, "arq", "--fleet=3");
+                if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
+                        EXPECT_EQ(
+                                strcmp(
+                                        buffer,
+                                        "CMD line failure:\n"
+                                        "    --fleet=3 \n"
+                                        "    Token '--fleet' unknown long option \n"   
                                 ), 0
                         );
                 } else {
