@@ -11,15 +11,65 @@ https://linux.die.net/man/3/getopt
 * It's a single-header library.
 * Written in c89.
 
-## Example
+## Compile example
 [amalgamate/example.c](amalgamate/example.c)
 ```
 cd amalgamate 
 gcc example.c -o example 
-./example --help
 ```
 
-## arq versus getopt
+# Long options
+
+Long options use two dashes followed by a descriptive name, for example --version or --help.
+Long options cannot be bundled together and must be passed separately:
+
+```./example --version --help```
+
+# Short options
+Short options use a single dash followed by one character, for example -v or -h.  
+You can combine (bundle) short options into a single flag:  
+```./example -vh```  
+prints version and help.
+
+```
+example version 1
+
+help
+-v --version()
+-h --help()
+-c --cstring(cstr_t str)
+-C --cstr2(cstr_t s_A, cstr_t s_B)
+-o --optionalstr(cstr_t str = NULL)
+-a --cstring_array(int number, cstr_t list[])
+-u --uint(uint number)
+-U --uint-default(uint number = 69)
+-i --int(int number)
+-I --int_default(int number = -69)
+-j --int_array(int numbers[])
+-f --float(float number)
+-F --floatdefault(float number = 5.1e1)
+-t --tuple(uint first_line = 0, uint last_line = +1200)
+-x --mixed(uint u_nr, int i_nr, float f_nr, cstr_t comment)
+```
+## Argument assignment
+Direct assignment for arguments without ```=``` or a space is only supported for short options.
+```
+./example -f3.5
+-f --float
+fn_float number = 3.5000000000
+```
+```
+./example -f 3.5
+-f --float
+fn_float number = 3.5000000000
+```
+```
+./example -f=3.5
+-f --float
+fn_float number = 3.5000000000
+```
+
+# arq versus getopt
 
 Just you know a dash '-' in the table means no.
 <!-- ttps://www.tablesgenerator.com/markdown_tables -->
@@ -43,7 +93,7 @@ Just you know a dash '-' in the table means no.
 | int parameter                                       | -      | yes |
 | float parameter                                     | -      | yes |
 
-## cstr_t
+# cstr_t
 
 cstr_t is a cstring ```const char*``` it points into the argv list.  
 For cstr_t, the only supported default value is NULL.  
@@ -204,88 +254,78 @@ So the final result is:
 ```
 ## = Command-line Assignment operator
 
-You can assign an argument using =.  
-However, when an cstr argument has multiple values, this becomes ambiguous.  
-For example, consider this option with two integers:
+You can assign an argument using ```=```.  
+However, when an cstr option has multiple arguments, this becomes ambiguous.  
+For example, consider this option with two unsigned integers parameters:
 ```
-{'i', "ints", fn_int, "(int number_0, int number_1)"},
+{'t', "tuple", fn_tuple, "(uint first_line = 0, uint last_line = +1200)"},
 ```
 
 You could write:
 ```
-./example --ints=42=69
+./example --tuple=42=69
 ```
-
-
-The parser correctly interprets this as 42 and 69. No problem.
-Now, consider an option with two cstr_t values:
+Output:
 ```
-{'s', "cstrs", fn_cstrs, "(cstr_t s_0, cstr_t s_1)"},
+-t --tuple
+first_line = 42
+last_line = 69
 ```
-
+The parser correctly interprets this as 42 and 69. No problem.  
+Now, consider an option with two cstr_t parameters:
+```
+{'C', "cstr2", fn_cstr2, "(cstr_t s_A, cstr_t s_B)"},
+```
+The following does **not** work:
 You cannot use:
 ```
-./example --cstrs=hello=world
+./example --cstr2=hello=world
 ```
+Error:
+```
+CMD line failure:
+    --cstr2=hello=world hello=world 
+    Token '' is not a c string => expected an argument
+    -C --cstr2 (cstr_t s_A, cstr_t s_B)
+```
+This happens because the parser treats hello=world as the first argument  
+and consumes the ```=``` character, leaving no second argument to parse.  
+Which is not what you intended.
 
-because the parser interprets the first argument as ```"hello=world"``` and the second as ```"world"```, which is not what you intended.
+But this works:
+```
+./example --cstr2=hello world
+-C --cstrs
+str_A = hello
+str_B = world
 
-# Short options
-Short options use a single dash followed by one character, for example -v or -h.  
-You can combine (bundle) short options into a single flag:  
-```./example -vh```  
-prints version and help.
-
-```
-example version 1
-
-help
--v --version()
--h --help()
--c --cstring(cstr_t str)
--o --optionalstr(cstr_t str = NULL)
--a --cstring_array(int number, cstr_t list[])
--u --uint(uint number)
--U --uint-default(uint number = 69)
--i --int(int number)
--I --int_default(int number = -69)
--j --int_array(int numbers[])
--f --float(float number)
--F --floatdefault(float number = 5.1e1)
--m --multiple(uint first_line = 0, uint last_line = +1200)
--x --mixed(uint u_nr, int i_nr, float f_nr, cstr_t comment)
-```
-## Direct assignment
-Direct assignment is only supported for short options:  
-```
-./example -f3.5
--f --float
-fn_float number = 3.5000000000
-```
-```
-./example -f 3.5
--f --float
-fn_float number = 3.5000000000
-```
-```
-./example -f=3.5
--f --float
-fn_float number = 3.5000000000
+./example --cstr2 hello world
+-C --cstrs
+str_A = hello
+str_B = world
 ```
 
 # Todos
 * conclusion 
-* -n9 short operator with argument => documentation
-* Assignment better explanation => documentation
 * CMD line failure message print token as slice
 ```
-"CMD line failure:\n"
-"    --string=hello=world hello=world \n"
-"    Token '' is not a c string => expected an argument\n"
-"    -s --string (cstr_t s1, cstr_t s2)\n"
+./example --cstr2=hello=world
+CMD line failure:
+    --cstr2=hello=world hello=world 
+    Token '' is not a c string => expected an argument
+    -C --cstr2 (cstr_t s_A, cstr_t s_B)
+```
+```
+./example --int_array=8=7=6=
+-j --int_array
 
-"CMD line failure:\n"
-"    --numbers=8=7=6= 8=7=6= 7=6= 6= = \n"
-"    Token '=' is not an option\n"
+list array_size: 3
+    argument[0]: 8
+    argument[1]: 7
+    argument[2]: 6
+
+CMD line failure:
+    --int_array=8=7=6= 8=7=6= 7=6= 6= = 
+    Token '=' is not an option
 ```
 

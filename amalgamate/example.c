@@ -21,6 +21,16 @@ void fn_cstring(Arq_Queue *queue) {
         printf("\n");
 }
 
+void fn_cstr2(Arq_Queue *queue) {
+        char const *str_A = arq_cstr_t(queue);
+        char const *str_B = arq_cstr_t(queue);
+        printf("-C --cstrs\n");
+        assert(str_A != NULL);
+        assert(str_B != NULL);
+        printf("str_A = %s\nstr_B = %s", str_A, str_B);
+        printf("\n");
+}
+
 void fn_optionalstr(Arq_Queue *queue) {
         char const *str = arq_cstr_t(queue);
         printf("-o --optionalstr\n");
@@ -105,11 +115,11 @@ void fn_floatdefault(Arq_Queue *queue) {
         printf("\n");
 }
 
-void fn_multiple(Arq_Queue *queue) {
-        uint32_t begin = arq_uint(queue);
-        uint32_t end = arq_uint(queue);
-        printf("-m --multiple\n");
-        printf("begin = %d\nend = %d\n", begin, end);
+void fn_tuple(Arq_Queue *queue) {
+        uint32_t first_line = arq_uint(queue);
+        uint32_t last_line = arq_uint(queue);
+        printf("-t --tuple\n");
+        printf("first_line = %d\nlast_line = %d\n", first_line, last_line);
         printf("\n");
 }
 
@@ -130,6 +140,7 @@ Arq_Option options[] = {
         {'h', "help",          fn_help, "()"},
 
         {'c', "cstring",       fn_cstring, "(cstr_t str)"},
+        {'C', "cstr2",         fn_cstr2, "(cstr_t s_A, cstr_t s_B)"},
         {'o', "optionalstr",   fn_optionalstr, "(cstr_t str = NULL)"},
         {'a', "cstring_array", fn_cstringarray, "(int number, cstr_t list[])"},
 
@@ -143,7 +154,7 @@ Arq_Option options[] = {
         {'f', "float",         fn_float, "(float number)"}, 
         {'F', "floatdefault",  fn_floatdefault, "(float number = 5.1e1)"}, 
 
-        {'m', "multiple",      fn_multiple, "(uint first_line = 0, uint last_line = +1200)"},
+        {'t', "tuple",         fn_tuple, "(uint first_line = 0, uint last_line = +1200)"},
         {'x', "mixed",         fn_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
 
 };
