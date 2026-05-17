@@ -722,7 +722,7 @@ TEST(arq, assignment_operator) {
                                 strcmp(
                                         buffer,
                                         "CMD line failure:\n"
-                                        "    --numbers=8=7=6= 8=7=6= 7=6= 6= = \n"
+                                        "    --numbers 8 7 6 = \n"
                                         "    Token '=' is not an option\n"
                                 ), 0
                         );
@@ -780,7 +780,7 @@ TEST(arq, assignment_operator) {
                                 strcmp(
                                         buffer,
                                         "CMD line failure:\n"
-                                        "    --string=hello=world hello=world \n"
+                                        "    --string hello=world \n"
                                         "    Token '' is not a c string => expected an argument\n"
                                         "    -s --string (cstr_t s1, cstr_t s2)\n"
                                 ), 0
@@ -797,7 +797,7 @@ TEST(arq, assignment_operator) {
                                 strcmp(
                                         buffer,
                                         "CMD line failure:\n"
-                                        "    --fleet=3 \n"
+                                        "    --fleet \n"
                                         "    Token '--fleet' unknown long option \n"   
                                 ), 0
                         );

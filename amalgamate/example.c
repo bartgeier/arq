@@ -10,7 +10,7 @@
 void fn_version(Arq_Queue *queue) {
         (void) queue;
         printf("example version 1\n");
-        printf("\n");
+        printf("https://github.com/bartgeier/arq \n");
 }
 
 void fn_cstring(Arq_Queue *queue) {

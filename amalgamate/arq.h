@@ -2423,12 +2423,11 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
                         arq_msg_append_nchr(m, cmd->lexer.token.at[1], x);
                         arq_msg_append_chr(m, '_');
                 } else if (cmd->lexer.token.id == ARQ_CMD_LONG_OPTION) {
-                        /* arq_msg_append_nchr(m, '-', 2); */
-                        arq_msg_append_cstr(m, cmd->lexer.token.at);
+                        arq_msg_append_str(m, cmd->lexer.token.at, cmd->lexer.token.size);
                         arq_msg_append_chr(m, '_');
                 } else if (cmd->lexer.token.id == ARQ_NO_TOKEN) {
                 } else {
-                        arq_msg_append_cstr(m, cmd->lexer.token.at);
+                        arq_msg_append_str(m, cmd->lexer.token.at, cmd->lexer.token.size);
                         arq_msg_append_chr(m, '_');
                 }
                 if (cmd->lexer.token.at == token.at) {
@@ -2460,12 +2459,11 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
                         arq_msg_append_nchr(m, cmd->lexer.token.at[1], x);
                         arq_msg_append_chr(m, ' ');
                 } else if (cmd->lexer.token.id == ARQ_CMD_LONG_OPTION) {
-                        /* arq_msg_append_nchr(m, '-', 2); */
-                        arq_msg_append_cstr(m, cmd->lexer.token.at);
+                        arq_msg_append_str(m, cmd->lexer.token.at, cmd->lexer.token.size);
                         arq_msg_append_chr(m, ' ');
                 } else if (cmd->lexer.token.id == ARQ_NO_TOKEN) {
                 } else {
-                        arq_msg_append_cstr(m, cmd->lexer.token.at);
+                        arq_msg_append_str(m, cmd->lexer.token.at, cmd->lexer.token.size);
                         arq_msg_append_chr(m, ' ');
                 }
                 if (cmd->lexer.token.at == token.at) {

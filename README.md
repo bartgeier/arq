@@ -1,18 +1,16 @@
  # ARQ
 
-> [!WARNING]
-> This software is unfinished. Keep your expectations low.
-
 Arq is a getopt-like C library for parsing command-line options.
 https://linux.die.net/man/3/getopt
 
 ## amalgamate/arq.h
-* It's all you need.
+* ```arq.h``` It's all you need.
 * It's a single-header library.
 * Written in c89.
 
 ## Compile example
-[amalgamate/example.c](amalgamate/example.c)
+[amalgamate/example.c](amalgamate/example.c)  
+Take a look at the example to understand how ARQ works, then continue reading.
 ```
 cd amalgamate 
 gcc example.c -o example 
@@ -50,6 +48,8 @@ help
 -F --floatdefault(float number = 5.1e1)
 -t --tuple(uint first_line = 0, uint last_line = +1200)
 -x --mixed(uint u_nr, int i_nr, float f_nr, cstr_t comment)
+
+https://github.com/bartgeier/arq
 ```
 ## Argument assignment
 Direct assignment for arguments without ```=``` or a space is only supported for short options.
@@ -71,8 +71,8 @@ fn_float number = 3.5000000000
 
 # arq versus getopt
 
-Just you know a dash '-' in the table means no.
-<!-- ttps://www.tablesgenerator.com/markdown_tables -->
+Just you know a dash '-' in the table means **no**.
+<!-- https://www.tablesgenerator.com/markdown_tables -->
 | Feature                                             | getopt | arq |
 |-----------------------------------------------------|--------|-----|
 | -- long options like --help                         | yes    | yes |
@@ -85,6 +85,7 @@ Just you know a dash '-' in the table means no.
 | -- positional arguments end of command-line options | yes    | yes |
 | -- switch from optional to required cstr argument   | -      | yes |
 | = cmd-line assignment operator like --std=c99       | yes    | yes |
+| direct assignment like -n42                         | yes    | yes |
 | option with array of arguments                      | -      | yes |
 | bundled short options                               | yes    | yes |
 | types for argument                                  | -      | yes |
@@ -283,8 +284,9 @@ You cannot use:
 ```
 Error:
 ```
+./example --cstr2=hello=world
 CMD line failure:
-    --cstr2=hello=world hello=world 
+    --cstr2 hello=world 
     Token '' is not a c string => expected an argument
     -C --cstr2 (cstr_t s_A, cstr_t s_B)
 ```
@@ -304,28 +306,48 @@ str_B = world
 str_A = hello
 str_B = world
 ```
-
-# Todos
-* conclusion 
-* CMD line failure message print token as slice
+# Conclusion 
+## Callback dispatching
+Dispatching via a callback function pointer has the drawback that only global variables are directly accessible.  
+One possible solution is to add a ```void *ctx``` parameter to the function pointer type:
 ```
-./example --cstr2=hello=world
-CMD line failure:
-    --cstr2=hello=world hello=world 
-    Token '' is not a c string => expected an argument
-    -C --cstr2 (cstr_t s_A, cstr_t s_B)
+typedef void (*function_pointer_t)(void *context, Arq_Queue *queue);
 ```
 ```
-./example --int_array=8=7=6=
--j --int_array
-
-list array_size: 3
-    argument[0]: 8
-    argument[1]: 7
-    argument[2]: 6
-
-CMD line failure:
-    --int_array=8=7=6= 8=7=6= 7=6= 6= = 
-    Token '=' is not an option
+Arq_Option options[] = {
+    /* short, long,  context, callback, parameter */
+    { 'i',    "int", &number, fn_int,   "(int number)" },
+};
 ```
 
+This allows access to stack-allocated variables through the context pointer. However, it comes at the cost of type safety.
+
+An alternative approach would be to avoid callback functions entirely and instead return an identifier that is dispatched through a switch statement.  
+In that design, rather than a single ```arq_fn``` function, we would need:
+
+1. An initialization function that returns a pointer to the ```Arq_Queue```
+2. A loop function that returns the next parsed option ID
+
+This raises additional design questions,  
+such as how to distinguish command-line parsing errors from normal termination,  
+and how the caller determines when the parsing loop has completed.
+
+## Parameter string
+
+The parameter string allows configuration of the options[] array in a way that resembles type forwarding in C++, which is quite elegant:
+```
+Arq_Option options[] = {
+    /* short, long,          callback,      parameter */
+    { 'I',    "int_default", fn_intdefault, "(int number = -69)"}, 
+};
+```
+However, this approach requires parsing and validating the parameter string, 
+which is handled by ```arq_verify(...)```. 
+In effect, the parameter string behaves like a small domain-specific language (a micro-program).
+
+While a developer could implement such logic manually within their application,
+in practice what is really needed is a clean set of functions that handle command-line parsing and provide consistent error management.
+
+## Final thoughts
+As always:  
+We only discover the correct design at the end of a project.
