@@ -10,7 +10,7 @@
 void fn_version(Arq_Queue *queue) {
         (void) queue;
         printf("example version 1\n");
-        printf("https://github.com/bartgeier/arq \n");
+        printf("\n");
 }
 
 void fn_cstring(Arq_Queue *queue) {
@@ -156,7 +156,6 @@ Arq_Option options[] = {
 
         {'t', "tuple",         fn_tuple, "(uint first_line = 0, uint last_line = +1200)"},
         {'x', "mixed",         fn_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
-
 };
 
 void fn_help(Arq_Queue *queue) {
@@ -166,6 +165,8 @@ void fn_help(Arq_Queue *queue) {
         for (i = 0; i < sizeof(options)/sizeof(Arq_Option); i++) {
                 printf("-%c --%s%s\n", options[i].chr, options[i].name, options[i].arguments);
         }
+        printf("\n");
+        printf("https://github.com/bartgeier/arq \n");
         printf("\n");
 }
 
