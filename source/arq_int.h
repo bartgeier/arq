@@ -3,7 +3,9 @@
 
 #include <stddef.h>  /* for size_t, ptrdiff_t */
 
-#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(_MSC_VER)
+    #include <stdint.h>
+#elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++ C99 */
     #include <stdint.h>
     #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)

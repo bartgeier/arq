@@ -3,7 +3,9 @@
 
 #include "arq_int.h"
 
-#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(_MSC_VER)
+    #include <inttypes.h>
+#elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++, >= C99 */
     #include <inttypes.h>
 #else
