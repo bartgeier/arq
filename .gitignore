@@ -2,6 +2,8 @@
 **/.cache
 **/trash
 **/googletest
+*.exe
+
 
 nob
 nob.old

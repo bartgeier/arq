@@ -6,7 +6,9 @@
 
 #include <stddef.h>  /* for size_t, ptrdiff_t */
 
-#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(_MSC_VER)
+    #include <stdint.h>
+#elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++ C99 */
     #include <stdint.h>
     #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
@@ -338,7 +340,9 @@ void arq_msg_insert_line_cstr(Arq_msg *m, uint32_t line_number, char const *cstr
 #ifndef ARQ_BOOL_H
 #define ARQ_BOOL_H
 
-#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(_MSC_VER)
+    #include <stdbool.h>
+#elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++, >= C99 */
     #include <stdbool.h>
 #else
@@ -403,7 +407,9 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token);
 #ifndef ARQ_INTTYPES_H
 #define ARQ_INTTYPES_H
 
-#if defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(_MSC_VER)
+    #include <inttypes.h>
+#elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++, >= C99 */
     #include <inttypes.h>
 #else
