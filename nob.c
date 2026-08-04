@@ -291,7 +291,6 @@ bool unittests_build(bool const clean) {
 #endif
 
 int main(int argc, char **argv) {
-        uint64_t t_start = nob_millis();
         bool ok = true;
         NOB_GO_REBUILD_URSELF(argc, argv);
         #ifdef _WIN32
@@ -318,14 +317,19 @@ int main(int argc, char **argv) {
         ok &= arq_build(flag.clean);
 
         #if 1
+            printf("\n");
+            printf("\n");
+            uint64_t t_start = nob_millis();
             ok &= unittests_build(flag.clean); 
+            nob_log(NOB_INFO ,"Successful done! %llu ms\n", nob_millis() - t_start);
+            printf("\n");
+            printf("\n");
         #endif
 
         if (!ok) {
                 nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n", nob_millis() - t_start);
                 return false;
         }
-        nob_log(NOB_INFO ,"Successful done! %llu ms\n", nob_millis() - t_start);
         amalgamate_arq();
         return  0;
 }

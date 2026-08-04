@@ -1,0 +1,22 @@
+{
+        "compiler_command": "gcc -std=c99 -O3",
+        "msvc": false,
+        "include_paths": [
+                "../../source/"
+        ],
+        "source_files": [
+                "../../source/arq_main.c",
+                "../../source/arq_symbols.c",
+                "../../source/arq_queue.c",
+                "../../source/arq_lexer.c",
+                "../../source/arq_log.c",
+                "../../source/arq_conversion.c",
+                "../../source/arq_msg.c",
+                "../../source/arq_arena.c",
+                "../../source/arq_immediate.c"
+        ],
+        "output_path": "../build",
+        "test_directories": [
+                ".."
+        ]
+}
