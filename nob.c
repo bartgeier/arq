@@ -233,7 +233,8 @@ bool unittests_build(bool const clean) {
         Nob_Cmd cmd = {0};
         nob_cmd_append(
                 &cmd, 
-                "g++", "-ggdb", "-O0", "-std=c++20",
+                //"g++", "-ggdb", "-O0", "-std=c++20",
+                "g++", "-O0", "-std=c++20",
                 "-Wall", "-Wextra", "-pedantic",
                 "-Wno-parentheses", "-Wno-missing-field-initializers"
         );
