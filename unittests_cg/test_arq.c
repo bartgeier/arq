@@ -1,7 +1,7 @@
 #include "cgtest/cgtest.h"
 #include "arq_main.h"
 #include <stdio.h>
-#include <stdbool.h>
+#include "arq_bool.h"
 #include <stdarg.h>
 char buffer[10000];
 uint32_t const b_size = sizeof(buffer);
@@ -996,7 +996,6 @@ void test_arq_dec_float(void) {
         };
         uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
-                //return;
                 set(&cmd, "arq", "--floatA", ".ge0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
