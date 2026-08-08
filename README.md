@@ -10,7 +10,7 @@ https://linux.die.net/man/3/getopt
 
 ## Download arq.h
 ```
-curl -L -o arq.h https://github.com/bartgeier/arq/raw/refs/tags/v3/amalgamate/arq.h
+curl -fL -o arq.h https://github.com/bartgeier/arq/raw/refs/tags/v3/amalgamate/arq.h
 ```
 
 ## Compile example
