@@ -8,7 +8,7 @@ https://linux.die.net/man/3/getopt
 * It's a single-header library.
 * Written in c89.
 
-## Download
+## Download arq.h
 ```
 curl -L -o arq.h https://github.com/bartgeier/arq/raw/refs/tags/v3/amalgamate/arq.h
 ```
