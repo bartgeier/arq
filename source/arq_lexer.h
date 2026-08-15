@@ -5,20 +5,20 @@
 #include "arq_bool.h"
 
 typedef struct {
-        uint32_t cursor_idx;
-        uint32_t SIZE;
+        arq_uint32_t cursor_idx;
+        arq_uint32_t SIZE;
         char const *at;
         Arq_Token token;
 } Arq_Lexer;
 
 typedef struct {
         Arq_Lexer lexer;
-        uint32_t idx;
+        arq_uint32_t idx;
 } Arq_LexerOpt;
 
 typedef struct {
         Arq_Lexer lexer;
-        uint32_t state;
+        arq_uint32_t state;
         int argc;
         char **argv;
         int argIdx;

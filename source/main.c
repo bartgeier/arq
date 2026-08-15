@@ -10,8 +10,8 @@
 #include <assert.h>
 
 typedef struct {
-        bool help;
-        uint8_t number;
+        arq_bool_t help;
+        arq_uint8_t number;
 } Context;
 
 void indent_log(void) {
@@ -42,20 +42,20 @@ void fn_nstring(Arq_Queue *queue) {
 }
 
 void fn_uint(Arq_Queue *queue) {
-        uint32_t number = arq_uint(queue);
+        arq_uint32_t number = arq_uint(queue);
         indent_log();
         printf("fn_uint number = %u\n", number);
 }
 
 void fn_int(Arq_Queue *queue) {
-        int32_t number = arq_int(queue);
+        arq_int32_t number = arq_int(queue);
         indent_log();
         printf("fn_int number = %d\n", number);
 }
 
 void fn_print(Arq_Queue *queue) {
-        uint32_t begin = arq_uint(queue);
-        uint32_t end = arq_uint(queue);
+        arq_uint32_t begin = arq_uint(queue);
+        arq_uint32_t end = arq_uint(queue);
         indent_log();
         printf("fn_print begin = %d, end = %d\n", begin, end);
 }
@@ -63,15 +63,15 @@ void fn_print(Arq_Queue *queue) {
 void fn_array(Arq_Queue *queue) {
         printf("fn_array {\n");
         {
-                uint32_t const array_size = arq_array_size(queue);
-                uint32_t i;
+                arq_uint32_t const array_size = arq_array_size(queue);
+                arq_uint32_t i;
                 printf("    numbers array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
                         printf("        argument[%d]: %d\n", i, arq_int(queue));
                 }
         } {
-                uint32_t i;
-                uint32_t const array_size = arq_array_size(queue);
+                arq_uint32_t i;
+                arq_uint32_t const array_size = arq_array_size(queue);
                 printf("\n");
                 printf("    foo array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
@@ -88,15 +88,45 @@ void fn_float(Arq_Queue *queue) {
 }
 
 void fn_test(Arq_Queue *queue) {
-        uint32_t num_0 = arq_uint(queue);
-        uint32_t num_1 = arq_uint(queue);
+        arq_uint32_t num_0 = arq_uint(queue);
+        arq_uint32_t num_1 = arq_uint(queue);
         indent_log();
         printf("fn_test %u %u\n", num_0, num_1);
 }
 
+void fn_help(Arq_Queue *queue);
+
+Arq_Option options[] = {
+        {'h', "help",    fn_help, "()"},
+        {'v', "version", fn_version, "()"},
+        {'s', "string",  fn_string,  "(cstr_t str)"},
+        {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},
+
+        {'u', "uint",    fn_uint,  "(uint number = 324)"},
+        {'U', "UU",      fn_uint,  "(uint number)"}, 
+        {'i', "int",     fn_int,   "( int number = -56)"}, 
+
+        {'p', "print",   fn_print,   "(uint first_line = 0, uint last_line = +1200)"},
+        {'a', "array",   fn_array,   "(int numbers[], cstr_t list[])"},
+
+        {'f', "float",   fn_float,   "(float number = 0.1e0)"}, 
+};
+
+void fn_help(Arq_Queue *queue) {
+        size_t i;
+        (void) queue;
+        printf("help\n");
+        for (i = 0; i < sizeof(options)/sizeof(Arq_Option); i++) {
+                printf("-%c --%s%s\n", options[i].chr, options[i].name, options[i].arguments);
+        }
+        printf("\n");
+        printf("This is a test program, only used by arq developer.\n");
+        printf("\n");
+}
 
 int main(int argc, char **argv) {
         Arq_Option options[] = {
+                {'h', "help",    fn_help, "()"},
                 {'v', "version", fn_version, "()"},
                 {'s', "string",  fn_string,  "(cstr_t str)"},
                 {'n', "nstring", fn_nstring, "(cstr_t str = NULL)"},

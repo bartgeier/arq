@@ -4,7 +4,7 @@
 #include "arq_bool.h"
 #include <stdarg.h>
 char buffer[10000];
-uint32_t const b_size = sizeof(buffer);
+arq_uint32_t const b_size = sizeof(buffer);
 
 void fn_failure(Arq_Queue *queue) {
         (void)queue;
@@ -14,7 +14,7 @@ void test_arq_verify(void) {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, ")"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -24,14 +24,14 @@ void test_arq_verify(void) {
                                 "                 ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "("},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -41,14 +41,14 @@ void test_arq_verify(void) {
                                 "                  ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(  ) sdf"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -58,14 +58,14 @@ void test_arq_verify(void) {
                                 "                      ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(asdf"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -75,7 +75,7 @@ void test_arq_verify(void) {
                                 "                  ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -83,7 +83,7 @@ void test_arq_verify(void) {
                         {'v', "version", fn_failure,  "()"},
                         {'u', "uint",    fn_failure,  "(uint32_t number = 324)"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -93,7 +93,7 @@ void test_arq_verify(void) {
                                 "               ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -101,7 +101,7 @@ void test_arq_verify(void) {
                         {'v', "version", fn_failure,  "()"},
                         {'u', "uint",    fn_failure,  "(uint number = 324 asdf)"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -111,7 +111,7 @@ void test_arq_verify(void) {
                                 "                                 ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -119,7 +119,7 @@ void test_arq_verify(void) {
                         {'v', "version", fn_failure,  "()"},
                         {'u', "uint",    fn_failure,  "(uint number[] xxx"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -129,14 +129,14 @@ void test_arq_verify(void) {
                                 "                             ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint32_t number)"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -146,14 +146,14 @@ void test_arq_verify(void) {
                                 "                  ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -163,14 +163,14 @@ void test_arq_verify(void) {
                                 "                      ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint number = xxx"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -180,14 +180,14 @@ void test_arq_verify(void) {
                                 "                                ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(int number = xxx"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -197,14 +197,14 @@ void test_arq_verify(void) {
                                 "                               ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(float number = xxx"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -214,14 +214,14 @@ void test_arq_verify(void) {
                                 "                                 ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(cstr_t text = xxx"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -231,14 +231,14 @@ void test_arq_verify(void) {
                                 "                                ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint float"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -248,14 +248,14 @@ void test_arq_verify(void) {
                                 "                       ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint, number)"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -265,14 +265,14 @@ void test_arq_verify(void) {
                                 "                      ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint number,)"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -282,14 +282,14 @@ void test_arq_verify(void) {
                                 "                              ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint number = sdf "},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -299,14 +299,14 @@ void test_arq_verify(void) {
                                 "                                ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint number = 99999999999999999999"},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -316,14 +316,14 @@ void test_arq_verify(void) {
                                 "                                ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 Arq_Option options[] = {
                         {'v', "version", fn_failure, "(uint number[ ] = sdf "},
                 };
-                uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+                arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
                 if (0 < arq_verify(buffer, b_size, options, o_size)) {
                         EXPECT_EQ_STR(
                                 buffer,
@@ -333,7 +333,7 @@ void test_arq_verify(void) {
                                 "                             ^\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
 }
@@ -371,21 +371,21 @@ void test_arq_no_parameter(void) {
         Arq_Option options[] = {
                 {'v', "version", fn_no_parameter, "()"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
 
         {
                 set(&cmd, "arq", "-v");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         /* arq_fn returns strlen of error msg */
                         /* printf("%s\n", buffer); */
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_version");
         }
         {
                 set(&cmd, "arq", "--version");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_version");
         }
@@ -399,7 +399,7 @@ void test_arq_no_parameter(void) {
                                 "    Token 'v' is not an option\n"
                         );
                 } else {
-                        EXPECT_FALSE(true);
+                        EXPECT_FALSE(ARQ_TRUE);
                 }
         }
 }
@@ -430,7 +430,7 @@ void test_arq_short_option_bundeling(void) {
                 {'s', "string",    fn_bundeling_string, "(cstr_t string)"},
                 {'o', "optional",  fn_bundeling_number, "(uint number = 42)"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 set(&cmd, "arq", "-vovnr");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -442,41 +442,41 @@ void test_arq_short_option_bundeling(void) {
                                "    -n --number (uint number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 set(&cmd, "arq", "-vorn", "69");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version number 42\nrecursion number 69\n");
         }
         {
                 set(&cmd, "arq", "-vrn", "69");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version recursion number 69\n");
         }
         {
                 set(&cmd, "arq", "-vrn8");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version recursion number 8\n");
         }
         {
                 set(&cmd, "arq", "-vrs", "hello!");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version recursion string hello!\n");
         }
         {
                 set(&cmd, "arq", "-vrshello!");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version recursion string hello!\n");
         }
@@ -492,14 +492,14 @@ void fn_assign_number(Arq_Queue *queue) {
 }
 void fn_assign_3number(Arq_Queue *queue) {
         (void) queue;
-        uint32_t n1 = arq_uint(queue);
-        uint32_t n2 = arq_uint(queue);
-        uint32_t n3 = arq_uint(queue);
+        arq_uint32_t n1 = arq_uint(queue);
+        arq_uint32_t n2 = arq_uint(queue);
+        arq_uint32_t n3 = arq_uint(queue);
         pos += sprintf(result + pos, "number %u %u %u\n", n1, n2, n3);
 }
 void fn_assign_mixed(Arq_Queue *queue) {
-        uint32_t u_nr = arq_uint(queue);
-        int32_t i_nr = arq_int(queue);
+        arq_uint32_t u_nr = arq_uint(queue);
+        arq_int32_t i_nr = arq_int(queue);
         double f_nr = arq_float(queue);
         char const *comment = arq_cstr_t(queue);
         pos += sprintf(result + pos, "u_nr = %u\ni_nr = %d\nf_nr = %f\ncomment = %s\n", u_nr, i_nr, f_nr, comment);
@@ -518,12 +518,12 @@ void test_arq_assignment_operator(void) {
                 {'x', "mixed",     fn_assign_mixed, "(uint u_nr, int i_nr, float f_nr, cstr_t comment)"},
                 {'s', "string",    fn_assign_string, "(cstr_t s1, cstr_t s2)"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 pos = 0;
                 set(&cmd, "arq", "--number=8");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"number 8\n");
         }
@@ -531,7 +531,7 @@ void test_arq_assignment_operator(void) {
                 pos = 0;
                 set(&cmd, "arq", "-n=8");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"number 8\n");
         }
@@ -539,7 +539,7 @@ void test_arq_assignment_operator(void) {
                 pos = 0;
                 set(&cmd, "arq", "-vn=8");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"version number 8\n");
         }
@@ -554,7 +554,7 @@ void test_arq_assignment_operator(void) {
                                 "    Token '--number=' is not an option\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -569,7 +569,7 @@ void test_arq_assignment_operator(void) {
                                 "    -n --number (uint number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -584,7 +584,7 @@ void test_arq_assignment_operator(void) {
                                 "    -n --number (uint number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -598,7 +598,7 @@ void test_arq_assignment_operator(void) {
                                 "    Token '=' is not an option\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
 
         }
@@ -606,7 +606,7 @@ void test_arq_assignment_operator(void) {
                 pos = 0;
                 set(&cmd, "arq", "-x=8=7=6.0=hello");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_TRUE(0 == strcmp(
                         result,
@@ -621,7 +621,7 @@ void test_arq_assignment_operator(void) {
                 pos = 0;
                 set(&cmd, "arq", "--string", "hello", "world");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_TRUE(0 == strcmp(
                         result,
@@ -634,7 +634,7 @@ void test_arq_assignment_operator(void) {
                 pos = 0;
                 set(&cmd, "arq", "--string=hello", "world");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_TRUE(0 == strcmp(
                         result,
@@ -655,7 +655,7 @@ void test_arq_assignment_operator(void) {
                                 "    -s --string (cstr_t s1, cstr_t s2)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -669,32 +669,32 @@ void test_arq_assignment_operator(void) {
                                 "    Token '--fleet' unknown long option \n"   
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
 }
 
 void fn_number32(Arq_Queue *queue) {
-        uint32_t x = arq_uint(queue);
+        arq_uint32_t x = arq_uint(queue);
         sprintf(result, "fn_number32 %u", x);
 }
 void fn_number32_array(Arq_Queue *queue) {
-        uint32_t const array_size = arq_array_size(queue);
-        uint32_t i;
+        arq_uint32_t const array_size = arq_array_size(queue);
+        arq_uint32_t i;
         int pos = sprintf(result, "fn_number32_array %u ", array_size);
         for (i = 0; i < array_size; i++) {
                 pos += sprintf(result + pos, "%u ", arq_uint(queue));
         }
 
 }
-void test_arq_uint32_t(void) {
+void test_arq_arq_uint32_t(void) {
         result[0] = 0;
         Arq_Option options[] = {
                 {'a', "numberA",  fn_number32,  "(uint number)"},
                 {'b', "numberB",  fn_number32,  "(uint number = 324)"},
                 {'c', "numberC",  fn_number32_array,  "(uint number[])"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 set(&cmd, "arq", "--numberA", "sdf");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -706,7 +706,7 @@ void test_arq_uint32_t(void) {
                                 "    -a --numberA (uint number)\n"
                         );
                 } else {
-                        EXPECT_FALSE(true);
+                        EXPECT_FALSE(ARQ_TRUE);
                 }
         }
         {
@@ -721,7 +721,7 @@ void test_arq_uint32_t(void) {
                                 "    -a --numberA (uint number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -735,34 +735,34 @@ void test_arq_uint32_t(void) {
                                 "    -a --numberA (uint number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 set(&cmd, "arq", "--numberA", "123");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_number32 123");
         }
         {
                 set(&cmd, "arq", "--numberA", "0xAa");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_number32 170");
         }
         {
                 set(&cmd, "arq", "--numberB");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_number32 324");
         }
         {
                 set(&cmd, "arq", "--numberB", "0xFFFFFFFF");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_number32 4294967295");
         }
@@ -770,19 +770,19 @@ void test_arq_uint32_t(void) {
                 set(&cmd, "arq", "--numberC", "0xF", "40004", "1", "42");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         printf("%s\n", buffer);
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_number32_array 4 15 40004 1 42 ");
         }
 }
 
 void fn_numberi32(Arq_Queue *queue) {
-        int32_t x = arq_int(queue);
+        arq_int32_t x = arq_int(queue);
         sprintf(result, "fn_numberi32 %d", x);
 }
 void fn_numberi32_array(Arq_Queue *queue) {
-        int32_t const array_size = arq_array_size(queue);
-        int32_t i;
+        arq_int32_t const array_size = arq_array_size(queue);
+        arq_int32_t i;
         int pos = sprintf(result, "fn_numberi32_array %d ", array_size);
         for (i = 0; i < array_size; i++) {
                 pos += sprintf(result + pos, "%d ", arq_int(queue));
@@ -796,7 +796,7 @@ void test_arq_int32_t(void) {
                 {'b', "numberB",  fn_numberi32,  "(int number = -324)"},
                 {'c', "numberC",  fn_numberi32_array,  "(int number[])"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 set(&cmd, "arq", "--numberA", "sdf");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -808,7 +808,7 @@ void test_arq_int32_t(void) {
                                 "    -a --numberA (int number)\n"
                         );
                 } else {
-                        EXPECT_FALSE(true);
+                        EXPECT_FALSE(ARQ_TRUE);
                 }
         }
         {
@@ -822,7 +822,7 @@ void test_arq_int32_t(void) {
                                 "    -a --numberA (int number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -836,7 +836,7 @@ void test_arq_int32_t(void) {
                                 "    -a --numberA (int number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
@@ -850,41 +850,41 @@ void test_arq_int32_t(void) {
                                 "    -a --numberA (int number)\n"
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 set(&cmd, "arq", "--numberA", "-123");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_numberi32 -123");
         }
         {
                 set(&cmd, "arq", "--numberA", "0xAa");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_numberi32 170");
         }
         {
                 set(&cmd, "arq", "--numberB");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_numberi32 -324");
         }
         {
                 set(&cmd, "arq", "--numberB", "0xFFFFFFFF");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_numberi32 -1");
         }
         {
                 set(&cmd, "arq", "--numberC", "0xF", "-40004", "42", "0x80000000");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_numberi32_array 4 15 -40004 42 -2147483648 ");
         }
@@ -895,8 +895,8 @@ void fn_float(Arq_Queue *queue) {
         sprintf(result, "fn_float = %.20f\n", x);
 }
 void fn_float_array(Arq_Queue *queue) {
-        int32_t const array_size = arq_array_size(queue);
-        int32_t i;
+        arq_int32_t const array_size = arq_array_size(queue);
+        arq_int32_t i;
         int pos = sprintf(result, "fn_float_array %d\n", array_size);
         for (i = 0; i < array_size; i++) {
                 pos += sprintf(result + pos, "%.20f\n", arq_float(queue));
@@ -913,7 +913,7 @@ void test_arq_hex_float(void) {
                 {'d', "floatD",  fn_float,       "(float number = -0x23.23p1)"},
                 {'e', "floatE",  fn_float,       "(float number = +0x23.23p1)"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 set(&cmd, "arq", "--floatA", "0xFF");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -925,13 +925,13 @@ void test_arq_hex_float(void) {
                                 "    -a --floatA (float number)\n"
                         );
                 } else {
-                        EXPECT_FALSE(true);
+                        EXPECT_FALSE(ARQ_TRUE);
                 }
         }
         {
                 set(&cmd, "arq", "--floatA", "0xFFFFFFFFFF.AAp0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 } else {
                         EXPECT_EQ_STR(result, "fn_float = 1099511627775.66406250000000000000\n");
                 }
@@ -939,7 +939,7 @@ void test_arq_hex_float(void) {
         {
                 set(&cmd, "arq", "--floatA", "-0x23.23p1");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 } else {
                         EXPECT_EQ_STR(result,"fn_float = -70.27343750000000000000\n");
                 }
@@ -947,21 +947,21 @@ void test_arq_hex_float(void) {
         {
                 set(&cmd, "arq", "--floatB");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = 70.27343750000000000000\n");
         }
         {
                 set(&cmd, "arq", "--floatB", "0x24.23p1");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = 72.27343750000000000000\n");
         }
         {
                 set(&cmd, "arq", "--floatC", "0x1.1p0",  "-0x2.1p0",  "+0xFF.1p5", "0x1.0p0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(
                         "fn_float_array 4\n"
@@ -975,14 +975,14 @@ void test_arq_hex_float(void) {
         {
                 set(&cmd, "arq", "--floatD");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = -70.27343750000000000000\n");
         }
         {
                 set(&cmd, "arq", "--floatE");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = 70.27343750000000000000\n");
         }
@@ -994,7 +994,7 @@ void test_arq_dec_float(void) {
                 {'b', "floatB",  fn_float,       "(float number = 2.0e2)"},
                 {'c', "floatC",  fn_float_array, "(float number[])"},
         };
-        uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
+        arq_uint32_t const o_size = sizeof(options)/sizeof(Arq_Option);
         {
                 set(&cmd, "arq", "--floatA", ".ge0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
@@ -1006,13 +1006,13 @@ void test_arq_dec_float(void) {
                                 buffer
                         );
                 } else {
-                        EXPECT_FALSE(true);
+                        EXPECT_FALSE(ARQ_TRUE);
                 }
         }
         {
                 set(&cmd, "arq", "--floatB");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 } else {
                         EXPECT_EQ_STR(result, "fn_float = 200.00000000000000000000\n");
                 }
@@ -1028,13 +1028,13 @@ void test_arq_dec_float(void) {
                                 buffer
                         );
                 } else {
-                        EXPECT_TRUE(false);
+                        EXPECT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 set(&cmd, "arq", "--floatA", "-1.0e0");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 } else {
                         EXPECT_EQ_STR(
                                 result,
@@ -1052,27 +1052,27 @@ void test_arq_dec_float(void) {
                                 buffer
                         );
                 } else {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
         }
         {
                 set(&cmd, "arq", "--floatB", "-2.0e-2");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result, "fn_float = -0.02000000000000000042\n");
         }
         {
                 set(&cmd, "arq", "--floatB", "1.0e-3");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = 0.00100000000000000002\n");
         }
         {
                 set(&cmd, "arq", "--floatB", "1e-3");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(result,"fn_float = 0.00100000000000000002\n");
         }
@@ -1082,7 +1082,7 @@ void test_arq_dec_float(void) {
                          "1e3", "1E3",  "3.14e-2", "0.5e+1", "25.0e0", "1e2", "1.e2");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         printf("%s\n", buffer);
-                        ASSERT_TRUE(false);
+                        ASSERT_TRUE(ARQ_FALSE);
                 }
                 EXPECT_EQ_STR(
                         "fn_float_array 12\n"

@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 typedef struct {
-    uint32_t id;
+    arq_uint32_t id;
     char const *at;
 } KeyWord;
 
@@ -19,114 +19,114 @@ static KeyWord const key_words[] = {
 };
 
 
-static bool str_eq_keyword(char const *str, uint32_t const str_size, KeyWord const *cstr) {
-        uint32_t i;
+static arq_bool_t str_eq_keyword(char const *str, arq_uint32_t const str_size, KeyWord const *cstr) {
+        arq_uint32_t i;
         if (str_size != strlen(cstr->at)) {
-                return false;
+                return ARQ_FALSE;
         }
         for (i = 0; i < str_size; i++) {
                 if (str[i] != cstr->at[i]) {
-                        return false;
+                        return ARQ_FALSE;
                 }
         }
-        return true;
+        return ARQ_TRUE;
 }
 
-static bool is_identifier(char const chr) {
+static arq_bool_t is_identifier(char const chr) {
         return isalnum(chr) || chr == '_';
 }
 
-static bool identifier_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
+static arq_bool_t identifier_start(Arq_Lexer *l) {
+        arq_uint32_t const idx = l->cursor_idx;
         if (isalpha(l->at[idx]) || l->at[idx] == '_') {
                 l->cursor_idx += 1;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool array_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
+static arq_bool_t array_start(Arq_Lexer *l) {
+        arq_uint32_t const idx = l->cursor_idx;
         if ((idx + 1 < l->SIZE)
         && (l->at[idx] == '[') 
         && (l->at[idx + 1] == ']')) {
                 l->cursor_idx += 2;
-                return true; 
+                return ARQ_TRUE; 
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool hex_start(Arq_Lexer *l) {
-        uint32_t idx = l->cursor_idx;
+static arq_bool_t hex_start(Arq_Lexer *l) {
+        arq_uint32_t idx = l->cursor_idx;
         if (l->at[idx] == '+' || l->at[idx] == '-') {
                 if (idx + 1 == l->SIZE) { 
-                        return false;
+                        return ARQ_FALSE;
                 }
                 idx++;
         }
         if (l->at[idx] != '0') {
-                return false;
+                return ARQ_FALSE;
         }
         if (idx + 1 == l->SIZE) { 
-                return false;
+                return ARQ_FALSE;
         }
         idx++;
         if (l->at[idx] != 'x' && l->at[idx + 1] != 'X') {
-                return false;
+                return ARQ_FALSE;
         }
         if (idx + 1 == l->SIZE) { 
-                return false;
+                return ARQ_FALSE;
         }
         idx++;
         if (!isxdigit(l->at[idx])) {
-                return false;
+                return ARQ_FALSE;
         } 
         l->cursor_idx = idx + 1;
-        return true;
+        return ARQ_TRUE;
 }
 
-static bool has_hex_exponent(char const s) {
+static arq_bool_t has_hex_exponent(char const s) {
     return (s == 'p') || (s == 'P');
 }
 
-static bool p_dec_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
+static arq_bool_t p_dec_start(Arq_Lexer *l) {
+        arq_uint32_t const idx = l->cursor_idx;
         if (isdigit(l->at[idx])) {
                 l->cursor_idx += 1;
-                return true;
+                return ARQ_TRUE;
         } else if (idx + 1 < l->SIZE 
         && l->at[idx] == '+' 
         && isdigit(l->at[idx + 1])) {
                 l->cursor_idx += 2;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool n_dec_start(Arq_Lexer *l) {
-        uint32_t const idx = l->cursor_idx;
+static arq_bool_t n_dec_start(Arq_Lexer *l) {
+        arq_uint32_t const idx = l->cursor_idx;
         if (idx + 1 < l->SIZE 
         && l->at[idx] == '-'
         && isdigit(l->at[idx + 1])) {
                 l->cursor_idx += 2;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool has_dec_exponent(Arq_Lexer *l) {
+static arq_bool_t has_dec_exponent(Arq_Lexer *l) {
         if (l->cursor_idx + 1 < l->SIZE) { 
-                uint32_t const idx = l->cursor_idx;
+                arq_uint32_t const idx = l->cursor_idx;
                 char const chr = l->at[l->cursor_idx];
-                bool isExp = (chr == 'e') || (chr == 'E');
+                arq_bool_t isExp = (chr == 'e') || (chr == 'E');
                 l->cursor_idx++;
                 isExp &= p_dec_start(l) || n_dec_start(l);
                 if (isExp) {
-                        return true;
+                        return ARQ_TRUE;
                 }
                 l->cursor_idx = idx;
         }
-        return false;
+        return ARQ_FALSE;
 }
 #if 1
 static void dec_float(Arq_Lexer *l, Arq_Token *t) {
@@ -189,44 +189,44 @@ static void skip_space(Arq_Lexer *l) {
 /******************************************************************************/
 /******************************************************************************/
 /* cmd_ */
-static bool is_long_identifier(char chr) {
+static arq_bool_t is_long_identifier(char chr) {
         return isalnum(chr) || chr == '-' || chr == '_';
 }
 
-static bool is_short_identifier(char chr) {
+static arq_bool_t is_short_identifier(char chr) {
         return isalpha(chr) || chr == '?';
 }
 
-static bool start_short_identifier(Arq_Lexer *l) {
+static arq_bool_t start_short_identifier(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && is_short_identifier(l->at[l->cursor_idx + 1])) {
                 l->cursor_idx += 2;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool start_long_identifier(Arq_Lexer *l) {
+static arq_bool_t start_long_identifier(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && l->at[l->cursor_idx + 1] == '-'
         && is_long_identifier(l->at[l->cursor_idx + 2])) {
                 l->cursor_idx += 3;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static bool start_dash_dash(Arq_Lexer *l) {
+static arq_bool_t start_dash_dash(Arq_Lexer *l) {
         if (l->at[l->cursor_idx] == '-'
         && l->at[l->cursor_idx + 1] == '-'
         && l->SIZE == 2) {
                 l->cursor_idx += 2;
-                return true;
+                return ARQ_TRUE;
         }
-        return false;
+        return ARQ_FALSE;
 }
 
-static Arq_Token next_token(Arq_Lexer *l, bool has_identifier) {
+static Arq_Token next_token(Arq_Lexer *l, arq_bool_t has_identifier) {
         Arq_Token t = {0};
         skip_space(l);
         t.at = &l->at[l->cursor_idx];
@@ -275,7 +275,7 @@ static Arq_Token next_token(Arq_Lexer *l, bool has_identifier) {
 
         if (has_identifier) {
                 if (identifier_start(l)) {
-                        uint32_t i;
+                        arq_uint32_t i;
                         t.id = ARQ_IDENTFIER; 
                         t.size = &l->at[l->cursor_idx] - t.at;
                         while (l->cursor_idx < l->SIZE && is_identifier(l->at[l->cursor_idx])) {
@@ -425,7 +425,7 @@ static Arq_Token next_token(Arq_Lexer *l, bool has_identifier) {
 }
 
 void arq_lexer_next_opt_token(Arq_LexerOpt *opt) {
-        bool has_identifier = true;
+        arq_bool_t has_identifier = ARQ_TRUE;
         opt->lexer.token = next_token(&opt->lexer, has_identifier);
 }
 
@@ -452,7 +452,7 @@ Arq_LexerOpt arq_lexerOpt_create(void) {
 /******************************************************************************/
 
 static Arq_Token next_cmd_token(Arq_Lexer *lexer) {
-        bool has_identifier = false;
+        arq_bool_t has_identifier = ARQ_FALSE;
         Arq_Token token = next_token(lexer, has_identifier);
 #if 0 
         if (token.id == ARQ_CMD_SHORT_OPTION) {
@@ -492,7 +492,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 cmd->lexer.at = NULL;
                 cmd->lexer.token.at = NULL;
                 cmd->lexer.token.size = 0;
-                cmd->bundeling = false;
+                cmd->bundeling = ARQ_FALSE;
                 return;
         }
 
@@ -512,13 +512,13 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
         }
 
         if (cmd->lexer.cursor_idx < cmd->lexer.SIZE) {
-                cmd->bundeling = true;
+                cmd->bundeling = ARQ_TRUE;
                 return;
         }
         if (cmd->argIdx < cmd->argc) {
                 cmd->argIdx++;
         }
-        cmd->bundeling = false;
+        cmd->bundeling = ARQ_FALSE;
         return;
 }
 #else
@@ -602,7 +602,7 @@ void arq_lexer_next_cmd_token(Arq_LexerCmd *cmd) {
                 cmd->state = 1; /* token */
                 } return;
         default:
-                assert(false);
+                assert(ARQ_FALSE);
                 return;
         }
 }

@@ -6,11 +6,13 @@
 #elif defined(__cplusplus) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* C++, >= C99 */
     #include <stdbool.h>
+    typedef bool arq_bool_t;
 #else
     /* C89 */
-    typedef int bool;
-    #define true 1
-    #define false 0
+    typedef int arq_bool_t;
 #endif
+
+#define ARQ_TRUE  ((arq_bool_t)1)
+#define ARQ_FALSE ((arq_bool_t)0)
 
 #endif

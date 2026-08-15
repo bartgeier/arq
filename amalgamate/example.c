@@ -45,11 +45,11 @@ void fn_optionalstr(Arq_Queue *queue) {
 void fn_cstringarray(Arq_Queue *queue) {
         printf("-a --cstring_array\n");
         {
-                int32_t const number = arq_int(queue);
+                arq_int32_t const number = arq_int(queue);
                 printf("number: %d\n", number);
         } {
-                uint32_t i;
-                uint32_t const array_size = arq_array_size(queue);
+                arq_uint32_t i;
+                arq_uint32_t const array_size = arq_array_size(queue);
                 printf("list array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
                         char const *list = arq_cstr_t(queue);
@@ -60,28 +60,28 @@ void fn_cstringarray(Arq_Queue *queue) {
 }
 
 void fn_uint(Arq_Queue *queue) {
-        uint32_t number = arq_uint(queue);
+        arq_uint32_t number = arq_uint(queue);
         printf("-u --uint\n");
         printf("number = %u\n", number);
         printf("\n");
 }
 
 void fn_uintdefault(Arq_Queue *queue) {
-        uint32_t number = arq_uint(queue);
+        arq_uint32_t number = arq_uint(queue);
         printf("-U --uint-default\n");
         printf("number = %u\n", number);
         printf("\n");
 }
 
 void fn_int(Arq_Queue *queue) {
-        int32_t number = arq_int(queue);
+        arq_int32_t number = arq_int(queue);
         printf("-i --int\n");
         printf("number = %d\n", number);
         printf("\n");
 }
 
 void fn_intdefault(Arq_Queue *queue) {
-        int32_t number = arq_int(queue);
+        arq_int32_t number = arq_int(queue);
         printf("-I --int_default\n");
         printf("number = %d\n", number);
         printf("\n");
@@ -90,8 +90,8 @@ void fn_intdefault(Arq_Queue *queue) {
 void fn_intarray(Arq_Queue *queue) {
         printf("-j --int_array\n");
         {
-                uint32_t i;
-                uint32_t const array_size = arq_array_size(queue);
+                arq_uint32_t i;
+                arq_uint32_t const array_size = arq_array_size(queue);
                 printf("\n");
                 printf("list array_size: %d\n", array_size);
                 for (i = 0; i < array_size; i++) {
@@ -116,16 +116,16 @@ void fn_floatdefault(Arq_Queue *queue) {
 }
 
 void fn_tuple(Arq_Queue *queue) {
-        uint32_t first_line = arq_uint(queue);
-        uint32_t last_line = arq_uint(queue);
+        arq_uint32_t first_line = arq_uint(queue);
+        arq_uint32_t last_line = arq_uint(queue);
         printf("-t --tuple\n");
         printf("first_line = %d\nlast_line = %d\n", first_line, last_line);
         printf("\n");
 }
 
 void fn_mixed(Arq_Queue *queue) {
-        uint32_t u_nr = arq_uint(queue);
-        int32_t i_nr = arq_int(queue);
+        arq_uint32_t u_nr = arq_uint(queue);
+        arq_int32_t i_nr = arq_int(queue);
         double f_nr = arq_float(queue);
         char const *comment = arq_cstr_t(queue);
         printf("-x --mixed\n");
