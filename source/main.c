@@ -21,7 +21,7 @@ void indent_log(void) {
 void fn_version(Arq_Queue *queue) {
         (void) queue;
         indent_log();
-        printf("version 1.1.1 \n");
+        printf("development version 4\n");
 }
 
 void fn_string(Arq_Queue *queue) {

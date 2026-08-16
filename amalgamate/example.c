@@ -9,7 +9,7 @@
 
 void fn_version(Arq_Queue *queue) {
         (void) queue;
-        printf("example version 3\n");
+        printf("example version 4\n");
         printf("\n");
 }
 
