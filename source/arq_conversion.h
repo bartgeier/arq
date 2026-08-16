@@ -6,17 +6,17 @@
 #include "arq_bool.h"
 
 typedef struct {
-        bool error;
-        uint32_t u;
+        arq_bool_t error;
+        arq_uint32_t u;
 } uint_o;
 
 typedef struct {
-        bool error;
-        int32_t i;
+        arq_bool_t error;
+        arq_int32_t i;
 } int_o;
 
 typedef struct {
-        bool error;
+        arq_bool_t error;
         double f;
 } float_o;
 
@@ -30,7 +30,7 @@ typedef union {
 extern "C" {
 #endif
 
-bool token_long_option_eq(Arq_Token const *token, char const *cstr);
+arq_bool_t token_long_option_eq(Arq_Token const *token, char const *cstr);
 
 uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);
 int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const *cstr);

@@ -1183,7 +1183,7 @@ TEST(arq, dec_float) {
                 set(&cmd, "arq", "--floatA", "23.2re1");
                 if (0 < arq_fn(cmd.argc, cmd.argv, buffer, b_size, options, o_size)) {
                         EXPECT_EQ(
-                                strcmp_verbose(buffer,
+                                strcmp(buffer,
                                         "CMD line failure:\n"
                                         "    --floatA 23.2 re1 \n"
                                         "    Token 're1' is not an option\n"

@@ -4,8 +4,8 @@
 #include "arq_int.h"
 
 typedef struct {
-        uint32_t id;
-        uint32_t size;
+        arq_uint32_t id;
+        arq_uint32_t size;
         char const *at;
 } Arq_Token;
 

@@ -17,21 +17,21 @@ typedef struct {
 extern "C" {
 #endif
 
-uint32_t arq_verify(
-        char *arena_buffer, uint32_t const buffer_size,
-        Arq_Option const *options, uint32_t const num_of_options
+arq_uint32_t arq_verify(
+        char *arena_buffer, arq_uint32_t const buffer_size,
+        Arq_Option const *options, arq_uint32_t const num_of_options
 );
 
-uint32_t arq_fn(
+arq_uint32_t arq_fn(
         int argc, char **argv, 
-        char *arena_buffer, uint32_t const buffer_size,
-        Arq_Option const *options, uint32_t const num_of_options
+        char *arena_buffer, arq_uint32_t const buffer_size,
+        Arq_Option const *options, arq_uint32_t const num_of_options
 );
 
 void arq_unused(Arq_Queue *queue);
-uint32_t arq_uint(Arq_Queue *queue);
-uint32_t arq_array_size(Arq_Queue *queue);
-int32_t arq_int(Arq_Queue *queue);
+arq_uint32_t arq_uint(Arq_Queue *queue);
+arq_uint32_t arq_array_size(Arq_Queue *queue);
+arq_int32_t arq_int(Arq_Queue *queue);
 double arq_float(Arq_Queue *queue);
 char const *arq_cstr_t(Arq_Queue *queue);
 

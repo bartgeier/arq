@@ -5,8 +5,8 @@
 #include <assert.h>
 
 Arq_Queue *arq_queue_malloc(Arq_Arena *arena) {
-        uint32_t NUM_OF_ARGUMENTS;
-        uint32_t const shrink_snapshot = arena->size;
+        arq_uint32_t NUM_OF_ARGUMENTS;
+        arq_uint32_t const shrink_snapshot = arena->size;
         Arq_Queue *queue = (Arq_Queue *)arq_arena_malloc_rest(arena, offsetof(Arq_Queue, at), sizeof(Arq_Argument), &NUM_OF_ARGUMENTS);
         queue->shrink = shrink_snapshot;
         queue->NUM_OF_ARGUMENTS = NUM_OF_ARGUMENTS;
@@ -46,13 +46,13 @@ void arq_unused(Arq_Queue *queue) {
         (void)pop(queue);
 }
 
-uint32_t arq_uint(Arq_Queue *queue) {
+arq_uint32_t arq_uint(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_TYPE_UINT);
         return t.value.u32;
 }
 
-uint32_t arq_array_size(Arq_Queue *queue) {
+arq_uint32_t arq_array_size(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_TYPE_ARRAY_SIZE);
         return t.value.u32;
@@ -66,7 +66,7 @@ uint64_t arq_uint64_t(Arq_Queue *queue) {
 }
 #endif
 
-int32_t arq_int(Arq_Queue *queue) {
+arq_int32_t arq_int(Arq_Queue *queue) {
         Arq_Argument t = pop(queue);
         assert(t.type_id == ARQ_TYPE_INT);
         return t.value.i32;
@@ -92,7 +92,7 @@ void arq_push_uint(Arq_Queue *queue, union_o const *x) {
         log_int_uint(&x->ou);
 }
 
-uint32_t *arq_push_array_size(Arq_Queue *queue, uint32_t n) {
+arq_uint32_t *arq_push_array_size(Arq_Queue *queue, arq_uint32_t n) {
         Arq_Argument a;
         a.type_id = ARQ_TYPE_ARRAY_SIZE;
         a.value.u32 = n;

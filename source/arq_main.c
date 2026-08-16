@@ -29,11 +29,11 @@ static void error_msg_append_option(Arq_msg *error_msg, Arq_Option const *o) {
         arq_msg_append_lf(error_msg);
 }
 
-static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd *cmd) {
+static void error_msg_insert_cmd_line(Arq_msg *m, arq_uint32_t line_nr, Arq_LexerCmd *cmd) {
         Arq_Token const token = cmd->lexer.token;
-        uint32_t A_IDX, B_IDX, C_IDX, D_IDX, ARGV_LEN; 
-        uint32_t ln_count = 0;
-        uint32_t i;
+        arq_uint32_t A_IDX, B_IDX, C_IDX, D_IDX, ARGV_LEN; 
+        arq_uint32_t ln_count = 0;
+        arq_uint32_t i;
         log_int_token(cmd->lexer.token.id);
         A_IDX = 0;
         for (i = 0; i < m->size; i++) {
@@ -50,10 +50,10 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         cmd->lexer = arq_lexer_create();
         cmd->state = 0;
         arq_lexer_next_cmd_token(cmd);
-        while(true) {
+        while(ARQ_TRUE) {
                 /* render argv to calculate argv_len */
                 if (cmd->lexer.token.id == ARQ_CMD_SHORT_OPTION) {
-                        uint32_t const x = cmd->lexer.token.at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
+                        arq_uint32_t const x = cmd->lexer.token.at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
                         arq_msg_append_chr(m, cmd->lexer.token.at[0]);
                         arq_msg_append_nchr(m, cmd->lexer.token.at[1], x);
                         arq_msg_append_chr(m, '_');
@@ -74,9 +74,9 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         C_IDX = m->size;
         ARGV_LEN = C_IDX - B_IDX;
         {
-                uint32_t const shift_right = B_IDX - A_IDX;
+                arq_uint32_t const shift_right = B_IDX - A_IDX;
                 for (i = 0; i < shift_right; i++) {
-                        uint32_t const idx = B_IDX - 1 - i;
+                        arq_uint32_t const idx = B_IDX - 1 - i;
                         m->at[idx + ARGV_LEN] = m->at[idx];
                 }
         }
@@ -86,10 +86,10 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
         cmd->lexer = arq_lexer_create();
         cmd->state = 0;
         arq_lexer_next_cmd_token(cmd);
-        while(true) {
+        while(ARQ_TRUE) {
                 /* render argv once more for moving argv */
                 if (cmd->lexer.token.id == ARQ_CMD_SHORT_OPTION) {
-                        uint32_t const x = cmd->lexer.token.at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
+                        arq_uint32_t const x = cmd->lexer.token.at[0] == '-' ? 1 : 0; /* because of short option bundeling  */
                         arq_msg_append_chr(m, cmd->lexer.token.at[0]);
                         arq_msg_append_nchr(m, cmd->lexer.token.at[1], x);
                         arq_msg_append_chr(m, ' ');
@@ -119,7 +119,7 @@ static void error_msg_insert_cmd_line(Arq_msg *m, uint32_t line_nr, Arq_LexerCmd
 }
 
 static void output_error_msg(Arq_msg *error_msg, char *arena_buffer) {
-        uint32_t i;
+        arq_uint32_t i;
         arq_msg_format(error_msg);
         for (i = 0; i < error_msg->size; i++) {
                 arena_buffer[i] = error_msg->at[i];
@@ -128,16 +128,16 @@ static void output_error_msg(Arq_msg *error_msg, char *arena_buffer) {
         assert(arena_buffer[error_msg->size] == 0);
 }
 
-static void call_back_function(Arq_Option const *options, uint32_t option_idx, Arq_Queue *queue) {
+static void call_back_function(Arq_Option const *options, arq_uint32_t option_idx, Arq_Queue *queue) {
         Arq_Option const *option = &options[option_idx];
         option->fn(queue);
         assert(queue->read_idx == queue->write_idx && "Queue is not empty, there are still arguments in the queue!");
         arq_queue_clear(queue);
 }
 
-static uint32_t arq_option_parameter_idx(Arq_Option const *option) {
-        uint32_t STRLEN;
-        uint32_t result = 0;
+static arq_uint32_t arq_option_parameter_idx(Arq_Option const *option) {
+        arq_uint32_t STRLEN;
+        arq_uint32_t result = 0;
         if (option->chr != 0) {
                 result += 3;
         }
@@ -148,20 +148,20 @@ static uint32_t arq_option_parameter_idx(Arq_Option const *option) {
         return result;
 }
 
-uint32_t arq_verify(
-        char *arena_buffer, uint32_t const buffer_size,
-        Arq_Option const *options, uint32_t const num_of_options
+arq_uint32_t arq_verify(
+        char *arena_buffer, arq_uint32_t const buffer_size,
+        Arq_Option const *options, arq_uint32_t const num_of_options
 ) {
         Arq_msg error_msg;
-        uint32_t i;
+        arq_uint32_t i;
         Arq_Arena *arena;
         (void) buffer_size;
 
         arena = arq_arena_init(arena_buffer, buffer_size);
 
         {
-                uint32_t SIZE_OF_ERROR_MSG;
-                uint32_t const shrink = arena->size;
+                arq_uint32_t SIZE_OF_ERROR_MSG;
+                arq_uint32_t const shrink = arena->size;
                 char *chr = (char *)arq_arena_malloc_rest(arena, 0, sizeof(char), &SIZE_OF_ERROR_MSG);
                 arena->size = shrink;
                 error_msg.SIZE = SIZE_OF_ERROR_MSG;
@@ -170,7 +170,7 @@ uint32_t arq_verify(
         }
 
         for (i = 0; i < num_of_options; i++) {
-                bool for_loop_continue = false;
+                arq_bool_t for_loop_continue = ARQ_FALSE;
                 Arq_LexerOpt opt = arq_lexerOpt_create();
                 opt.lexer.at = options[i].arguments;
                 opt.lexer.SIZE = strlen(options[i].arguments);
@@ -235,7 +235,7 @@ uint32_t arq_verify(
                                         arq_msg_append_str(&error_msg, opt.lexer.token.at, opt.lexer.token.size);
                                         arq_msg_append_cstr(&error_msg, "' after ')' no tokens allowed!\n");
                                         if (arq_imm_noToken(&opt.lexer.token)) {
-                                                for_loop_continue = true; 
+                                                for_loop_continue = ARQ_TRUE; 
                                                 break;
                                         } 
                                 }
@@ -250,9 +250,9 @@ uint32_t arq_verify(
                 }
 error:
                 {
-                        uint32_t n;
+                        arq_uint32_t n;
                         uint_o ups; 
-                        ups.error = true; 
+                        ups.error = ARQ_TRUE; 
                         ups.u = opt.lexer.cursor_idx - opt.lexer.token.size;
                         n = arq_option_parameter_idx(&options[i]) + ups.u;
                         error_msg_append_option(&error_msg, &options[i]);
@@ -263,14 +263,14 @@ error:
                 }
 
         } /* for loop */
-        /* assert(false); */
+        /* assert(ARQ_FALSE); */
         return 0;
 }
 
-uint32_t arq_fn(
+arq_uint32_t arq_fn(
         int argc, char **argv, 
-        char *arena_buffer, uint32_t const buffer_size,
-        Arq_Option const *options, uint32_t const num_of_options
+        char *arena_buffer, arq_uint32_t const buffer_size,
+        Arq_Option const *options, arq_uint32_t const num_of_options
 ) {
         Arq_LexerCmd cmd = arq_lexerCmd_create(argc, argv);
         Arq_LexerOpt opt;
@@ -290,7 +290,7 @@ uint32_t arq_fn(
         log_memory(("Arena     %5d %10d %10s", (int)offsetof(Arq_Arena, at), arena->SIZE, "-"));
 
         {
-                uint32_t SIZE_OF_ERROR_MSG = 500;
+                arq_uint32_t SIZE_OF_ERROR_MSG = 500;
                 error_msg.at = (char *)arq_arena_malloc(arena, SIZE_OF_ERROR_MSG);
                 error_msg.SIZE = SIZE_OF_ERROR_MSG;
                 error_msg.size = 0;
@@ -349,7 +349,7 @@ uint32_t arq_fn(
                 }
                 arq_lexer_next_opt_token(&opt);
                 (void)arq_imm(ARQ_OP_L_PARENTHESIS, &opt);
-                while (true) {
+                while (ARQ_TRUE) {
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -384,10 +384,10 @@ uint32_t arq_fn(
                                         arq_push_cstr_t(queue, cstr);
                                 } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
                                         struct {
-                                                bool on;
-                                                bool edge;
+                                                arq_bool_t on;
+                                                arq_bool_t edge;
                                         } dashdash = {0};
-                                        uint32_t *array_size = arq_push_array_size(queue, 0);
+                                        arq_uint32_t *array_size = arq_push_array_size(queue, 0);
                                         log_inta(("u32 %u // init array_size", *array_size));
                                         while (1) {
                                                 dashdash.on |= arq_imm_cmd_is_dashdash(&cmd);
@@ -475,7 +475,7 @@ uint32_t arq_fn(
                                 }
                                 imm.PUSH(queue, &x);
                         } else if (arq_imm(ARQ_OP_ARRAY, &opt)) {
-                                uint32_t *array_size = arq_push_array_size(queue, 0);
+                                arq_uint32_t *array_size = arq_push_array_size(queue, 0);
                                 log_inta(("u32 %u // init array_size", *array_size));
                                 while (imm.IS_LITERAL_TYPE(&cmd)) {
                                         union_o x = {0};
@@ -494,7 +494,7 @@ uint32_t arq_fn(
                                 arq_msg_clear(&error_msg);
                                 x = imm.ARGUMENT(&cmd, &error_msg);
                                 if (error_msg.size > 0) { 
-                                        /* wasn't an uint32_t number or overflow */
+                                        /* wasn't an arq_uint32_t number or overflow */
                                         error_msg_insert_cmd_line(&error_msg, 1, &cmd);
                                         error_msg_append_option(&error_msg, &options[opt.idx]);
                                         output_error_msg(&error_msg, arena_buffer);
@@ -509,7 +509,7 @@ terminator:
                                 call_back_function(options, opt.idx, queue);
                                 break;
                         }
-                        assert(false);
+                        assert(ARQ_FALSE);
                 } /* while */
         } /* while */
         arena_buffer[0] = 0;

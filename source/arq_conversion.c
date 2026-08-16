@@ -5,23 +5,23 @@
 #include <stdio.h>
 #include <math.h>
 
-bool token_long_option_eq(Arq_Token const *token, char const *cstr) {
-        uint32_t i;
+arq_bool_t token_long_option_eq(Arq_Token const *token, char const *cstr) {
+        arq_uint32_t i;
         if (strlen(cstr) != token->size - 2) {
-                return false;
+                return ARQ_FALSE;
 
         }
         for (i = 2; i < token->size; i++) {
                 if (cstr[i - 2] != token->at[i]) {
-                        return false;
+                        return ARQ_FALSE;
                 }
         }
-        return true;
+        return ARQ_TRUE;
 }
 
 uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint_o result = {0};
-        uint32_t i;
+        arq_uint32_t i;
         assert(token->id == ARQ_P_DEC);
         if (token->at[0] == '+') {
                 i = 1;
@@ -29,12 +29,12 @@ uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char con
                 i = 0;
         }
         for (; i < token->size; i++) {
-                uint32_t digit = token->at[i] - '0';
-                if (result.u > (UINT32_MAX - digit) / 10) {
+                arq_uint32_t digit = token->at[i] - '0';
+                if (result.u > (ARQ_UINT32_MAX - digit) / 10) {
                         if (error_msg != NULL) {
                                 Arq_Token tok = *token;
                                 char buffer[12];
-                                sprintf(buffer, "%" PRIu32, UINT32_MAX);
+                                sprintf(buffer, "%" ARQ_PRIu32, ARQ_UINT32_MAX);
                                 arq_msg_clear(error_msg);
                                 arq_msg_append_cstr(error_msg, cstr);
                                 /*arq_msg_append_cstr(error_msg, "Token '");*/
@@ -43,7 +43,7 @@ uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char con
                                 arq_msg_append_cstr(error_msg, buffer);
                                 arq_msg_append_lf(error_msg);
                         }
-                        result.error = true;
+                        result.error = ARQ_TRUE;
                         return result;
                 }
                 result.u = result.u * 10 + digit;
@@ -53,8 +53,8 @@ uint_o arq_tok_pDec_to_uint(Arq_Token const *token, Arq_msg *error_msg, char con
 
 int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         int_o result = {0};
-        int32_t SIGN;
-        uint32_t i;
+        arq_int32_t SIGN;
+        arq_uint32_t i;
         assert(token->id == ARQ_P_DEC || token->id == ARQ_N_DEC);
 
         if (token->at[0] == '-') {
@@ -71,15 +71,15 @@ int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const
 
         for (; i < token->size; i++) {
                 char const ch = token->at[i];
-                int32_t const digit = ch - '0';
+                arq_int32_t const digit = ch - '0';
 
                 if (SIGN > 0) {
-                        if (result.i > (INT32_MAX - digit) / 10) {
-                                result.error = true;
+                        if (result.i > (ARQ_INT32_MAX - digit) / 10) {
+                                result.error = ARQ_TRUE;
                                 if (error_msg != NULL) {
                                         Arq_Token tok = *token;
                                         char buffer[12];
-                                        sprintf(buffer, "%" PRId32, INT32_MAX);
+                                        sprintf(buffer, "%" ARQ_PRId32, ARQ_INT32_MAX);
                                         arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, cstr);
                                         arq_msg_append_str(error_msg, tok.at, tok.size);
@@ -91,12 +91,12 @@ int_o arq_tok_sDec_to_int(Arq_Token const *token, Arq_msg *error_msg, char const
                         }
                         result.i = result.i * 10 + digit;
                 } else {
-                        if (result.i < (INT32_MIN + digit) / 10) {
-                                result.error = true;
+                        if (result.i < (ARQ_INT32_MIN + digit) / 10) {
+                                result.error = ARQ_TRUE;
                                 if (error_msg != NULL) {
                                         Arq_Token tok = *token;
                                         char buffer[12];
-                                        sprintf(buffer, "%" PRId32, INT32_MIN);
+                                        sprintf(buffer, "%" ARQ_PRId32, ARQ_INT32_MIN);
                                         arq_msg_clear(error_msg);
                                         arq_msg_append_cstr(error_msg, cstr);
                                         arq_msg_append_str(error_msg, tok.at, tok.size);
@@ -125,14 +125,14 @@ static int decval(char c) {
 
 uint_o arq_tok_hex_to_uint(Arq_Token const *token, Arq_msg *error_msg, char const *cstr) {
         uint_o result = {0};
-        uint32_t i;
+        arq_uint32_t i;
         assert(token->id == ARQ_HEX);
         for (i = 2; i < token->size; i++) {
                 char const ch = token->at[i];
                 int const digit = hexval(ch);
                 assert(digit >= 0);
-                if (result.u > (UINT32_MAX - digit) / 10) {
-                        result.error = true;
+                if (result.u > (ARQ_UINT32_MAX - digit) / 10) {
+                        result.error = ARQ_TRUE;
                         if (error_msg != NULL) {
                                 Arq_Token tok = *token;
                                 arq_msg_clear(error_msg);
@@ -178,7 +178,7 @@ float_o arq_tok_decFloat_to_float(Arq_Token const *token) {
         int exp10 = 0;
         int exp_sign = 1;
 
-        uint32_t i = 0;
+        arq_uint32_t i = 0;
 
         assert(token->id == ARQ_DEC_FLOAT);
 
@@ -242,12 +242,12 @@ float_o arq_tok_decFloat_to_float(Arq_Token const *token) {
                 }
                 if (exp_sign > 0 && exp10 > 1200) {
                         result.f = HUGE_VAL; /* INFINITY */
-                        result.error = false;
+                        result.error = ARQ_FALSE;
                         return result;
                 }
                 if (exp_sign < 0 && exp10 > 1200) {
                         result.f = 0.0;
-                        result.error = false;
+                        result.error = ARQ_FALSE;
                         return result;
                 }
         }
@@ -255,7 +255,7 @@ float_o arq_tok_decFloat_to_float(Arq_Token const *token) {
         /* scale by value * 10^exp10 */
         {
                 result.f = value * arq_pow(10.0, (double)(exp_sign * exp10));
-                result.error = false;
+                result.error = ARQ_FALSE;
                 return result;
         }
 }
@@ -267,7 +267,7 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         int exp_sign = 1;
         int frac_sign;
 
-        uint32_t i = 0;
+        arq_uint32_t i = 0;
 
         if (token->at[i] == '-') {
                 frac_sign = -1;
@@ -329,12 +329,12 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
                 }
                 if (exp_sign > 0 && exp10 > 1200) {
                         result.f = HUGE_VAL; /* INFINITY */
-                        result.error = false;
+                        result.error = ARQ_FALSE;
                         return result;
                 }
                 if (exp_sign < 0 && exp10 > 1200) {
                         result.f = 0.0;
-                        result.error = false;
+                        result.error = ARQ_FALSE;
                         return result;
                 }
         }
@@ -343,7 +343,7 @@ float_o arq_tok_hexFloat_to_float(Arq_Token const *token) {
         {
                 int final_exp = exp_sign * exp10;
                 result.f = frac_sign * ldexp(value, final_exp);
-                result.error = false;
+                result.error = ARQ_FALSE;
                 return result;
         }
 }
