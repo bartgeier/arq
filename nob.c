@@ -5,13 +5,54 @@
 #include "nob.h"
 
 #define BUILD_DIR "build"
+#define TOOLS_DIR "tools"
 
-bool create_build_dir(bool const clean) {
+bool mkdir_build_tools(bool const clean) {
         if (clean) {
+                nob_remove(TOOLS_DIR);
                 return nob_remove(BUILD_DIR);
         }
-        return nob_mkdir_if_not_exists(BUILD_DIR);
+        bool ok = nob_mkdir_if_not_exists(TOOLS_DIR);
+        ok &= nob_mkdir_if_not_exists(BUILD_DIR);
+        printf("\n");
+        return ok;
 }
+
+bool download_tools_cgtest(bool const clean) {
+        if (clean) {
+                return true;
+        }
+        bool ok = true;
+        if (!nob_file_exists("tools/cgtest")) { 
+                printf("-----------------------------------------------------------------\n");
+                ok &= nob_mkdir_if_not_exists("tools/cgtest");
+                printf("\n");
+        }
+        if (!nob_file_exists("tools/cgtest/cgtest.c")) { 
+                Nob_Cmd cmd = {0};
+                nob_cmd_append(&cmd, "curl");
+                nob_cmd_append(&cmd, "-L");
+                nob_cmd_append(&cmd, "https://github.com/bartgeier/cgtest/raw/refs/tags/v0.1.3/cgtest.c");
+                nob_cmd_append(&cmd, "--output", "tools/cgtest/cgtest.c");
+                ok &= nob_cmd_run_sync(cmd);
+                cmd.count = 0;
+                printf("\n");
+        }
+        if (!nob_file_exists("build/cgtest")) { 
+                nob_log(NOB_INFO, "build_cgtest");
+                Nob_Cmd cmd = {0};
+                nob_cmd_append(&cmd, "gcc");
+                nob_cmd_append(&cmd, "tools/cgtest/cgtest.c");
+                nob_cmd_append(&cmd, "-o");
+                nob_cmd_append(&cmd, "build/cgtest");
+                ok &= nob_cmd_run_sync(cmd);
+                cmd.count = 0;
+                printf("-----------------------------------------------------------------\n");
+                printf("\n");
+        }
+        return ok;
+}
+
 
 Nob_Cmd include_paths = {0};
 void create_include_paths(void) {
@@ -36,6 +77,8 @@ bool arq_build(bool const clean) {
         if (clean) {
                 return true;
         }
+        printf("-----------------------------------------------------------------\n");
+        uint64_t t_start = nob_millis();
         nob_log(NOB_INFO, "BUILD: arq ----> cmd line argument library");
         Nob_Cmd c_compiler = {0};
         //nob_cmd_append(&cmd, "gcc", "-O0", "-ggdb", "-pedantic");
@@ -100,21 +143,28 @@ bool arq_build(bool const clean) {
 
         nob_cmd_free(c_compiler);
         nob_cmd_free(cmd);
+        nob_log(NOB_INFO ,"Successful done! %llu ms", nob_millis() - t_start);
+        printf("-----------------------------------------------------------------\n");
+        printf("\n");
         return ok;
 }
 
-void amalgamate_arq(void) {
+bool amalgamate_arq(const bool clean) {
+        if (clean) {
+                return true;
+        }
+        printf("-----------------------------------------------------------------\n");
 #if 1
         {
                 FILE *file_r = fopen("LICENSE", "r");
                 if (!file_r) {
                         perror("Failed to open LICENSE");
-                        return;
+                        return false;
                 }
                 FILE *file_w = fopen("build/license.h", "w");
                 if (!file_w) {
                         perror("Failed to open file");
-                        return;
+                        return false;
                 }
                 fprintf(file_w, "#if 1\n/*\n");
                 char line[1024];
@@ -134,6 +184,7 @@ void amalgamate_arq(void) {
                 nob_cmd_append(&cmd, "amalgamate", "source/amalgamate.c", "amalgamate/arq.h", "-i", "source");
                 bool ok = nob_cmd_run_sync(cmd);
         }
+        printf("\n");
         {
                 Nob_Cmd c_compiler = {0};
                 nob_cmd_append(&c_compiler, "gcc", "-std=c89", // "-DARQ_LOG_TOKENIZER", 
@@ -149,147 +200,23 @@ void amalgamate_arq(void) {
                 nob_cmd_append(&cmd, "-I", "./amalgamate");
                 nob_cmd_run_sync(cmd);
         }
+        printf("-----------------------------------------------------------------\n");
+        printf("\n");
+        return true; // ok
 }
 
-bool download_build_googleTest(bool const clean) {
-        #if 1
-                #define GTEST_URL "https://github.com/google/googletest/archive/refs/heads/"
-                #define GTEST_COMMIT "main"
-        #else
-                #define GTEST_URL "https://github.com/google/googletest/archive/"
-                #define GTEST_COMMIT "76bb2afb8b522d24496ad1c757a49784fbfa2e42"
-        #endif
-        bool ok = true;
-        if (clean) {
-                ok &= nob_remove("googletest.zip");
-                ok &= nob_remove("googletest-"GTEST_COMMIT);
-                ok &= nob_remove("googletest");
-                return ok;
-        }
-        if (nob_file_exists("googletest")) return true;
-        nob_log(NOB_INFO, "DOWNLOAD BUILD: googletest");
-        Nob_Cmd cmd = {0};
-        nob_cmd_append(&cmd, "curl");
-        nob_cmd_append(&cmd, "-L");
-        nob_cmd_append(&cmd,GTEST_URL GTEST_COMMIT".zip");
-        nob_cmd_append(&cmd, "--output", "googletest.zip");
-        ok &= nob_cmd_run_sync(cmd);
-        cmd.count = 0;
-        #ifdef _WIN32
-                nob_log(NOB_INFO,"xxxxx unzip with tar xxxxx");
-                nob_cmd_append(&cmd, "tar", "-xvzf", "googletest.zip");
-        #else
-                nob_cmd_append(&cmd, "unzip", "googletest.zip");                
-        #endif
-        ok &= nob_cmd_run_sync(cmd);
-        cmd.count = 0;
-        ok &= nob_remove("googletest.zip");
-        ok &= nob_mkdir_if_not_exists("googletest-"GTEST_COMMIT"/build");
-        #ifdef _WIN32
-                nob_cmd_append(&cmd, "cmake");
-                nob_cmd_append(&cmd, "-DCMAKE_CXX_COMPILER=g++");
-                nob_cmd_append(&cmd, "-DCMAKE_CC_COMPILER=gcc");
-                nob_cmd_append(&cmd, "-DCMAKE_MAKE_PROGRAM=mingw32-make");
-                nob_cmd_append(&cmd, "-G", "MinGW Makefiles");
-                nob_cmd_append(&cmd, "-Hgoogletest-"GTEST_COMMIT);
-                nob_cmd_append(&cmd, "-DBUILD_SHARED_LIBS=OFF", "-DBUILD_GMOCK=OFF");
-                nob_cmd_append(&cmd, "-Bgoogletest-"GTEST_COMMIT"/build");
-                ok &= nob_cmd_run_sync(cmd);
-                cmd.count = 0;
-
-                nob_cmd_append(&cmd, "mingw32-make", "-C", "googletest-"GTEST_COMMIT"/build");
-                ok &= nob_cmd_run_sync(cmd);
-                cmd.count = 0;
-        #else       
-                nob_cmd_append(&cmd, "cmake");
-                nob_cmd_append(&cmd, "-Hgoogletest-"GTEST_COMMIT);
-                nob_cmd_append(&cmd, "-DBUILD_SHARED_LIBS=OFF", "-DBUILD_GMOCK=OFF", "-Dgtest_disable_pthreads=ON");
-                nob_cmd_append(&cmd, "-Bgoogletest-"GTEST_COMMIT"/build");
-                ok &= nob_cmd_run_sync(cmd);
-                cmd.count = 0;
-
-                nob_cmd_append(&cmd, "make", "-C", "googletest-"GTEST_COMMIT"/build");                
-                ok &= nob_cmd_run_sync(cmd);
-                cmd.count = 0;
-        #endif  
-        nob_cmd_free(cmd);
-        ok &= nob_mkdir_if_not_exists("googletest");
-        ok &= nob_mkdir_if_not_exists("googletest/build");
-        ok &= nob_mkdir_if_not_exists("googletest/include");
-        ok &= nob_rename("googletest-"GTEST_COMMIT"/LICENSE", "googletest/LICENSE");
-        ok &= nob_rename("googletest-"GTEST_COMMIT"/build/lib", "googletest/build/lib/");
-        ok &= nob_rename("googletest-"GTEST_COMMIT"/googletest/include/gtest", "googletest/include/gtest/");
-        ok &= nob_remove("googletest-"GTEST_COMMIT);
-        return ok;
-}
-
-#if 1
-bool unittests_build(bool const clean) {
+bool cgtest_run(bool const clean) {
         if (clean) {
                 return true;
         }
         bool ok = true;
-        nob_log(NOB_INFO, "BUILD: otest ----> unit tests");
         Nob_Cmd cmd = {0};
-        nob_cmd_append(
-                &cmd, 
-                //"g++", "-ggdb", "-O0", "-std=c++20",
-                "g++", "-O0", "-std=c++20",
-                "-Wall", "-Wextra", "-pedantic",
-                "-Wno-parentheses", "-Wno-missing-field-initializers"
-        );
-        nob_cmd_append(&cmd, "-I", "googletest/include/"); 
-        nob_cmd_append(&cmd, "-I", "source/"); 
-        nob_cmd_append(&cmd, "-L", "googletest/build/lib/");
-        nob_cmd_append(&cmd, "-o", "build/test");
-        nob_cmd_append(&cmd, "./source/arq_main.c");
-        nob_cmd_append(&cmd, "./source/arq_symbols.c");
-        nob_cmd_append(&cmd, "./source/arq_queue.c");
-        nob_cmd_append(&cmd, "./source/arq_lexer.c");
-        nob_cmd_append(&cmd, "./source/arq_conversion.c");
-        nob_cmd_append(&cmd, "./source/arq_msg.c");
-        nob_cmd_append(&cmd, "./source/arq_arena.c");
-        nob_cmd_append(&cmd, "./source/arq_immediate.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq_arena.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq_queue.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq.c");
-        nob_cmd_append(&cmd, "-lgtest", "-lgtest_main");
+        nob_cmd_append( &cmd, "build/cgtest", "--run", "unittests/cgtest", "--time");
         ok &= nob_cmd_run_sync(cmd);
         cmd.count = 0;
         nob_cmd_free(cmd);
         return ok;
 }
-#else
-bool unittests_build(bool const clean) {
-        if (clean) {
-                return true;
-        }
-        bool ok = true;
-        nob_log(NOB_INFO, "BUILD: otest ----> unit tests");
-        Nob_Cmd cmd = {0};
-        nob_cmd_append(
-                &cmd, 
-                "g++", "-ggdb", "-O0", "-std=c++20",
-                "-Wall", "-Wextra", "-pedantic",
-                "-Wno-parentheses", "-Wno-missing-field-initializers"
-        );
-        nob_cmd_append(&cmd, "-I", "googletest/include/"); 
-        nob_cmd_append(&cmd, "-I", "source/"); 
-        nob_cmd_append(&cmd, "-L", "googletest/build/lib/");
-        nob_cmd_append(&cmd, "-o", "build/test");
-        nob_cmd_append(&cmd, "source/arq_arena.c");
-        nob_cmd_append(&cmd, "source/arq_queue.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq_arena.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq_queue.c");
-        nob_cmd_append(&cmd, "unittests/tst_arq.c");
-        nob_cmd_append(&cmd, "-lgtest", "-lgtest_main");
-        ok &= nob_cmd_run_sync(cmd);
-        cmd.count = 0;
-        nob_cmd_free(cmd);
-        return ok;
-}
-
-#endif
 
 int main(int argc, char **argv) {
         bool ok = true;
@@ -301,6 +228,7 @@ int main(int argc, char **argv) {
                 }
         #else
                 ok &= nob_remove("nob.old");
+                printf("\n");
         #endif 
 
         struct {
@@ -310,27 +238,21 @@ int main(int argc, char **argv) {
                 char const *s = nob_shift_args(&argc, &argv);
                 if (strcmp(s, "clean") == 0) flag.clean = true;
         }
-        ok &= create_build_dir(flag.clean);
-        ok &= download_build_googleTest(flag.clean);        
+
+        ok &= mkdir_build_tools(flag.clean);
+        ok &= download_tools_cgtest(flag.clean);        
 
         create_source_paths();
         create_include_paths();
         ok &= arq_build(flag.clean);
 
-        #if 1
-            printf("\n");
-            printf("\n");
-            uint64_t t_start = nob_millis();
-            ok &= unittests_build(flag.clean); 
-            nob_log(NOB_INFO ,"Successful done! %llu ms\n", nob_millis() - t_start);
-            printf("\n");
-            printf("\n");
-        #endif
+        ok &= amalgamate_arq(flag.clean);
+
+        ok &= cgtest_run(flag.clean); 
 
         if (!ok) {
-                nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n", nob_millis() - t_start);
+                nob_log(NOB_ERROR, "Done  => One or more errors occurred! %llu ms\n");
                 return false;
         }
-        amalgamate_arq();
         return  0;
 }
