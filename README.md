@@ -355,4 +355,6 @@ in practice what is really needed is a clean set of functions that handle comman
 
 ## Final thoughts
 As always:  
-We only discover the correct design at the end of a project.
+We only discover the correct design at the end of a project.  
+> **Authorship:** All source code in this repository was written by hand.  
+> The README was drafted with AI assistance and then edited and shortened by hand.
